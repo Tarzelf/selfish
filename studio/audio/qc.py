@@ -96,15 +96,35 @@ def _stereo_correlation(stereo: np.ndarray) -> float:
 
 
 def _hf_energy_ratio(stereo: np.ndarray, rate: int, split_hz: float = 8000.0) -> float:
-    """Fraction of spectral energy above `split_hz` — a proxy for ASMR detail."""
+    """Fraction of spectral energy above `split_hz` — a proxy for ASMR detail.
+
+    Averaged across the whole file rather than measured on the opening. The first
+    thirty seconds of an intimate episode are typically its quietest and most
+    whispered passage, so judging detail there measures the least representative
+    part of the render.
+    """
     mono = stereo.mean(axis=1)
-    n = min(mono.size, rate * 30)
-    spectrum = np.abs(np.fft.rfft(mono[:n] * np.hanning(n))) ** 2
-    freqs = np.fft.rfftfreq(n, 1.0 / rate)
-    total = spectrum.sum()
+    if mono.size == 0:
+        return 0.0
+
+    segment = min(mono.size, rate * 4)
+    window = np.hanning(segment)
+    freqs = np.fft.rfftfreq(segment, 1.0 / rate)
+    high_band = freqs >= split_hz
+
+    accumulated = np.zeros(freqs.size)
+    count = 0
+    for start in range(0, mono.size - segment + 1, segment):
+        block = mono[start : start + segment] * window
+        accumulated += np.abs(np.fft.rfft(block)) ** 2
+        count += 1
+    if count == 0:
+        accumulated = np.abs(np.fft.rfft(mono[:segment] * window[: mono.size])) ** 2
+
+    total = accumulated.sum()
     if total <= 0:
         return 0.0
-    return float(spectrum[freqs >= split_hz].sum() / total)
+    return float(accumulated[high_band].sum() / total)
 
 
 def check_render(
@@ -113,6 +133,7 @@ def check_render(
     target: MasterTarget | None = None,
     expect_binaural: bool = True,
     max_expected_silence_s: float = 1.5,
+    expect_lateral: bool = True,
 ) -> QcReport:
     """Inspect a finished render.
 
@@ -120,6 +141,11 @@ def check_render(
     creates deliberately long pauses. Without it this check flags every slow-burn
     episode as having a dropped line, and a gate that cries wolf gets ignored —
     which would cost us the genuinely missing lines it exists to catch.
+
+    `expect_lateral` must be cleared for renders placed dead ahead. A genuinely
+    centred source produces channel correlation of exactly 1.0, which is
+    indistinguishable by this measure from a binaural render that collapsed — so
+    the caller, which knows the placement, has to say which it is.
     """
     target = target or MasterTarget(rate=rate)
     report = QcReport()
@@ -182,9 +208,14 @@ def check_render(
     elif silence > max_expected_silence_s:
         report.warn(f"{silence:.1f}s of near-silence")
 
-    if expect_binaural and corr > 0.98:
+    if expect_binaural and expect_lateral and corr > 0.98:
         report.fail(
             f"channel correlation {corr:.3f} — the binaural image has collapsed to mono"
+        )
+    elif expect_binaural and not expect_lateral and corr > 0.98:
+        report.warn(
+            f"channel correlation {corr:.3f}, consistent with the declared centred "
+            "placement; spatial collapse cannot be detected for centred renders"
         )
 
     if not expect_binaural and mono_fold < -3.0:
@@ -202,48 +233,193 @@ def check_render(
     return report
 
 
+_CONTRACTIONS = {
+    "i'm": "i am", "im": "i am",
+    "you're": "you are", "youre": "you are",
+    "we're": "we are", "they're": "they are",
+    "it's": "it is", "its": "it is",
+    "that's": "that is", "thats": "that is",
+    "there's": "there is", "theres": "there is",
+    "here's": "here is", "what's": "what is",
+    "let's": "let us", "lets": "let us",
+    "don't": "do not", "dont": "do not",
+    "doesn't": "does not", "didn't": "did not",
+    "won't": "will not", "wouldn't": "would not",
+    "can't": "can not", "cant": "can not", "cannot": "can not",
+    "couldn't": "could not", "shouldn't": "should not",
+    "isn't": "is not", "aren't": "are not",
+    "wasn't": "was not", "weren't": "were not",
+    "haven't": "have not", "hasn't": "has not", "hadn't": "had not",
+    "i'll": "i will", "you'll": "you will", "we'll": "we will",
+    "i've": "i have", "you've": "you have", "we've": "we have",
+    "i'd": "i would", "you'd": "you would",
+    "nothin": "nothing", "somethin": "something", "goin": "going",
+    "gonna": "going to", "wanna": "want to", "kinda": "kind of",
+    "gotta": "got to", "ya": "you", "yeah": "yes", "yep": "yes",
+    "ok": "okay",
+}
+
+_NUMBERS = {
+    "0": "zero", "1": "one", "2": "two", "3": "three", "4": "four",
+    "5": "five", "6": "six", "7": "seven", "8": "eight", "9": "nine",
+    "10": "ten",
+}
+
+
+def _normalise_for_alignment(text: str) -> list[str]:
+    """Normalise so that trivial ASR spelling choices are not counted as errors.
+
+    Without contraction expansion, an ASR system writing "there's" where the
+    script says "there is" registers as an error. Measured on a real example, two
+    such differences in a 28-word passage produced a 14.3% word error rate and
+    failed a 5% gate — so the gate as originally written would have rejected good
+    renders while a genuinely mangled one slipped past.
+    """
+    lowered = text.lower().replace("’", "'")
+    kept = "".join(c if (c.isalnum() or c.isspace() or c == "'") else " " for c in lowered)
+
+    words: list[str] = []
+    for token in kept.split():
+        token = token.strip("'")
+        expanded = _CONTRACTIONS.get(token, _NUMBERS.get(token, token))
+        words.extend(expanded.split())
+    return words
+
+
+def _levenshtein(ref: list[str], hyp: list[str]) -> int:
+    prev = list(range(len(hyp) + 1))
+    for i, r in enumerate(ref, start=1):
+        cur = [i] + [0] * len(hyp)
+        for j, h in enumerate(hyp, start=1):
+            cur[j] = min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (0 if r == h else 1))
+        prev = cur
+    return prev[len(hyp)]
+
+
+def _errors_per_reference_word(
+    ref: list[str], hyp: list[str], band: int | None = None
+) -> list[float]:
+    """Align once, globally, and attribute each error to a reference position.
+
+    Windowed error rates need to know *where* the errors are, and two simpler
+    approaches both failed:
+
+    - Comparing each reference window against a wide hypothesis span charges for
+      every hypothesis word outside the window, scoring a perfect window at 100%.
+    - Letting each window match the best substring anywhere nearby lets repeated
+      phrasing match the wrong copy — and this genre repeats endearments and
+      refrains constantly, so a mangled passage was found "clean" because an
+      identical passage sat 50 words away.
+
+    A single banded global alignment fixes both: errors are attributed to actual
+    positions, and the band prevents matching a distant duplicate.
+    """
+    n, m = len(ref), len(hyp)
+    if n == 0:
+        return []
+    if m == 0:
+        return [1.0] * n
+
+    if band is None:
+        band = max(64, abs(n - m) + 64)
+
+    inf = float("inf")
+    # cost[j] over the banded window, plus backpointers for traceback.
+    cost = [[inf] * (m + 1) for _ in range(n + 1)]
+    back = [[0] * (m + 1) for _ in range(n + 1)]
+    cost[0][0] = 0
+    for j in range(1, min(m, band) + 1):
+        cost[0][j] = j
+        back[0][j] = 2  # insertion
+    for i in range(1, n + 1):
+        lo = max(1, i - band)
+        hi = min(m, i + band)
+        if lo == 1:
+            cost[i][0] = i
+            back[i][0] = 1  # deletion
+        for j in range(lo, hi + 1):
+            sub = cost[i - 1][j - 1] + (0 if ref[i - 1] == hyp[j - 1] else 1)
+            dele = cost[i - 1][j] + 1
+            ins = cost[i][j - 1] + 1
+            best = min(sub, dele, ins)
+            cost[i][j] = best
+            back[i][j] = 0 if best == sub else (1 if best == dele else 2)
+
+    errors = [0.0] * n
+    i, j = n, m
+    while i > 0 or j > 0:
+        if i > 0 and j > 0 and cost[i][j] != inf and back[i][j] == 0:
+            if ref[i - 1] != hyp[j - 1]:
+                errors[i - 1] += 1.0
+            i, j = i - 1, j - 1
+        elif i > 0 and (j == 0 or back[i][j] == 1 or cost[i][j] == inf):
+            errors[i - 1] += 1.0
+            i -= 1
+        else:
+            # Insertion: charge it to the neighbouring reference word.
+            if i > 0:
+                errors[i - 1] += 1.0
+            j -= 1
+    return errors
+
+
 def verify_transcript(
     reference_text: str,
     heard_text: str,
     max_word_error_rate: float = 0.05,
+    window_words: int = 50,
+    max_window_error_rate: float = 0.20,
 ) -> QcReport:
     """Compare an ASR transcript of the render against the source script.
 
-    Catches the failure mode that matters most in synthetic narration: a word
-    silently dropped or mangled. Word error rate is computed with Levenshtein
-    distance over normalised word sequences.
+    This is the highest-leverage check available, because a dropped or mangled word
+    is synthetic narration's most frequent and most immersion-breaking defect and
+    it is invisible to every acoustic measurement.
+
+    Two rates are reported, and the windowed one is the important one. A whole-file
+    average hides exactly what we are hunting: one catastrophically garbled
+    sentence inside a 2,600-word episode is about 0.4% overall error and would sail
+    through any global threshold, while being the single thing a listener would
+    notice. So the file is also scanned in windows and judged on its **worst**
+    window.
     """
     report = QcReport()
 
-    def normalise(text: str) -> list[str]:
-        cleaned = "".join(c.lower() if c.isalnum() or c.isspace() else " " for c in text)
-        return cleaned.split()
-
-    ref = normalise(reference_text)
-    hyp = normalise(heard_text)
+    ref = _normalise_for_alignment(reference_text)
+    hyp = _normalise_for_alignment(heard_text)
 
     if not ref:
         report.fail("empty reference text")
         return report
 
-    # Levenshtein over word lists, two-row rolling implementation.
-    prev = list(range(len(hyp) + 1))
-    for i, r in enumerate(ref, start=1):
-        cur = [i] + [0] * len(hyp)
-        for j, h in enumerate(hyp, start=1):
-            cur[j] = min(
-                prev[j] + 1,
-                cur[j - 1] + 1,
-                prev[j - 1] + (0 if r == h else 1),
-            )
-        prev = cur
+    overall = _levenshtein(ref, hyp) / len(ref)
 
-    wer = prev[len(hyp)] / len(ref)
+    per_word = _errors_per_reference_word(ref, hyp)
+    worst_rate = 0.0
+    worst_at = 0
+    if len(ref) > window_words:
+        step = max(1, window_words // 2)
+        for start in range(0, len(ref) - window_words + 1, step):
+            rate = min(1.0, sum(per_word[start : start + window_words]) / window_words)
+            if rate > worst_rate:
+                worst_rate, worst_at = rate, start
+    else:
+        worst_rate = overall
+
     report.measurements = {
-        "word_error_rate": float(wer),
+        "word_error_rate": float(overall),
+        "worst_window_error_rate": float(worst_rate),
+        "worst_window_start_word": worst_at,
         "reference_words": len(ref),
         "heard_words": len(hyp),
     }
-    if wer > max_word_error_rate:
-        report.fail(f"word error rate {wer:.1%} exceeds {max_word_error_rate:.1%}")
+
+    if overall > max_word_error_rate:
+        report.fail(f"word error rate {overall:.1%} exceeds {max_word_error_rate:.1%}")
+    if worst_rate > max_window_error_rate:
+        report.fail(
+            f"worst {window_words}-word window at word {worst_at} has "
+            f"{worst_rate:.1%} error, exceeding {max_window_error_rate:.1%} — "
+            "a localised mangle a listener would notice"
+        )
     return report

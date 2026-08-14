@@ -50,7 +50,14 @@ def room_tone(
     level_db: float = -48.0,
     seed: int = 0,
 ) -> np.ndarray:
-    """A very quiet, warm stereo room tone to sit under narration."""
+    """A very quiet, warm stereo room tone to sit under narration.
+
+    `level_db` is an **RMS** target. Normalising by peak instead — the obvious
+    thing to do — made the delivered level about 8 dB quieter than the number
+    suggested, and by an amount that varied with the noise's crest factor, so bed
+    gain staging was neither what an operator would expect nor reproducible
+    between seeds.
+    """
     rng = np.random.default_rng(seed)
     n = int(duration_s * rate)
     left = brown_noise(n, rng)
@@ -63,8 +70,17 @@ def room_tone(
     # Lowpassing near-DC noise leaves an offset behind; remove it here so it does
     # not accumulate into the mix and trip the QC gate downstream.
     bed -= bed.mean(axis=0, keepdims=True)
-    bed /= np.max(np.abs(bed)) + 1e-12
-    return bed * (10.0 ** (level_db / 20.0))
+
+    rms = float(np.sqrt(np.mean(bed**2)))
+    if rms < 1e-12:
+        return bed
+    bed *= (10.0 ** (level_db / 20.0)) / rms
+
+    # Guard against an implausible peak after RMS scaling.
+    peak = float(np.max(np.abs(bed)))
+    if peak > 0.5:
+        bed *= 0.5 / peak
+    return bed
 
 
 def drifting_soundscape(

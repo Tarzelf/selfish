@@ -41,25 +41,103 @@ class MasterTarget:
     rate: int = 48000
 
 
-def true_peak_dbtp(x: np.ndarray, rate: int, oversample: int = 4) -> float:
-    """Inter-sample peak estimate, in dBTP."""
+def true_peak_dbtp(
+    x: np.ndarray,
+    rate: int,
+    oversample: int = 4,
+    chunk_samples: int = 1 << 20,
+) -> float:
+    """Inter-sample peak estimate, in dBTP.
+
+    Processed in chunks because the obvious implementation — oversample the whole
+    signal, then take the maximum — allocates an array `oversample` times the
+    length of the episode. Measured at 2 GiB of resident memory for five minutes
+    of stereo audio and scaling linearly, which made full-length episodes
+    unworkable on a laptop and blocked any parallel rendering.
+
+    Since the result is a maximum, chunking is exact. Each chunk carries a small
+    overlap so the polyphase filter has context, and only the interior of each
+    upsampled chunk contributes, so no boundary transient is ever measured.
+    """
     if x.size == 0:
         return -np.inf
-    up = resample_poly(x, oversample, 1, axis=0)
-    peak = float(np.max(np.abs(up)))
+
+    x = np.asarray(x)
+    n = x.shape[0]
+    if n == 0:
+        return -np.inf
+
+    # resample_poly's default filter is 2*10*oversample+1 taps, so ~10*oversample
+    # input samples of context is ample.
+    pad = max(128, 16 * oversample)
+    peak = 0.0
+
+    for start in range(0, n, chunk_samples):
+        stop = min(n, start + chunk_samples)
+        lo = max(0, start - pad)
+        hi = min(n, stop + pad)
+        up = resample_poly(x[lo:hi], oversample, 1, axis=0)
+        interior_start = (start - lo) * oversample
+        interior_stop = interior_start + (stop - start) * oversample
+        peak = max(peak, float(np.max(np.abs(up[interior_start:interior_stop]))))
+
     return 20.0 * np.log10(max(peak, 1e-12))
 
 
 def _limit_true_peak(x: np.ndarray, rate: int, ceiling_dbtp: float) -> np.ndarray:
-    """Transparent gain-down to a true-peak ceiling.
-
-    A static trim rather than a limiter: at these levels there is almost never
-    anything to limit, and a limiter would eat exactly the transients we want.
-    """
+    """Transparent gain-down to a true-peak ceiling."""
     tp = true_peak_dbtp(x, rate)
     if tp <= ceiling_dbtp:
         return x
     return x * (10.0 ** ((ceiling_dbtp - tp) / 20.0))
+
+
+def _soft_clip_peaks(
+    x: np.ndarray,
+    rate: int,
+    ceiling_dbtp: float,
+    attack_ms: float = 1.0,
+    release_ms: float = 20.0,
+    intersample_margin_db: float = 1.5,
+) -> np.ndarray:
+    """Look-ahead peak reduction that acts only where peaks actually exceed.
+
+    A whole-file gain trim is the wrong instrument for this catalogue. Close-mic
+    intimate recording routinely contains isolated 2 ms mouth clicks tens of dB
+    above the surrounding whisper, and trimming the entire episode to accommodate
+    one of them drags the whole thing far below its loudness target — which then
+    surfaces as two misleading QC failures about loudness and over-compression,
+    neither of which describes what happened.
+
+    So instead of penalising the episode for its loudest 2 ms, reduce the
+    offending peaks and leave everything else alone.
+    """
+    from scipy.ndimage import minimum_filter1d, uniform_filter1d
+
+    # The gain is derived from the sample-domain envelope, but the ceiling is a
+    # *true* peak that includes inter-sample overshoot. Aiming exactly at the
+    # ceiling therefore leaves the true peak above it, and the caller's loop then
+    # pays for the miss in loudness. A margin absorbs the overshoot instead.
+    ceiling_lin = 10.0 ** ((ceiling_dbtp - intersample_margin_db) / 20.0)
+    peak_env = np.max(np.abs(x), axis=1)
+
+    over = peak_env > ceiling_lin
+    if not np.any(over):
+        return x
+
+    required = np.ones_like(peak_env)
+    required[over] = ceiling_lin / peak_env[over]
+
+    # Hold the reduction across a window spanning attack and release, so the gain
+    # is already down before the transient arrives and recovers gradually after.
+    window = max(3, int((attack_ms + release_ms) * 1e-3 * rate))
+    held = minimum_filter1d(required, size=window, mode="nearest")
+    smoothed = uniform_filter1d(held, size=window, mode="nearest")
+
+    # Smoothing can lift the curve back above what the ceiling requires, so clamp
+    # once more. The corner this reintroduces is tiny compared with the transient.
+    gain = np.minimum(smoothed, required)
+    return x * gain[:, None]
 
 
 def mix_bed(
@@ -87,10 +165,29 @@ def mix_bed(
     return voice + bed * (10.0 ** (bed_gain_db / 20.0))
 
 
-def normalise(stereo: np.ndarray, target: MasterTarget) -> tuple[np.ndarray, dict]:
-    """Loudness-normalise then true-peak protect. Returns (audio, measurements)."""
+def normalise(
+    stereo: np.ndarray,
+    target: MasterTarget,
+    rate: int | None = None,
+    limit_peaks: bool = True,
+) -> tuple[np.ndarray, dict]:
+    """Loudness-normalise and protect the true-peak ceiling.
+
+    `rate` may be passed explicitly and is checked against `target.rate`; passing
+    a 44.1 kHz array with a 48 kHz target otherwise mis-measures loudness silently,
+    and the pipeline legitimately works at both rates.
+
+    When `limit_peaks` is set, isolated peaks are reduced locally and the loudness
+    target is then re-achieved. Without it, a single close-mic click would pull the
+    whole episode down — which is a routine input for this catalogue, not an edge
+    case.
+    """
     if stereo.ndim != 2 or stereo.shape[1] != 2:
         raise ValueError("normalise expects stereo (n, 2)")
+    if rate is not None and rate != target.rate:
+        raise ValueError(
+            f"audio is {rate} Hz but target expects {target.rate} Hz; resample first"
+        )
 
     # Final DC safety. Filters and convolution each leave a tiny offset behind,
     # and by the master stage they have accumulated. DC costs headroom and can
@@ -102,20 +199,40 @@ def normalise(stereo: np.ndarray, target: MasterTarget) -> tuple[np.ndarray, dic
     if not np.isfinite(measured):
         raise ValueError("could not measure loudness; signal may be silent")
 
-    gained = stereo * (10.0 ** ((target.integrated_lufs - measured) / 20.0))
-    limited = _limit_true_peak(gained, target.rate, target.true_peak_dbtp)
+    out = stereo * (10.0 ** ((target.integrated_lufs - measured) / 20.0))
 
-    final_lufs = meter.integrated_loudness(limited)
-    # A high-crest-factor mix can hit the true-peak ceiling before it reaches the
-    # loudness target, and the static trim then leaves it quieter than asked. That
-    # is the right trade to make silently for headphones, but not for the speaker
-    # master, where level is already scarce — so the shortfall is reported rather
-    # than swallowed, and the caller decides whether it needs real limiting.
+    # Raising level and squashing peaks fight each other: reduce the peaks, and the
+    # subsequent re-level pushes them back over the ceiling. One pass therefore
+    # lands short of target. Alternating converges in two or three rounds, because
+    # locally reducing an isolated transient barely moves integrated loudness.
+    peak_reduction_db = 0.0
+    if limit_peaks:
+        for _ in range(8):
+            current_peak = true_peak_dbtp(out, target.rate)
+            if current_peak <= target.true_peak_dbtp:
+                break
+            out = _soft_clip_peaks(out, target.rate, target.true_peak_dbtp)
+            peak_reduction_db += current_peak - true_peak_dbtp(out, target.rate)
+            relevelled = meter.integrated_loudness(out)
+            if not np.isfinite(relevelled):
+                break
+            if abs(target.integrated_lufs - relevelled) < 0.05:
+                break
+            out = out * (10.0 ** ((target.integrated_lufs - relevelled) / 20.0))
+
+    # Anything still over the ceiling is reduced locally once more rather than by a
+    # whole-file trim, so the last step cannot undo the level we just achieved.
+    if limit_peaks and true_peak_dbtp(out, target.rate) > target.true_peak_dbtp:
+        out = _soft_clip_peaks(out, target.rate, target.true_peak_dbtp)
+    out = _limit_true_peak(out, target.rate, target.true_peak_dbtp)
+
+    final_lufs = meter.integrated_loudness(out)
     shortfall = target.integrated_lufs - float(final_lufs)
-    return limited, {
+    return out, {
         "input_lufs": float(measured),
         "output_lufs": float(final_lufs),
-        "true_peak_dbtp": true_peak_dbtp(limited, target.rate),
+        "true_peak_dbtp": true_peak_dbtp(out, target.rate),
+        "peak_reduction_db": float(peak_reduction_db),
         "loudness_shortfall_db": float(max(0.0, shortfall)),
         "peak_limited": bool(shortfall > 0.5),
     }

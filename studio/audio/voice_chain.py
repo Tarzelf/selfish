@@ -253,14 +253,19 @@ def _emphasise_breath(
 
     gain = np.ones(rms.size)
     gain[is_breath] = _db_to_lin(gain_db)
-    # Smooth across frames so gain changes are inaudible.
     if gain.size >= 3:
         kernel = np.array([0.25, 0.5, 0.25])
         gain = np.convolve(gain, kernel, mode="same")
         gain[0] = gain[1] if gain.size > 1 else gain[0]
         gain[-1] = gain[-2] if gain.size > 1 else gain[-1]
 
-    per_sample = np.repeat(gain, hop)[: x.size]
+    # Interpolate between frame centres rather than repeating a value across each
+    # frame. np.repeat would undo the smoothing above and reintroduce steps of up
+    # to `gain_db` every frame — an audible zipper at the frame rate, landing
+    # directly on the mouth detail this stage exists to bring forward.
+    frame_centres = np.arange(gain.size) * hop + hop / 2.0
+    sample_index = np.arange(x.size)
+    per_sample = np.interp(sample_index, frame_centres, gain)
     return x * per_sample
 
 
