@@ -40,7 +40,28 @@ npm install
 npm run demo       # brief -> draft -> safety -> editorial -> render -> manifest, all with mock providers
 ```
 
-Swap `MockLlm`/`MockTts` for `GrokLlm` / `ElevenLabsTts` / `SelfHostedTts` in production. The two production pipelines (soft vs. spicy content) run on fully separated accounts/keys/infrastructure — see `docs/PLAN.md` §5.
+Providers are selected by environment (mocks by default):
+
+| Env | Effect |
+|---|---|
+| `PIPELINE_LLM=grok` + `XAI_API_KEY` | Script drafting via the Grok API (optional `GROK_MODEL`) |
+| `PIPELINE_TTS=grok` + `XAI_API_KEY` | Audio rendering via Grok TTS (optional `GROK_TTS_VOICE` to map persona → provider voice) |
+| `PIPELINE_TTS=elevenlabs` + `ELEVENLABS_API_KEY` | Soft pipeline only — ElevenLabs prohibits explicit content |
+| `PIPELINE_TTS=self-hosted` + `SELF_HOSTED_TTS_URL` | Orpheus/Chatterbox server (OpenAI-compatible `/v1/audio/speech`) |
+
+The two production pipelines (soft vs. spicy content) run on fully separated accounts/keys/infrastructure — see `docs/PLAN.md` §5.
+
+## Grok TTS voice audition
+
+With an xAI API key (Cursor Dashboard → Cloud Agents → Secrets → `XAI_API_KEY`, repo-scoped):
+
+```bash
+cd packages/pipeline
+npm run tts:audition                  # whisper-closeness probe across every built-in voice (~$0.01 total)
+npm run tts:audition -- --voice ara   # full 3-probe deep test of one voice (whisper / warmth / sleep cadence)
+```
+
+Clips land in `packages/pipeline/out/tts-audition/` with a `report.json` (latency, size, est. cost per clip). The probes map to the craft bar in `docs/PLAN.md` §4.3: whisper realism & breath, audible smile, slow sleep pacing.
 
 ## Compliance posture (read before shipping anything)
 

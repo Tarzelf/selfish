@@ -3,21 +3,56 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import process from 'node:process';
 
-import { MockLlm } from './providers/llm.js';
-import { MockTts } from './providers/tts.js';
+import { GrokLlm, type LlmProvider, MockLlm } from './providers/llm.js';
+import { ElevenLabsTts, GrokTts, MockTts, SelfHostedTts, type TtsProvider } from './providers/tts.js';
 import { RuleBasedSafetyScreen, runSafety } from './stages/safety.js';
 import type { AuditManifest, Brief } from './types.js';
 
 /**
- * Pipeline runner (preview build): brief -> draft -> safety -> editorial gate
- * -> render -> post -> manifest. Mock providers by default; swap in
- * GrokLlm/ElevenLabsTts/SelfHostedTts via environment in production.
+ * Pipeline runner: brief -> draft -> safety -> editorial gate -> render ->
+ * post -> manifest. Mock providers by default; real providers via env:
+ *
+ *   PIPELINE_LLM=grok            + XAI_API_KEY   (optional GROK_MODEL)
+ *   PIPELINE_TTS=grok            + XAI_API_KEY   (optional GROK_TTS_VOICE — overrides the brief's voiceId)
+ *   PIPELINE_TTS=elevenlabs      + ELEVENLABS_API_KEY   (soft pipeline only — no explicit content)
+ *   PIPELINE_TTS=self-hosted     + SELF_HOSTED_TTS_URL [SELF_HOSTED_TTS_KEY]
  *
  * Usage: tsx src/run.ts briefs/<brief>.json [--approve]
  *   --approve  Editorial auto-approval for local demo runs only. In production
  *              the editorial gate is a human review workflow; unapproved
  *              scripts never reach the render stage.
  */
+
+function makeLlm(): LlmProvider {
+  if (process.env.PIPELINE_LLM === 'grok') {
+    const key = process.env.XAI_API_KEY;
+    if (!key) throw new Error('PIPELINE_LLM=grok requires XAI_API_KEY');
+    return new GrokLlm(key, process.env.GROK_MODEL ?? 'grok-4');
+  }
+  return new MockLlm();
+}
+
+function makeTts(): TtsProvider {
+  switch (process.env.PIPELINE_TTS) {
+    case 'grok': {
+      const key = process.env.XAI_API_KEY;
+      if (!key) throw new Error('PIPELINE_TTS=grok requires XAI_API_KEY');
+      return new GrokTts(key);
+    }
+    case 'elevenlabs': {
+      const key = process.env.ELEVENLABS_API_KEY;
+      if (!key) throw new Error('PIPELINE_TTS=elevenlabs requires ELEVENLABS_API_KEY');
+      return new ElevenLabsTts(key);
+    }
+    case 'self-hosted': {
+      const url = process.env.SELF_HOSTED_TTS_URL;
+      if (!url) throw new Error('PIPELINE_TTS=self-hosted requires SELF_HOSTED_TTS_URL');
+      return new SelfHostedTts(url, process.env.SELF_HOSTED_TTS_KEY);
+    }
+    default:
+      return new MockTts();
+  }
+}
 
 async function main() {
   const [briefPath, ...flags] = process.argv.slice(2);
@@ -40,9 +75,10 @@ async function main() {
   const record = (stage: AuditManifest['stages'][number]['stage'], detail: Record<string, unknown>) =>
     manifest.stages.push({ stage, at: new Date().toISOString(), detail });
 
-  const llm = new MockLlm();
-  const tts = new MockTts();
+  const llm = makeLlm();
+  const tts = makeTts();
   const screens = [new RuleBasedSafetyScreen()];
+  console.log(`Providers: llm=${llm.name} tts=${tts.name}`);
 
   for (const variant of brief.variants) {
     console.log(`\n— ${brief.familyId} / ${variant.label} (${variant.heat})`);
@@ -74,9 +110,12 @@ async function main() {
     manifest.approvedBy = 'demo --approve flag';
     console.log('  editorial approved (demo)');
 
-    // 4. Render
-    const audioPath = join(outDir, `${variant.label.toLowerCase().replace(/\s+/g, '-')}.audio`);
-    const render = await tts.render({ text: script.text, voiceId: brief.voiceId, outPath: audioPath, variantLabel: variant.label });
+    // 4. Render. GROK_TTS_VOICE maps the brief's persona voice (e.g. v-jasper)
+    // to a concrete provider voice id for real runs.
+    const ext = tts.name === 'mock-tts' ? 'audio' : 'mp3';
+    const audioPath = join(outDir, `${variant.label.toLowerCase().replace(/\s+/g, '-')}.${ext}`);
+    const providerVoice = process.env.GROK_TTS_VOICE ?? brief.voiceId;
+    const render = await tts.render({ text: script.text, voiceId: providerVoice, outPath: audioPath, variantLabel: variant.label });
     record('render', { variant: variant.label, provider: render.provider, durationSec: render.durationSec });
     console.log(`  render    ok (~${Math.round(render.durationSec / 60)} min) -> ${render.audioPath}`);
 
