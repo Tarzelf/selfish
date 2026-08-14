@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Selfish",
+    "slug": "selfish",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "selfish",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.selfish.listen"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0c0a0f",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.selfish.listen"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
