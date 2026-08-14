@@ -84,8 +84,16 @@ Everything in `research/02-app-store-compliance.md` plus red-team corrections (`
 - iOS: 18+ rating; birthdate gate; Desire shelf opt-in default-off; Declared Age Range API stack; 5.1.2(i) third-party-AI consent screen; honest App Review notes + demo account with the real catalog visible (**standing rule: never show review a sanitized build or remotely enable anything post-approval — that's the termination pattern**).
 - **No-runtime-generation invariant** documented in review notes and enforced architecturally: the v1 client has no path to any generation endpoint.
 - Payments: IAP $6.99/mo · $49.99/yr; US storefront web-checkout link, checkout-only neutral copy (don't bank on 0% link-out forever — Epic rate-setting live).
-- EU/UK web availability gated on loop-2 obligations (Art. 50 marking; UK OSA age assurance for erotic audio; state AV laws scope check for audio-only).
 - Interactive voice (v3 ambition) is a chatbot under 4.7 *and* 1.2 per the Feb 6, 2026 update — costed as such, not assumed cheap.
+
+Loop-2 regulatory findings (`research/05-regulatory-loop2.md`), now binding on the roadmap:
+
+- **US state AV laws cover audio.** Texas HB 1181 ("descriptions"), Tennessee ("text, audio"), Florida ("describes") et al. — a dedicated erotica service exceeds every content threshold. Integrate an age-verification vendor (ID + transactional options, zero retention) for AV-law states from day one; the same integration serves the UK.
+- **UK OSA:** audio-only erotica is Part 5 pornographic content requiring **highly effective age assurance** (self-declaration non-compliant; Ofcom fines have hit small foreign operators). Launch decision: HEAA (~£0.10–0.25/check) or geoblock the UK — documented either way.
+- **EU AI Act Art. 50:** machine-readable synthetic-audio marking (signed metadata + AudioSeal-class watermark) is mandatory with **no artistic carve-out**, plus a public detection means; the fictional-work carve-out only softens user-facing disclosure to an unobtrusive episode-page label (already our design). Applies immediately to systems on the EEA market from Aug 2, 2026.
+- **Voice licenses re-papered to AB 2602/ELVIS standard:** reasonably specific description of erotic-AI use, counsel/union acknowledgment, fine-tune consent, category exclusion rights, takedown terms. Boilerplate "all media" clauses are unenforceable in California.
+- **FTC posture:** "Narrated in the voice of [Actor], AI-rendered under license" is the safe pattern; never imply human performance; never deny AI use in-app. The FTC 6(b) companion-app study means intimacy apps are on the radar.
+- **Naming resolved:** "Selfish" is viable (clearance search before filing, classes 9/41/42); "Hush" is blocked by five live sleep/ASMR apps. Working title is now the name candidate.
 
 ## 7. Business model & moats
 
@@ -119,7 +127,7 @@ Everything in `research/02-app-store-compliance.md` plus red-team corrections (`
 
 ## 11. Resolved questions (from v1's open list)
 
-1. Name → keep **Selfish** as working title; trademark scan in loop 2; user-test pre-launch.
+1. Name → **Selfish confirmed viable** by loop-2 trademark scan ("Hush" is blocked by five live sleep apps); full clearance before filing; user-test pre-launch.
 2. Free tier → small + permanent, with shorter (14-day) trial.
 3. Focus in v1 → **cut**; Rest + Desire only.
 4. Name-drop → opt-in, default off, whitelist-only.
