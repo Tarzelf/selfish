@@ -30,6 +30,7 @@
 | Four-screen onboarding (welcome → age → promise → self) | Agent | Done |
 | First session is onboarding (skip Home until after) | Agent | Done |
 | Self persona (soft / playful / bold + optional name) | Agent | Done |
+| Mood board + living component design board | Agent | Done |
 | Focus mode: 3 bundled ambient audio sessions | Agent | Done (timer placeholder, audio assets TBD) |
 | Audio player with background playback | Agent | Done (expo-av configured) |
 | Basic dark/warm UI (wellness aesthetic) | Agent | Done |

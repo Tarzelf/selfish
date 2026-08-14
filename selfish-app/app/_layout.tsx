@@ -31,6 +31,10 @@ export default function RootLayout() {
           name="whisper/session"
           options={{ presentation: 'fullScreenModal', animation: 'fade' }}
         />
+        <Stack.Screen
+          name="dev/design-board"
+          options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+        />
       </Stack>
     </AppProvider>
   );

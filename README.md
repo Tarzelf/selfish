@@ -42,3 +42,7 @@ npx expo start
 | [03_PERSONA_REVIEW.md](docs/03_PERSONA_REVIEW.md) | User persona evaluation |
 | [04_TECHNICAL_ARCHITECTURE.md](docs/04_TECHNICAL_ARCHITECTURE.md) | System design |
 | [05_EXECUTION_ROADMAP.md](docs/05_EXECUTION_ROADMAP.md) | Phased delivery plan |
+| [06_ONBOARDING.md](docs/06_ONBOARDING.md) | First session and Self |
+| [07_HAPTICS_SIGNAL.md](docs/07_HAPTICS_SIGNAL.md) | Body layer, not a vibrator tab |
+| [08_DESIGN_SYSTEM.md](docs/08_DESIGN_SYSTEM.md) | Mood + component board |
+| [09_SHIP_READINESS.md](docs/09_SHIP_READINESS.md) | What we can ship now |

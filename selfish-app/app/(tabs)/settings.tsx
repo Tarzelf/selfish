@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getSelfOption } from '../../src/constants/self';
 import { useAppState } from '../../src/context/AppContext';
@@ -6,6 +7,7 @@ import { colors } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { self } = useAppState();
   const selfOption = self ? getSelfOption(self.feeling) : null;
 
@@ -40,6 +42,11 @@ export default function SettingsScreen() {
         <Text style={styles.sectionTitle}>Subscription</Text>
         <SettingsRow label="Selfish+" hint="After you want to keep going" />
       </View>
+
+      <Pressable onPress={() => router.push('/dev/design-board')} style={styles.row}>
+        <Text style={styles.rowLabel}>Design board</Text>
+        <Text style={styles.rowHint}>Mood, tokens, components</Text>
+      </Pressable>
     </SafeAreaView>
   );
 }
