@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -61,16 +62,26 @@ export default function Onboarding() {
 
         {step === 'welcome' && (
           <View style={styles.stepBody}>
-            <Display>Selfish</Display>
-            <Body dim style={styles.lede}>
+            <LinearGradient
+              colors={['#3D2244', '#8A3B5C']}
+              start={{ x: 0.1, y: 0.05 }}
+              end={{ x: 0.95, y: 1 }}
+              style={styles.welcomeArt}
+            >
+              <View style={styles.welcomeRing} />
+              <Text style={styles.welcomeMonogram}>S</Text>
+            </LinearGradient>
+            <Display style={styles.welcomeTitle}>Selfish</Display>
+            <Body dim style={[styles.lede, styles.welcomeLede]}>
               Audio made for exactly one person tonight: you.
             </Body>
-            <Body dim style={styles.lede}>
+            <Body dim style={[styles.lede, styles.welcomeLede]}>
               Stories to fall asleep to. Stories that are very much not for sleeping. Every one of
               them written with care, performed up close, and tuned to your mood.
             </Body>
             <View style={styles.spacer} />
             <Button label="Begin" onPress={next} />
+            <Text style={styles.headphoneHint}>🎧 Best experienced with headphones</Text>
           </View>
         )}
 
@@ -226,5 +237,34 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     fontSize: 15,
     padding: spacing.sm,
+  },
+  welcomeArt: {
+    width: 128,
+    height: 128,
+    borderRadius: 32,
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  welcomeRing: {
+    position: 'absolute',
+    width: 84,
+    height: 84,
+    borderRadius: 42,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.16)',
+  },
+  welcomeMonogram: { fontFamily: fonts.display, fontSize: 56, color: palette.text },
+  welcomeTitle: { textAlign: 'center' },
+  welcomeLede: { textAlign: 'center' },
+  headphoneHint: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    color: palette.textFaint,
+    textAlign: 'center',
+    marginTop: spacing.md,
   },
 });

@@ -1,10 +1,55 @@
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Body, Caption, Card, Display, Heading, Screen } from '@/components/ui';
 import { fonts, palette, spacing } from '@/constants/theme';
+import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { VOICES } from '@/data/catalog';
+import type { Voice } from '@/lib/types';
+
+function VoiceCard({ voice }: { voice: Voice }) {
+  const source = VOICE_PREVIEW_AUDIO[voice.id] ?? null;
+  const player = useAudioPlayer(source);
+  const status = useAudioPlayerStatus(player);
+
+  const toggle = () => {
+    if (status.playing) {
+      player.pause();
+      return;
+    }
+    if (status.duration > 0 && status.currentTime >= status.duration - 0.05) player.seekTo(0);
+    player.play();
+  };
+
+  return (
+    <Card>
+      <View style={styles.voiceRow}>
+        <View style={styles.voiceText}>
+          <Body>
+            {voice.name} · {voice.gender === 'M' ? 'he/him' : voice.gender === 'F' ? 'she/her' : 'they/them'}
+          </Body>
+          <Caption style={{ marginTop: spacing.xs }}>{voice.descriptor}</Caption>
+          <Caption style={{ marginTop: spacing.xs }}>{voice.narratorCredit}</Caption>
+        </View>
+        {source != null && (
+          <Pressable
+            onPress={toggle}
+            accessibilityRole="button"
+            accessibilityLabel={status.playing ? `Pause ${voice.name} sample` : `Play ${voice.name} sample`}
+            style={({ pressed }) => [styles.playButton, pressed && { opacity: 0.7 }]}
+          >
+            <Text style={styles.playGlyph}>{status.playing ? '❚❚' : '▶'}</Text>
+          </Pressable>
+        )}
+      </View>
+      {source != null && (
+        <Caption style={styles.sampleNote}>Engine preview — current pipeline output, not the final cast voice.</Caption>
+      )}
+    </Card>
+  );
+}
 
 export default function Transparency() {
   const router = useRouter();
@@ -37,8 +82,9 @@ export default function Transparency() {
       <Body dim style={styles.para}>
         Sessions are drafted with the help of AI writing tools, then rewritten and approved by our
         editorial team — humans with strong opinions about pacing. Every script passes an
-        independent safety review before production. Nothing in Selfish is generated live while you
-        listen, and nothing you type is ever sent to an AI model.
+        independent safety review before production, and an automated listener checks every take
+        before a human ever hears it. Nothing in Selfish is generated live while you listen, and
+        nothing you type is ever sent to an AI model.
       </Body>
 
       <Heading>What we keep (very little)</Heading>
@@ -48,14 +94,11 @@ export default function Transparency() {
       </Body>
 
       <Heading>The roster</Heading>
+      <Caption style={{ marginBottom: spacing.sm }}>
+        Tap ▶ to hear a whisper-register engine preview of each voice.
+      </Caption>
       {VOICES.map((v) => (
-        <Card key={v.id}>
-          <Body>
-            {v.name} · {v.gender === 'M' ? 'he/him' : v.gender === 'F' ? 'she/her' : 'they/them'}
-          </Body>
-          <Caption style={{ marginTop: spacing.xs }}>{v.descriptor}</Caption>
-          <Caption style={{ marginTop: spacing.xs }}>{v.narratorCredit}</Caption>
-        </Card>
+        <VoiceCard key={v.id} voice={v} />
       ))}
 
       <Caption style={styles.footer}>
@@ -70,4 +113,18 @@ const styles = StyleSheet.create({
   close: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, padding: spacing.xs },
   para: { marginBottom: spacing.sm },
   footer: { marginTop: spacing.lg, textAlign: 'center' },
+  voiceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  voiceText: { flex: 1 },
+  playButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: palette.goldSoft,
+    borderWidth: 1,
+    borderColor: palette.gold,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playGlyph: { fontSize: 16, color: palette.gold },
+  sampleNote: { marginTop: spacing.sm },
 });

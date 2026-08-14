@@ -1,7 +1,9 @@
 import React from 'react';
 import {
   Pressable,
+  type PressableStateCallbackType,
   ScrollView,
+  type StyleProp,
   StyleSheet,
   Text,
   type TextStyle,
@@ -13,6 +15,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fonts, heatColor, palette, radius, spacing } from '@/constants/theme';
 import { HEAT_LABEL, type HeatLevel } from '@/lib/types';
 
+/** react-native-web adds `hovered` to Pressable state; native ignores it. */
+type PressState = PressableStateCallbackType & { hovered?: boolean };
+
+/** Content column: full-width on phones, centered column on desktop web. */
+const SHELL_MAX_WIDTH = 760;
+
 export function Screen({
   children,
   scroll = true,
@@ -23,34 +31,36 @@ export function Screen({
   padded?: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  const pad = padded ? { paddingHorizontal: spacing.md } : null;
+  const inner = (
+    <View style={[styles.shell, padded && { paddingHorizontal: spacing.md }]}>{children}</View>
+  );
   if (!scroll) {
-    return <View style={[styles.screen, { paddingTop: insets.top }, pad]}>{children}</View>;
+    return <View style={[styles.screen, { paddingTop: insets.top }]}>{inner}</View>;
   }
   return (
     <ScrollView
       style={[styles.screen, { paddingTop: insets.top }]}
-      contentContainerStyle={[pad, { paddingBottom: spacing.xxl * 2 }]}
+      contentContainerStyle={{ paddingBottom: spacing.xxl * 2 }}
       showsVerticalScrollIndicator={false}
     >
-      {children}
+      {inner}
     </ScrollView>
   );
 }
 
-export function Display({ children, style }: { children: React.ReactNode; style?: TextStyle }) {
+export function Display({ children, style }: { children: React.ReactNode; style?: StyleProp<TextStyle> }) {
   return <Text style={[styles.display, style]}>{children}</Text>;
 }
 
-export function Heading({ children, style }: { children: React.ReactNode; style?: TextStyle }) {
+export function Heading({ children, style }: { children: React.ReactNode; style?: StyleProp<TextStyle> }) {
   return <Text style={[styles.heading, style]}>{children}</Text>;
 }
 
-export function Body({ children, dim, style }: { children: React.ReactNode; dim?: boolean; style?: TextStyle }) {
+export function Body({ children, dim, style }: { children: React.ReactNode; dim?: boolean; style?: StyleProp<TextStyle> }) {
   return <Text style={[styles.body, dim && { color: palette.textDim }, style]}>{children}</Text>;
 }
 
-export function Caption({ children, style }: { children: React.ReactNode; style?: TextStyle }) {
+export function Caption({ children, style }: { children: React.ReactNode; style?: StyleProp<TextStyle> }) {
   return <Text style={[styles.caption, style]}>{children}</Text>;
 }
 
@@ -65,20 +75,21 @@ export function Button({
   onPress: () => void;
   kind?: 'primary' | 'ghost' | 'danger';
   disabled?: boolean;
-  style?: ViewStyle;
+  style?: StyleProp<ViewStyle>;
 }) {
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
       disabled={disabled}
-      style={({ pressed }) => [
+      style={(state: PressState) => [
         styles.button,
         kind === 'primary' && { backgroundColor: palette.gold },
         kind === 'ghost' && { backgroundColor: 'transparent', borderWidth: 1, borderColor: palette.border },
         kind === 'danger' && { backgroundColor: 'transparent', borderWidth: 1, borderColor: palette.danger },
+        state.hovered && !disabled && styles.buttonHovered,
         disabled && { opacity: 0.4 },
-        pressed && !disabled && { opacity: 0.75 },
+        state.pressed && !disabled && { opacity: 0.75 },
         style,
       ]}
     >
@@ -112,10 +123,11 @@ export function Chip({
       accessibilityRole="button"
       accessibilityState={{ selected: !!selected }}
       onPress={onPress}
-      style={({ pressed }) => [
+      style={(state: PressState) => [
         styles.chip,
         selected && { backgroundColor: palette.goldSoft, borderColor: palette.gold },
-        pressed && { opacity: 0.8 },
+        state.hovered && !selected && { borderColor: palette.textFaint },
+        state.pressed && { opacity: 0.8 },
       ]}
     >
       <Text style={[styles.chipLabel, selected && { color: palette.gold }]}>{label}</Text>
@@ -137,13 +149,18 @@ export function HeatBadge({ heat, locked }: { heat: HeatLevel; locked?: boolean 
   );
 }
 
-export function Card({ children, onPress, style }: { children: React.ReactNode; onPress?: () => void; style?: ViewStyle }) {
+export function Card({ children, onPress, style }: { children: React.ReactNode; onPress?: () => void; style?: StyleProp<ViewStyle> }) {
   if (!onPress) return <View style={[styles.card, style]}>{children}</View>;
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.card, pressed && { backgroundColor: palette.surfacePressed }, style]}
+      style={(state: PressState) => [
+        styles.card,
+        state.hovered && styles.cardHovered,
+        state.pressed && { backgroundColor: palette.surfacePressed },
+        style,
+      ]}
     >
       {children}
     </Pressable>
@@ -156,6 +173,7 @@ export function Divider() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: palette.bg },
+  shell: { flex: 1, width: '100%', maxWidth: SHELL_MAX_WIDTH, alignSelf: 'center' },
   display: {
     fontFamily: fonts.display,
     fontSize: 32,
@@ -181,6 +199,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  buttonHovered: { transform: [{ scale: 1.01 }], opacity: 0.92 },
   buttonLabel: { fontFamily: fonts.body, fontSize: 16, fontWeight: '600' },
   chip: {
     borderRadius: radius.pill,
@@ -214,5 +233,6 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
   },
+  cardHovered: { borderColor: palette.border, backgroundColor: palette.surfaceRaised },
   divider: { height: 1, backgroundColor: palette.borderSoft, marginVertical: spacing.lg },
 });
