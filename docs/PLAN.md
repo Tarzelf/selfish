@@ -1,120 +1,128 @@
-# Selfish — Product Plan (PRD v1, pre-debate draft)
+# Selfish — Product Plan (PRD v2, post-debate)
 
-> Working name: **Selfish** (from the repo name — it fits: "time that's just for you." Self-care framing, zero shame, slightly wicked wink.)
-> Status: v1 draft synthesized from research pass 1 (`docs/research/01-04`). To be stress-tested by persona debate, then revised.
+> Working name: **Selfish** ("time that's just for you" — pending trademark scan + coworker-glance test, see `DEBATE.md`).
+> Status: v2 — revised after the three-persona debate (`docs/DEBATE.md`). Research: `docs/research/01-05`.
 
 ## 1. One-line vision
 
-**A beautiful, women-first audio app where an intimacy engine — voice, breath, pacing, story — adapts to you: from "help me focus" to "help me fall asleep" to "tell me a story that's just for me."**
+**A beautiful, women-first audio app where an intimacy engine — voice, breath, pacing, story — adapts to you: sessions for falling asleep and sessions for desire, rendered by studio-crafted synthetic voices built from licensed human performances, and tunable in ways no human catalog can be.**
 
-Not "AI erotica." Not a porn app. A personal audio companion for focus, rest, and desire, in that order of *visibility* and the reverse order of *revenue*.
+Two shelves. One engine. Radical honesty about how it's made.
 
-## 2. Thesis (what research pass 1 established)
+## 2. Thesis (established in research pass 1, hardened by debate)
 
-1. **The market is real and women-led.** Quinn: $12M+ ARR, 75–80% women. Dipsea: ~$6M ARR at exit. Audio is the erotic format women actually choose (75–82% of audio erotica listeners are women, vs ~36% of visual porn visitors).
-2. **The incumbent weakness is discovery + personalization, not catalog size.** Loudest complaints: hard paywall, weak search, inconsistent quality. Nobody can give you *your* scenario, *your* pacing, *your* name, *your* heat level on demand. AI can.
-3. **"AI-narrated" is a liability as a brand, an asset as infrastructure.** Dipsea publicly *removed* AI narration in 2026 to applause; communities call AI audio "slop." We never lead with "AI voices." We lead with personalization and let quality speak. Blind-test bar: our best track must be indistinguishable from a human recording before it ships.
-4. **The compliance envelope is proven and narrow.** 18+ rating, wellness/romance metadata (never "erotica" in iOS copy), 4+ clean screenshots, curated first-party catalog (no user prompts in v1 → avoids UGC guideline 1.2), Declared Age Range API, IAP + US web-checkout link. Explicit-most tier lives on web only.
-5. **The science gives us the design language.** Women's arousal is context-driven and brake-sensitive: privacy, trust, consent-forward stories, and emotional buildup do more than explicitness. ASMR and intimacy share one mechanism — simulated caregiving closeness — so one "intimacy engine" (close-miked breathy voice, binaural placement, slow pacing) genuinely serves both focus/sleep and desire.
-6. **The tech stack exists and is cheap.** Soft content: ElevenLabs v3 (whisper tags, ~$0.10/finished-min). Spicy content: self-hosted Orpheus/Chatterbox (~$0.005–0.02/min, no content policy) + xAI Grok for scripts (only frontier API permitting fictional adult text). Pipelines fully separated. A 1,000-episode catalog costs hundreds of dollars in compute; the cost is QA and craft.
+1. **The market is real and women-led.** Quinn: $12M+ ARR, 75–80% women. Dipsea: ~$6M ARR at exit. Women are 75–82% of audio-erotica listeners vs ~36% of visual porn visitors — audio is the format women choose.
+2. **The incumbent weakness is personalization, not catalog size.** Loudest complaints: hard paywall, weak one-tag search, mood mismatch. Nobody can give you *your* scenario at *your* heat at *your* pace, tonight. AI can — via a pre-generated variant matrix, not runtime generation.
+3. **The core risk is disclosure, not detectability.** Dipsea removed AI narration *to applause*; communities call AI audio "slop." The debate killed half-stealth: we adopt the **Bloom posture, fully** — named human narrators license their voice likenesses for revenue share, the app says plainly that performances are synthetic, and the licensing story ("never cloned without consent, humans get paid") is the brand's spine, not its fine print. The blind-test bar remains as a *quality* gate.
+4. **The compliance envelope is proven and narrow** — 18+, wellness/romance metadata, clean 4+ screenshots, curated first-party catalog, age-declaration stack, IAP + US web-checkout link. Plus, from the red team: no disguised icons (2.3.1), no in-app marketing of anything more explicit elsewhere (1.1.4), and a documented **no-runtime-generation invariant**: in v1, user input never reaches a generative model.
+5. **The science gives the design language.** Arousal for women is context-driven and brake-sensitive: privacy, trust, consent-forward stories, buildup > explicitness. ASMR closeness and intimacy share one mechanism, which is why Sleep and Desire belong in one app with one voice roster.
+6. **The stack is cheap; the craft isn't.** TTS render cost is $0.005–0.10/finished-minute; the real cost is editorial + QA (target < $8/finished-minute all-in). Soft pipeline: ElevenLabs v3. Spicy pipeline: self-hosted Orpheus/Chatterbox fine-tuned on licensed data (license must explicitly cover synthetic erotic performance). Script drafting: Grok API (spicy) / any frontier model (soft). Pipelines fully separated (accounts, keys, infra).
 
 ## 3. Who it's for
 
-**Primary: "Maya," 24–38, romance reader / Quinn-curious.**
-Listens to audiobooks and sleep stories. Reads BookTok romance ("yearning," enemies-to-lovers). Has tried Quinn or r/GoneWildAudio; frustrated by repetition, hit-or-miss quality, and content that doesn't match her mood tonight. Values discretion absolutely: nothing spicy on her lock screen, an app she isn't embarrassed to have on her home screen. Buys Calm-type annual subs.
+**Primary: "Maya," 24–38, romance reader / Quinn-curious.** Audiobooks, BookTok tropes, tried Quinn/GWA, frustrated by repetition and mood mismatch. Privacy-absolutist. Stays for *people* (voices/characters), not catalogs — so we build voice loyalty deliberately: small roster, named (pseudonymous) personas with continuity, series with recurring characters.
 
-**Secondary: focus/sleep users (all genders)** who come for adaptive soundscapes and voice-guided wind-downs and may never touch the spicy shelf. They make the app "defensible" in positioning, App Review, and ad channels — and they're real users, not camouflage: same engine, same craft.
+**Secondary: sleep users** who want "someone reads you down" closeness with zero spice. Same engine, honest shelf.
 
-**Explicitly not v1:** male-targeted companion/girlfriend experiences. The Grok-style "spicy chat" demand for men is proven but it's a different product, a different brand risk, and Apple's 4.3 graveyard is full of it. Revisit post-v1 on web only.
+**Explicitly not v1:** male-targeted companion experiences; interactive chat of any kind; user free-text anything.
 
 ## 4. The product
 
-### 4.1 Three shelves, one engine
+### 4.1 Two shelves, one engine
 
 | Shelf | What | Heat | Where |
 |---|---|---|---|
-| **Focus & Calm** | Adaptive soundscapes (Endel-style layers), ASMR attention tracks, voice-guided resets | — | iOS + web |
-| **Rest & Sleep** | Wind-down stories, breath-paced body scans, "someone reads to you" closeness | Comfort | iOS + web |
-| **Desire** | Second-person POV story sessions: boyfriend experience, praise, soft dom, friends-to-lovers, aftercare. Slow-burn by default. | Comfort → Slow burn → **Spicy** | iOS (to Spicy); **Explicit tier web-only** |
+| **Rest** | Wind-down stories, breath-paced body scans, ambient beds, "read to me" closeness | Comfort only | iOS + web |
+| **Desire** | Second-person POV sessions: boyfriend experience, praise, soft dom, friends-to-lovers, reunion, aftercare | Comfort → Slow burn → Spicy | iOS + web (18+, opt-in, default off) |
 
-One continuous "heat" dial, defaulted low, opt-in per level. The same voice roster and audio engine across all shelves — the voice that helped you focus this afternoon can read you to sleep tonight. That continuity *is* the product's emotional moat.
+- Heat dial with **per-context memory** (weeknight vs weekend profiles).
+- **Explicit tier: deferred post-launch entirely** (web-only when it comes; zero in-app references ever — the web link in iOS is checkout-only with neutral copy).
+- Focus/adaptive-soundscape shelf: cut from v1 (debate D1); ambient production assets live on in Rest.
 
-### 4.2 The personalization wedge (why us and not Quinn)
+### 4.2 The hero: the variation engine
 
-v1 (curated catalog, no free-text prompts — compliance):
-- **Tonight picker:** 3 taps — mood (comforted / teased / adored / in charge), voice, length, heat. The catalog is pre-generated across this matrix, so it feels made-to-order without UGC risk.
-- **Name-drop:** sessions rendered with your name spoken (pre-rendered variants for top-N names; "love/you" fallback). No incumbent can do this.
-- **"More like this, but…"** softer / slower / less explicit / more buildup — one-tap variation requests that map to pre-generated alternates.
-- **Hard-limits filter set once:** themes you never want to hear are globally excluded, GWA-style content warnings on every session.
+Every session ships as a **family**: the same story rendered in ~4 deliberate variants along heat, pace, and buildup. The player exposes it as **"More like this, but…"** — softer · slower · more buildup · less explicit — an instant switch that keeps place in the story where possible.
 
-v2 (post-traction, with full 1.2 moderation stack): scenario composer (structured pickers, still not free text). v3: real-time interactive voice sessions (Grok speech-to-speech / Hume EVI class) — the true endgame the AI-companion data supports (voice sessions 2× text engagement), gated on trust and unit economics.
+- Launch catalog: **100 Desire session-families (≈400 renders) + 30 Rest sessions**, deep in three dynamics (BFE, praise, friends-to-lovers), plus F4F and NB-voiced sessions at launch (≥15 sessions; roster of ~6 voices: 3 M, 2 F, 1 NB).
+- Marketed as "hundreds of ways to hear it," never as "150 tracks."
+- **Tonight picker:** mood (comforted · adored · teased · wanted · missed · in charge) × voice × length × heat → retrieval over the pre-rendered matrix. UI copy says *"find your session"* — never "we'll create one for you."
+- **Name-drop:** opt-in, off by default, hard-locked to a pre-rendered whitelist of names (never free text, never runtime rendering). A delight, not the hero.
+- **Series:** recurring characters and dynamics with a "Continue" rail — the retention loop GWA proves.
+- **Anonymous social proof:** listener ratings and play-derived chips ("loved for: buildup"). No comments, no profiles, no feed.
 
 ### 4.3 Craft bar (non-negotiables)
 
-- **Headphone-first, binaural-always:** HRTF spatialization, breath and mouth micro-sounds, whisper-distance miking illusion. Prompt for headphones at session start.
-- **Voice spec (M4F lead voices):** low-but-not-bass pitch, breathy, warm, audible smile; prosody directed at character level. Small curated roster (4–6 voices at launch) users can favorite — parasocial loyalty is Quinn's engine and we need our own.
-- **Consent inside the fiction:** partners in stories ask, check in, give aftercare. Never an unflagged kink. This is both ethics and — per the science — what actually works for the audience.
-- **Blind-test gate:** every voice/format ships only after passing indistinguishability testing against human-recorded reference clips with target-demo listeners.
+- **Headphone-first, binaural-always:** HRTF spatialization, breath/mouth micro-sounds, whisper-distance illusion; headphone prompt at session start.
+- **Voice spec (M lead voices):** low-but-not-bass, breathy, warm, audible smile; prosody directed per character beat. F/NB voices directed with the same closeness spec.
+- **Consent inside the fiction:** partners ask, check in, give aftercare; never an unflagged kink; GWA-style content warnings on every session.
+- **Blind-test gate (quality, not disguise):** no voice/format ships until target-demo listeners can't reliably distinguish it from human-recorded reference clips.
 
-### 4.4 Discretion & trust (brake-removal as feature list)
+### 4.4 Trust, discretion, disclosure
 
-- Neutral notifications ("Your session is ready"), no spicy words on lock screen ever
-- Optional disguised app icon; Face ID lock on the Desire shelf
-- No social feed, no public profiles; history and account deletion that actually deletes
-- Transparent AI sourcing page: which voices are synthetic, whose likenesses were licensed (if any), what data we keep (minimal), what we never do (no real-person voices, ever)
+- **Disclosure, proudly and first:** every session page carries "Performed by [Voice] — a studio-crafted synthetic voice, built with [Narrator]'s licensed performance. Humans paid, nothing cloned without consent." Transparency page with the full story. Machine-readable synthetic-audio marking embedded in files (EU AI Act Art. 50 — see §6).
+- **Discretion:** neutral notifications; discreet-mode Now Playing metadata ("Selfish — Session") across lock screen/Control Center/CarPlay; Face ID lock on the Desire shelf; **neutral abstract branded alternate icons only** (no disguise icons — 2.3.1); history & account deletion that deletes.
+- **No implied humanity anywhere** (FTC Section 5): narrator personas are presented as crafted characters with real licensed humans behind them, never as fake human bios.
 
-## 5. Content system
+## 5. Content system & pipeline
 
-- **Format:** 8–20 min "sessions," second-person POV, GWA-informed structure (scene-setting → buildup → payoff → aftercare/wind-down). Series with recurring characters for retention.
-- **Tags:** dynamic (BFE, praise, soft dom, friends-to-lovers, strangers, reunion…), mood, heat level, voice, length. Multi-tag filtering from day one (Quinn's top complaint).
-- **Launch catalog:** ~150 sessions (100 Desire across heat levels, 30 Sleep, 20 Focus) + 6 soundscapes. All first-party, human-QA'd, mastered with room tone/soundscape layers.
-- **Pipeline:** LLM script (Grok primary for spicy; any frontier model for soft) → human editorial pass (the craft moat — scripts are *written*, the LLM drafts) → TTS render (ElevenLabs v3 soft / Orpheus-Chatterbox self-hosted spicy) → post (binaural placement, breath layering, soundscape bed, mastering) → blind-test QA → publish.
-- **Two fully separated pipelines** (accounts, keys, infra) so a policy strike on the spicy line can't touch the soft catalog.
+- **Format:** 8–20 min second-person POV sessions; scene-setting → buildup → payoff → aftercare/wind-down; series > one-offs.
+- **Tags:** dynamic, mood, heat, voice, length; multi-tag filtering day one.
+- **Pipeline stages (each blocking):**
+  1. Script draft — LLM (Grok primary for spicy; frontier model for soft) from an editorial brief; every character's adult age established in-text (checklist requirement).
+  2. **Safety classifier** — independent automated screen of every script for minors/age-ambiguity, non-consent (vs. flagged CNC-adjacent themes: reject in v1), incest tropes, real-person references. Runs *before* human review; failures quarantined.
+  3. Human editorial pass — craft gate: rewrite, pacing, consent-forward beats. (Editorial is the moat and the cost center: track $/finished-minute, target < $8.)
+  4. TTS render — ElevenLabs v3 (soft pipeline) / self-hosted Orpheus or Chatterbox (spicy pipeline); separated accounts/keys/infra.
+  5. Post — binaural placement, breath layering, ambient bed, mastering, loudness normalization; synthetic-audio watermark/metadata embed.
+  6. Blind-test QA sample → publish to catalog with full **audit trail** (brief → prompt → script → classifier verdict → approver → render hash).
+- **Voice licensing precondition:** no fine-tuning or rendering until a written license explicitly covering *synthetic erotic performance* (ELVIS-Act-aware) is executed per voice. Paper must match the transparency page.
+- **Incident-response plan** (takedown, comms, root-cause) written before scale generation.
 
-## 6. Compliance posture (from `02-app-store-compliance.md`)
+## 6. Compliance posture
 
-- iOS metadata: "Selfish — Audio stories, sleep & focus." Copy says "romantic fiction," "spicy stories," "wellness" — never "erotica/NSFW." Screenshots 4+-clean.
-- 18+ age rating; declared birthdate gate at signup; Desire shelf behind explicit opt-in defaulted off; Declared Age Range API + Significant Change API + StoreKit age-rating property (iOS 26.2+ Texas/Utah/LA laws).
-- v1 catalog is first-party curated → no UGC stack needed. The moment we add composer features, we ship report/block/filter + server-side moderation first.
-- 5.1.2(i): disclose third-party AI processing, explicit consent at onboarding.
-- Payments: IAP subscriptions + US storefront web-checkout link (lower price on web). Explicit tier sold and streamed on web only.
-- App Review notes: honest description, demo account, comparable-app citations (Quinn, Dipsea).
-- Google Play: later; soft catalog only + web link, per Play's stricter carve-out.
+Everything in `research/02-app-store-compliance.md` plus red-team corrections (`DEBATE.md`) plus loop-2 findings (`research/05-regulatory-loop2.md`):
 
-## 7. Business model
+- iOS: 18+ rating; birthdate gate; Desire shelf opt-in default-off; Declared Age Range API stack; 5.1.2(i) third-party-AI consent screen; honest App Review notes + demo account with the real catalog visible (**standing rule: never show review a sanitized build or remotely enable anything post-approval — that's the termination pattern**).
+- **No-runtime-generation invariant** documented in review notes and enforced architecturally: the v1 client has no path to any generation endpoint.
+- Payments: IAP $6.99/mo · $49.99/yr; US storefront web-checkout link, checkout-only neutral copy (don't bank on 0% link-out forever — Epic rate-setting live).
+- EU/UK web availability gated on loop-2 obligations (Art. 50 marking; UK OSA age assurance for erotic audio; state AV laws scope check for audio-only).
+- Interactive voice (v3 ambition) is a chatbot under 4.7 *and* 1.2 per the Feb 6, 2026 update — costed as such, not assumed cheap.
 
-- **Free tier (real one):** full Focus shelf + rotating free Sleep/Desire sessions. Marginal cost ≈ 0; converts trust into trials (top category complaint is "nothing free").
-- **Selfish+ :** $7.99/mo or **$59.99/yr (annual-first paywall)**, 21-day free trial (RevenueCat data: 17–32-day trials convert ~70% better). Unlocks full catalog, name-drop, downloads, variation requests.
-- **Web-only Explicit tier** included in the same sub purchased via web checkout (Stripe — existing team competency), also unlocking iOS content. Web price $49.99/yr to shift mix off IAP.
-- Benchmarks put a good outcome at Quinn-scale ($10–15M ARR); the interactive v3 is the bet that expands the ceiling (AI-companion category: 25M MAU, women 30–40% and rising).
+## 7. Business model & moats
 
-## 8. Go-to-market sketch
+- **Free tier (small, permanent):** rotating 3 Desire + 3 Rest sessions. Answers the category's loudest complaint; costs ≈ 0.
+- **Selfish+:** **$6.99/mo · $49.99/yr** (at/below Quinn until voice loyalty exists), annual-first paywall, **14-day trial** (giveaway-stacking trimmed per debate; revisit with data at day 60).
+- Explicit web tier: post-launch, priced within the same sub.
+- **Moats, named honestly:** (1) per-variant preference data — skip/replay/dial-down signals at a granularity no fixed catalog can collect, compounding into recommendation and commissioning decisions; (2) **exclusive voice-likeness contracts** for synthetic erotic performance — lockable now, expensive to copy later; (3) the trust brand ("the app that pays humans and tells the truth"), which converts the inevitable exposé into a press release.
+- Ceiling honesty: as scoped this is a Quinn-class ($10–15M ARR) outcome; the composer (v1.5) and interactive voice (v3) are the ceiling-expansion bets, sequenced behind trust and unit economics.
 
-- Channels where the category already converts: BookTok/romance TikTok, romance podcast sponsorships, Reddit (r/RomanceBooks etc. — carefully, no astroturf), Quinn-adjacent creator collabs.
-- Brand voice: warm, witty, literate; "the most considerate voice in your life." Female creative lead on all copy/scripts. Never market explicit capability off-platform (the nudify-app killer).
-- PR narrative available: "ethical AI intimacy" — licensed voices, no real-person cloning, transparency page.
+## 8. Go-to-market
 
-## 9. Risks (top 5)
+1. **Web smoke test first** (operator's demand, shared build): Expo web deploy, 25–40 BFE-dynamic sessions, Stripe paywall, AI disclosed, traffic via 3 romance-TikTok creators. Thresholds: ≥3% visitor→paid; disclosure-aware retention ≥ non-disclosed cohort. iOS submission proceeds on signal.
+2. Channels: BookTok/romance TikTok, romance podcasts, creator collabs; never market explicit capability off-platform.
+3. Brand voice: warm, witty, literate; female creative lead on all scripts/copy; "ethical AI intimacy" narrative led by the licensing story.
 
-1. **Quality bar miss:** AI narration reads as slop → blind-test gate, human editorial pass, post-production craft; delay launch before shipping slop.
-2. **Apple policy shift** on AI+adult adjacency → curated-catalog posture, wellness shelf is genuinely strong, web escape hatch for content and payments.
-3. **TTS provider strike** (ElevenLabs interprets slow-burn as explicit) → self-hosted fallback already in the stack; pipelines separated; test marginal scripts on both.
-4. **4.3 "AI girlfriend" pattern-match at review** → women-first brand, real wellness content, no chat UI in v1, cite Dipsea/Quinn comparables in review notes.
-5. **Cold-start catalog feels thin/repetitive** → depth over breadth in 3 hero dynamics (BFE, praise, friends-to-lovers) at launch; series > one-offs; weekly drops.
+## 9. Risks (updated)
 
-## 10. MVP build scope (execution phase of this repo)
+1. **Disclosed-AI rejection** — the smoke test measures exactly this before scale spend; licensing story is the mitigation.
+2. **Quality miss** — blind-test gate; delay > slop.
+3. **Apple policy shift / review variance** — curated posture, honest notes, web escape hatch.
+4. **Provider strike** (ElevenLabs classifier tightening on slow-burn) — self-hosted fallback warm; pipelines separated.
+5. **Editorial throughput bounds catalog velocity** — $/finished-minute tracked from session one; commissioning guided by preference data, not volume.
+6. **Fast-follow by Quinn/Bloom** — voice exclusivity + data moat + shipping the composer before they notice.
 
-- **App:** Expo / React Native (Expo Router), TypeScript. Screens: age gate + onboarding (mood/voice/heat/hard-limits), Home ("Tonight"), Browse (multi-tag), Player (binaural badge, headphone prompt, heat indicator, skip-scene), Focus/Sleep shelves, Settings (privacy, discretion, subscription).
-- **Backend:** Supabase (existing team competency) — auth (OTP), Postgres catalog schema (sessions, voices, tags, heat levels, entitlements), Storage/CDN for audio, edge functions for entitlement checks.
-- **Pipeline (separate package):** Node/TS generation pipeline — script templates + LLM draft step (pluggable: Grok/OpenAI-compatible), TTS render step (pluggable: ElevenLabs / Orpheus server / mock), post-process hooks, manifest → Supabase publisher. Runnable locally with mock providers so the repo works without secrets.
-- **Not in MVP build:** payments wiring (Stripe/IAP stubs only), real voice cloning, interactive chat.
+## 10. MVP build scope (this repo)
 
-## 11. Open questions for the debate
+- **App:** Expo / React Native + TypeScript (Expo Router), iOS-first, web output for the smoke test. Screens: age gate → onboarding (moods, voices, heat, hard limits, AI-disclosure consent) → Home ("Tonight" picker + Continue rail) → Browse (multi-tag) → Player (variant switcher, heat indicator, headphone prompt, content notes, discreet mode) → Rest shelf → Settings (privacy, discretion, subscription stub, transparency page).
+- **Backend:** Supabase — OTP auth, Postgres schema (voices, narrators/licenses, series, session families, variants, tags, heat levels, ratings, entitlements, preference events), Storage/CDN for audio, RLS everywhere; edge function for entitlement checks.
+- **Pipeline package:** Node/TS CLI — brief → LLM draft (pluggable Grok/OpenAI-compatible; mock provider default) → safety classifier stage (pluggable; rule-based baseline + LLM screen) → editorial gate (human-in-the-loop file workflow) → TTS render (pluggable ElevenLabs / Orpheus server / mock) → post hooks → audit-trail manifest → Supabase publisher. Runs end-to-end locally with mocks, no secrets required.
+- **Explicitly stubbed:** payments (RevenueCat/Stripe interfaces only), real TTS keys, watermarking (interface + TODO to AudioSeal-class implementation).
 
-1. Is "Selfish" the right name, or too cute/negative? (Alternatives: Velvet, Hush, Blush, Undone, Softly.)
-2. Free tier generosity: does a real free tier cannibalize the trial, or is it the trust unlock this category is missing?
-3. Should Focus be in v1 at all, or is it scope creep that dilutes the Desire wedge? (Counter: compliance + brand cover + genuine retention glue.)
-4. Name-drop feature: delightful or uncanny? Does hearing your name break immersion for some listeners?
-5. Is 150 sessions enough to not feel thin against Quinn's thousands?
-6. M4F-first: how fast do we need F4F/NB voices to be credibly "for all women"?
-7. Web-explicit tier: real revenue or distraction in v1?
+## 11. Resolved questions (from v1's open list)
+
+1. Name → keep **Selfish** as working title; trademark scan in loop 2; user-test pre-launch.
+2. Free tier → small + permanent, with shorter (14-day) trial.
+3. Focus in v1 → **cut**; Rest + Desire only.
+4. Name-drop → opt-in, default off, whitelist-only.
+5. 150 sessions → reframed as 100 families × 4 variants + 30 Rest; depth in 3 dynamics.
+6. F4F/NB → launch requirement (≥15 sessions, 3 of 6 voices non-male).
+7. Web explicit tier → deferred post-launch; never referenced in-app.
