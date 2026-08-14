@@ -1,4 +1,4 @@
-import { ColorValue, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Tabs } from 'expo-router';
 import { colors } from '../../src/theme/colors';
 
@@ -8,53 +8,27 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.surface,
+          backgroundColor: colors.background,
           borderTopColor: colors.border,
-          borderTopWidth: 1,
-          height: 88,
-          paddingTop: 8,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          height: 78,
+          paddingTop: 10,
         },
-        tabBarActiveTintColor: colors.accent,
+        tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.textSubtle,
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '500',
-          letterSpacing: 0.5,
+          letterSpacing: 1.2,
+          textTransform: 'uppercase',
         },
+        tabBarIconStyle: { display: 'none' },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <TabIcon label="◆" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="focus"
-        options={{
-          title: 'Focus',
-          tabBarIcon: ({ color }) => <TabIcon label="○" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="whisper"
-        options={{
-          title: 'Whisper',
-          tabBarIcon: ({ color }) => <TabIcon label="◎" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'You',
-          tabBarIcon: ({ color }) => <TabIcon label="◇" color={color} />,
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: 'Home' }} />
+      <Tabs.Screen name="whisper" options={{ title: 'Whisper' }} />
+      <Tabs.Screen name="focus" options={{ title: 'Focus' }} />
+      <Tabs.Screen name="settings" options={{ title: 'You' }} />
     </Tabs>
   );
-}
-
-function TabIcon({ label, color }: { label: string; color: ColorValue }) {
-  return <Text style={{ color, fontSize: 18 }}>{label}</Text>;
 }

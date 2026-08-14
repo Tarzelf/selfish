@@ -124,21 +124,17 @@ export default function WhisperSessionScreen() {
     <LinearGradient colors={['#1A1218', '#0D0B0E']} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Pressable onPress={handleLeave} style={styles.closeButton}>
-            <Text style={styles.closeText}>✕</Text>
+          <Pressable onPress={handleLeave} hitSlop={12}>
+            <Text style={styles.closeText}>Close</Text>
           </Pressable>
           <View style={styles.headerInfo}>
             <Text style={styles.personaName}>{elena.name}</Text>
             <Text style={styles.scenarioTitle}>
               {scenario.title}
-              {self?.name ? ` · you as ${self.name}` : ''}
-              {intensity ? ` · ${intensity}` : ''}
+              {self?.name ? ` · ${self.name}` : ''}
             </Text>
           </View>
-          <Pressable
-            onPress={() => setBodyOn((prev) => !prev)}
-            style={[styles.bodyToggle, bodyOn && styles.bodyToggleOn]}
-          >
+          <Pressable onPress={() => setBodyOn((prev) => !prev)} hitSlop={12}>
             <Text style={[styles.bodyToggleText, bodyOn && styles.bodyToggleTextOn]}>
               Body {bodyOn ? 'on' : 'off'}
             </Text>
@@ -232,13 +228,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  closeButton: {
-    padding: 8,
-    marginRight: 8,
-  },
   closeText: {
+    ...typography.link,
     color: colors.textMuted,
-    fontSize: 18,
+    marginRight: 12,
   },
   headerInfo: {
     flex: 1,
@@ -254,26 +247,13 @@ const styles = StyleSheet.create({
     textTransform: 'none',
     letterSpacing: 0,
   },
-  bodyToggle: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  bodyToggleOn: {
-    borderColor: colors.whisper,
-    backgroundColor: 'rgba(184, 125, 158, 0.15)',
-  },
   bodyToggleText: {
-    ...typography.caption,
+    ...typography.link,
     color: colors.textSubtle,
-    textTransform: 'none',
-    letterSpacing: 0,
-    fontSize: 12,
+    fontSize: 13,
   },
   bodyToggleTextOn: {
-    color: colors.whisper,
+    color: colors.text,
   },
   messages: {
     flex: 1,

@@ -7,7 +7,11 @@
 
 ## Mood (what it should feel like)
 
-Not a porn app. Not a meditation startup with a crystal. A **jewelry box at night**.
+Not a porn app. Not a meditation startup with a crystal.
+
+**Feel:** the brands she already trusts — Vuori, Calm, a good jewelry site. Full-bleed photography. Type in the quiet part of the photo. Underlined text instead of fat buttons. Instant trust on an iPhone.
+
+A jewelry box at night, shot like a lifestyle campaign.
 
 | Word | Yes | No |
 |------|-----|----|
@@ -122,10 +126,16 @@ If a new screen is not on this list, it waits.
 
 ## Living board
 
-Open the app → You → **Design board**  
-or route `/dev/design-board`.
+```bash
+open design-board.html
+# or
+npx serve . --listen 4173
+# then http://localhost:4173/design-board.html
+```
 
-That screen is the component design board: tokens, buttons, cards, fields, bubbles. Change a component there first, then use it in product screens.
+Also in the app: You → **Design board** (`/dev/design-board`).
+
+Change a component on the HTML board first, then use it in product screens.
 
 ---
 

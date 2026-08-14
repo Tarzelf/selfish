@@ -35,7 +35,7 @@ export default function AgeGateScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.label}>A moment</Text>
+        <Text style={styles.eyebrow}>A moment</Text>
         <Text style={styles.title}>This is for adults.</Text>
         <Text style={styles.description}>What year were you born?</Text>
 
@@ -56,7 +56,7 @@ export default function AgeGateScreen() {
       </View>
 
       <View style={styles.actions}>
-        <Button label="Continue" onPress={handleContinue} />
+        <Button label="Continue" onPress={handleContinue} variant="link" />
         <Button label="Go back" onPress={() => router.back()} variant="ghost" />
       </View>
     </SafeAreaView>
@@ -68,43 +68,41 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     paddingHorizontal: 28,
-    paddingBottom: 24,
+    paddingBottom: 32,
   },
   content: {
     flex: 1,
     justifyContent: 'center',
   },
-  label: {
+  eyebrow: {
     ...typography.label,
-    color: colors.accent,
+    color: colors.textSubtle,
     marginBottom: 16,
   },
   title: {
-    ...typography.title,
+    ...typography.hero,
     color: colors.text,
-    marginBottom: 8,
+    fontSize: 32,
+    marginBottom: 10,
   },
   description: {
     ...typography.body,
     color: colors.textMuted,
-    marginBottom: 28,
+    marginBottom: 36,
   },
   input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-    padding: 16,
-    fontSize: 22,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: 14,
+    fontSize: 28,
+    fontWeight: '400',
     color: colors.text,
-    letterSpacing: 2,
+    letterSpacing: 4,
   },
   error: {
     ...typography.caption,
     color: colors.danger,
-    textTransform: 'none',
-    letterSpacing: 0,
-    marginTop: 12,
+    marginTop: 14,
   },
   actions: {
     gap: 8,

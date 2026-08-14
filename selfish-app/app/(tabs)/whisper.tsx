@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../src/components/Button';
@@ -13,41 +14,44 @@ export default function WhisperScreen() {
   const elena = personas[0];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Whisper</Text>
-        <Text style={styles.subtitle}>
-          Interactive voice companions that respond to you. Choose a story, set the mood, and
-          listen.
-        </Text>
-        <Text style={styles.sessionsLeft}>
-          {freeWhisperSessionsRemaining} free session{freeWhisperSessionsRemaining !== 1 ? 's' : ''}{' '}
-          remaining
-        </Text>
-      </View>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <ImageBackground
+          source={require('../../assets/mood/mood-materials.png')}
+          style={styles.hero}
+        >
+          <LinearGradient
+            colors={['transparent', 'rgba(13,11,14,0.88)']}
+            style={styles.heroOverlay}
+          >
+            <Text style={styles.eyebrow}>Companion</Text>
+            <Text style={styles.heroTitle}>{elena.name}</Text>
+            <Text style={styles.heroTag}>{elena.tagline}</Text>
+          </LinearGradient>
+        </ImageBackground>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.personaCard}>
-          <Text style={styles.personaName}>{elena.name}</Text>
-          <Text style={styles.personaTagline}>{elena.tagline}</Text>
-          <Text style={styles.personaDescription}>{elena.description}</Text>
+        <View style={styles.body}>
+          <Text style={styles.description}>{elena.description}</Text>
+          <Text style={styles.sessions}>
+            {freeWhisperSessionsRemaining} sessions remaining
+          </Text>
 
-          <Text style={styles.scenariosLabel}>Scenarios</Text>
+          <Text style={styles.section}>Scenes</Text>
           {elena.scenarios.map((scenario) => (
-            <View key={scenario.id} style={styles.scenarioItem}>
-              <Text style={styles.scenarioTitle}>{scenario.title}</Text>
-              <Text style={styles.scenarioDescription}>{scenario.description}</Text>
+            <View key={scenario.id} style={styles.scene}>
+              <Text style={styles.sceneTitle}>{scenario.title}</Text>
+              <Text style={styles.sceneCopy}>{scenario.description}</Text>
             </View>
           ))}
+
+          <Button
+            label="Start a session"
+            onPress={() => router.push('/whisper/setup')}
+            variant="link"
+            style={styles.cta}
+          />
         </View>
       </ScrollView>
-
-      <View style={styles.actions}>
-        <Button
-          label="Start a Whisper session"
-          onPress={() => router.push('/whisper/setup')}
-        />
-      </View>
     </SafeAreaView>
   );
 }
@@ -56,81 +60,67 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  hero: {
+    height: 280,
+    justifyContent: 'flex-end',
+  },
+  heroOverlay: {
     paddingHorizontal: 24,
+    paddingBottom: 24,
+    paddingTop: 80,
   },
-  header: {
-    paddingTop: 16,
-    paddingBottom: 16,
-  },
-  title: {
-    ...typography.title,
-    color: colors.whisper,
-    marginBottom: 8,
-  },
-  subtitle: {
-    ...typography.body,
-    color: colors.textMuted,
-    lineHeight: 22,
-    marginBottom: 8,
-  },
-  sessionsLeft: {
-    ...typography.caption,
-    color: colors.accent,
-    textTransform: 'none',
-    letterSpacing: 0,
-  },
-  content: {
-    flex: 1,
-  },
-  personaCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 24,
-    marginBottom: 16,
-  },
-  personaName: {
-    ...typography.title,
-    color: colors.text,
-    marginBottom: 4,
-  },
-  personaTagline: {
-    ...typography.caption,
-    color: colors.whisper,
-    textTransform: 'none',
-    letterSpacing: 0,
-    marginBottom: 12,
-  },
-  personaDescription: {
-    ...typography.body,
-    color: colors.textMuted,
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  scenariosLabel: {
+  eyebrow: {
     ...typography.label,
-    color: colors.textSubtle,
-    marginBottom: 12,
+    color: colors.text,
+    opacity: 0.75,
+    marginBottom: 8,
   },
-  scenarioItem: {
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
+  heroTitle: {
+    ...typography.hero,
+    color: colors.text,
   },
-  scenarioTitle: {
+  heroTag: {
     ...typography.subtitle,
     color: colors.text,
-    fontSize: 16,
+    opacity: 0.85,
+    marginTop: 6,
+  },
+  body: {
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 40,
+  },
+  description: {
+    ...typography.body,
+    color: colors.textMuted,
+    marginBottom: 12,
+  },
+  sessions: {
+    ...typography.caption,
+    color: colors.textSubtle,
+    marginBottom: 32,
+  },
+  section: {
+    ...typography.label,
+    color: colors.textSubtle,
+    marginBottom: 8,
+  },
+  scene: {
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  sceneTitle: {
+    ...typography.subtitle,
+    color: colors.text,
     marginBottom: 4,
   },
-  scenarioDescription: {
+  sceneCopy: {
     ...typography.caption,
     color: colors.textMuted,
-    textTransform: 'none',
-    letterSpacing: 0,
   },
-  actions: {
-    paddingBottom: 16,
+  cta: {
+    marginTop: 28,
   },
 });

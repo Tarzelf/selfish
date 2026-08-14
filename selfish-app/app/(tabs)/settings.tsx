@@ -12,46 +12,36 @@ export default function SettingsScreen() {
   const selfOption = self ? getSelfOption(self.feeling) : null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
+        <Text style={styles.eyebrow}>Private</Text>
         <Text style={styles.title}>You</Text>
-        <Text style={styles.subtitle}>
-          A private self. Not a profile. Nobody else sees this.
-        </Text>
+        <Text style={styles.subtitle}>A self. Not a profile.</Text>
       </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>This version of you</Text>
-        <SettingsRow
-          label="Name here"
-          hint={self?.name ? self.name : 'Unnamed — that is fine'}
-        />
-        <SettingsRow
-          label="Feeling"
-          hint={selfOption ? `${selfOption.title} — ${selfOption.feeling}` : 'Not set'}
-        />
-      </View>
+      <Text style={styles.section}>This version of you</Text>
+      <Row label="Name here" hint={self?.name ? self.name : 'Unnamed — that is fine'} />
+      <Row
+        label="Feeling"
+        hint={selfOption ? `${selfOption.title} — ${selfOption.feeling}` : 'Not set'}
+      />
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Privacy</Text>
-        <SettingsRow label="Delete session history" hint="Coming soon" />
-        <SettingsRow label="Memory" hint="Off until you ask" />
-      </View>
+      <Text style={styles.section}>Privacy</Text>
+      <Row label="Memory" hint="Off until you ask" />
+      <Row label="Delete history" hint="Coming soon" />
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Subscription</Text>
-        <SettingsRow label="Selfish+" hint="After you want to keep going" />
-      </View>
+      <Text style={styles.section}>Keep going</Text>
+      <Row label="Selfish+" hint="When you want more evenings" />
 
       <Pressable onPress={() => router.push('/dev/design-board')} style={styles.row}>
         <Text style={styles.rowLabel}>Design board</Text>
-        <Text style={styles.rowHint}>Mood, tokens, components</Text>
+        <Text style={styles.rowHint}>Mood and components</Text>
       </Pressable>
     </SafeAreaView>
   );
 }
 
-function SettingsRow({ label, hint }: { label: string; hint: string }) {
+function Row({ label, hint }: { label: string; hint: string }) {
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
@@ -67,11 +57,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   header: {
-    paddingTop: 16,
-    paddingBottom: 24,
+    paddingTop: 12,
+    paddingBottom: 28,
+  },
+  eyebrow: {
+    ...typography.label,
+    color: colors.textSubtle,
+    marginBottom: 10,
   },
   title: {
-    ...typography.title,
+    ...typography.hero,
     color: colors.text,
     marginBottom: 8,
   },
@@ -80,16 +75,14 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   section: {
-    marginBottom: 32,
-  },
-  sectionTitle: {
     ...typography.label,
-    color: colors.textMuted,
-    marginBottom: 12,
+    color: colors.textSubtle,
+    marginTop: 20,
+    marginBottom: 4,
   },
   row: {
-    paddingVertical: 14,
-    borderBottomWidth: 1,
+    paddingVertical: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
   },
   rowLabel: {
@@ -100,7 +93,5 @@ const styles = StyleSheet.create({
   rowHint: {
     ...typography.caption,
     color: colors.textSubtle,
-    textTransform: 'none',
-    letterSpacing: 0,
   },
 });

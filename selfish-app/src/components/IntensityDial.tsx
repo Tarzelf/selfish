@@ -25,11 +25,12 @@ export function IntensityDial({ value, onChange }: IntensityDialProps) {
             <Pressable
               key={option.value}
               onPress={() => onChange(option.value)}
-              style={[styles.option, selected && styles.optionSelected]}
+              style={styles.option}
             >
               <Text style={[styles.optionText, selected && styles.optionTextSelected]}>
                 {option.label}
               </Text>
+              {selected ? <View style={styles.underline} /> : <View style={styles.gap} />}
             </Pressable>
           );
         })}
@@ -40,38 +41,34 @@ export function IntensityDial({ value, onChange }: IntensityDialProps) {
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   label: {
     ...typography.label,
-    color: colors.textMuted,
-    marginBottom: 12,
+    color: colors.textSubtle,
+    marginBottom: 14,
   },
   row: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 24,
   },
   option: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-  },
-  optionSelected: {
-    borderColor: colors.whisper,
-    backgroundColor: 'rgba(184, 125, 158, 0.12)',
+    paddingBottom: 4,
   },
   optionText: {
-    ...typography.caption,
-    color: colors.textMuted,
-    textTransform: 'none',
-    letterSpacing: 0,
-    fontWeight: '500',
+    ...typography.subtitle,
+    color: colors.textSubtle,
   },
   optionTextSelected: {
-    color: colors.whisper,
+    color: colors.text,
+  },
+  underline: {
+    marginTop: 6,
+    height: 1,
+    backgroundColor: colors.text,
+  },
+  gap: {
+    marginTop: 6,
+    height: 1,
   },
 });

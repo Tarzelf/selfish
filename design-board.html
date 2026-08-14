@@ -208,18 +208,19 @@
     }
 
     .btn {
-      display: block;
-      width: 100%;
+      display: inline-block;
       border: 0;
-      border-radius: 28px;
-      padding: 16px 24px;
-      font-size: 16px;
+      background: transparent;
+      padding: 0;
+      font-size: 15px;
       font-weight: 500;
       cursor: pointer;
       font-family: inherit;
+      text-decoration: underline;
+      color: var(--text);
     }
 
-    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-primary { color: var(--text); }
     .btn-secondary {
       background: var(--elevated);
       color: var(--text);

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,35 +19,53 @@ export default function WelcomeScreen() {
   }, [hasCompletedOnboarding, hasCompletedFirstSession, router]);
 
   return (
-    <LinearGradient colors={['#0D0B0E', '#1A1218', '#0D0B0E']} style={styles.gradient}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.hero}>
-          <Text style={styles.brand}>Selfish</Text>
-          <Text style={styles.tagline}>Time that's just yours.</Text>
-        </View>
-
-        <View style={styles.actions}>
-          <Button label="Begin" onPress={() => router.push('/age-gate')} />
-          <Text style={styles.disclaimer}>Headphones recommended. Adults 18+.</Text>
-        </View>
-      </SafeAreaView>
-    </LinearGradient>
+    <ImageBackground
+      source={require('../assets/mood/mood-atmosphere.png')}
+      style={styles.photo}
+      resizeMode="cover"
+    >
+      <LinearGradient
+        colors={['rgba(13,11,14,0.15)', 'rgba(13,11,14,0.25)', 'rgba(13,11,14,0.92)']}
+        style={styles.gradient}
+      >
+        <SafeAreaView style={styles.container}>
+          <View style={styles.spacer} />
+          <View style={styles.copy}>
+            <Text style={styles.eyebrow}>Private listening</Text>
+            <Text style={styles.brand}>Selfish</Text>
+            <Text style={styles.tagline}>Time that's just yours.</Text>
+            <Button label="Begin" onPress={() => router.push('/age-gate')} variant="link" />
+          </View>
+        </SafeAreaView>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  photo: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
   gradient: {
     flex: 1,
   },
   container: {
     flex: 1,
     paddingHorizontal: 28,
-    justifyContent: 'space-between',
-    paddingBottom: 24,
+    paddingBottom: 36,
   },
-  hero: {
+  spacer: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  copy: {
+    maxWidth: 320,
+  },
+  eyebrow: {
+    ...typography.label,
+    color: colors.text,
+    opacity: 0.75,
+    marginBottom: 10,
   },
   brand: {
     ...typography.hero,
@@ -56,16 +74,8 @@ const styles = StyleSheet.create({
   },
   tagline: {
     ...typography.subtitle,
-    color: colors.accent,
-  },
-  actions: {
-    gap: 16,
-  },
-  disclaimer: {
-    ...typography.caption,
-    color: colors.textSubtle,
-    textAlign: 'center',
-    textTransform: 'none',
-    letterSpacing: 0,
+    color: colors.text,
+    opacity: 0.88,
+    marginBottom: 22,
   },
 });

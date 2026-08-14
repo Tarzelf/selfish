@@ -2,12 +2,10 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button } from '../../src/components/Button';
-import { FocusSessionCard } from '../../src/components/FocusSessionCard';
 import { IntensityDial } from '../../src/components/IntensityDial';
-import { ModeCard } from '../../src/components/ModeCard';
+import { LifestyleCard } from '../../src/components/LifestyleCard';
 import { SelfCard } from '../../src/components/SelfCard';
 import { TextField } from '../../src/components/TextField';
-import { focusSessions } from '../../src/constants/focusSessions';
 import { selfOptions } from '../../src/constants/self';
 import { colors } from '../../src/theme/colors';
 import { spacing } from '../../src/theme/spacing';
@@ -65,22 +63,22 @@ export default function DesignBoardScreen() {
         </Text>
         <Text style={[typography.label, styles.specimenMuted]}>Your self</Text>
 
-        <Text style={styles.section}>Buttons</Text>
-        <Button label="Begin" onPress={() => undefined} />
-        <View style={{ height: spacing.sm }} />
-        <Button label="Secondary" onPress={() => undefined} variant="secondary" />
-        <Button label="Ghost" onPress={() => undefined} variant="ghost" />
+        <Text style={styles.section}>Actions</Text>
+        <Button label="Begin" onPress={() => undefined} variant="link" />
+        <Button label="Go back" onPress={() => undefined} variant="ghost" />
 
-        <Text style={styles.section}>Cards</Text>
-        <ModeCard
+        <Text style={styles.section}>Lifestyle</Text>
+        <LifestyleCard
+          image={require('../../assets/mood/mood-atmosphere.png')}
+          eyebrow="Voice"
           title="Whisper"
-          subtitle="A voice that listens."
-          accentColor={colors.whisper}
+          description="A voice that listens."
+          action="Begin"
+          height={200}
           onPress={() => undefined}
         />
         <SelfCard option={selfOptions[0]} selected onPress={() => undefined} />
         <SelfCard option={selfOptions[1]} selected={false} onPress={() => undefined} />
-        <FocusSessionCard session={focusSessions[0]} onPress={() => undefined} />
 
         <Text style={styles.section}>Controls</Text>
         <IntensityDial value="warm" onChange={() => undefined} />

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SelfOption } from '../constants/self';
 import { colors } from '../theme/colors';
 import { typography } from '../theme/typography';
@@ -13,48 +13,53 @@ export function SelfCard({ option, selected, onPress }: SelfCardProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.card,
-        selected && styles.selected,
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.row, pressed && styles.pressed]}
     >
-      <Text style={[styles.title, selected && styles.titleSelected]}>{option.title}</Text>
-      <Text style={styles.feeling}>{option.feeling}</Text>
+      <View style={[styles.mark, selected && styles.markOn]} />
+      <View style={styles.copy}>
+        <Text style={[styles.title, selected && styles.titleOn]}>{option.title}</Text>
+        <Text style={styles.feeling}>{option.feeling}</Text>
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: 20,
-    paddingHorizontal: 22,
-    marginBottom: 12,
-  },
-  selected: {
-    borderColor: colors.whisper,
-    backgroundColor: 'rgba(184, 125, 158, 0.12)',
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 18,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   pressed: {
-    opacity: 0.9,
-    transform: [{ scale: 0.99 }],
+    opacity: 0.75,
+  },
+  mark: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginRight: 16,
+  },
+  markOn: {
+    backgroundColor: colors.text,
+    borderColor: colors.text,
+  },
+  copy: {
+    flex: 1,
   },
   title: {
     ...typography.subtitle,
     color: colors.text,
-    fontSize: 18,
     marginBottom: 4,
   },
-  titleSelected: {
-    color: colors.whisper,
+  titleOn: {
+    fontWeight: '500',
   },
   feeling: {
-    ...typography.body,
+    ...typography.caption,
     color: colors.textMuted,
-    fontSize: 15,
   },
 });

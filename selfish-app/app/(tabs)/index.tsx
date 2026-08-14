@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ModeCard } from '../../src/components/ModeCard';
+import { LifestyleCard } from '../../src/components/LifestyleCard';
 import { getSelfOption } from '../../src/constants/self';
 import { useAppState } from '../../src/context/AppContext';
 import { colors } from '../../src/theme/colors';
@@ -11,41 +11,40 @@ export default function HomeScreen() {
   const router = useRouter();
   const { self } = useAppState();
   const selfOption = self ? getSelfOption(self.feeling) : null;
-  const greeting = self?.name ? `Welcome back, ${self.name}` : 'Welcome back';
+  const greeting = self?.name ? self.name : 'Welcome back';
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.greeting}>{greeting}</Text>
-        <Text style={styles.subtitle}>
-          {selfOption
-            ? `You can keep being ${selfOption.title.toLowerCase()} — or try another self.`
-            : 'What do you need right now?'}
-        </Text>
-      </View>
-
-      {selfOption ? (
-        <View style={styles.selfCard}>
-          <Text style={styles.selfLabel}>Your self tonight</Text>
-          <Text style={styles.selfTitle}>{selfOption.title}</Text>
-          <Text style={styles.selfFeeling}>{selfOption.feeling}</Text>
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        <View style={styles.header}>
+          <Text style={styles.eyebrow}>This evening</Text>
+          <Text style={styles.greeting}>{greeting}</Text>
+          <Text style={styles.subtitle}>
+            {selfOption
+              ? `${selfOption.title}. ${selfOption.feeling}`
+              : 'What do you need right now?'}
+          </Text>
         </View>
-      ) : null}
 
-      <View style={styles.modes}>
-        <ModeCard
+        <LifestyleCard
+          image={require('../../assets/mood/mood-atmosphere.png')}
+          eyebrow="Voice"
           title="Whisper"
-          subtitle="Continue. Or start a new scene."
-          accentColor={colors.whisper}
+          description="A voice that listens. A story that's yours."
+          action="Begin"
+          height={320}
           onPress={() => router.push('/(tabs)/whisper')}
         />
-        <ModeCard
+        <LifestyleCard
+          image={require('../../assets/mood/mood-device.png')}
+          eyebrow="Quiet"
           title="Focus"
-          subtitle="Quiet, if you need it."
-          accentColor={colors.focus}
+          description="Ambient sessions when you need the room to settle."
+          action="Listen"
+          height={220}
           onPress={() => router.push('/(tabs)/focus')}
         />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -54,47 +53,28 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    paddingHorizontal: 24,
+  },
+  scroll: {
+    paddingHorizontal: 20,
+    paddingBottom: 32,
   },
   header: {
-    paddingTop: 16,
-    paddingBottom: 20,
+    paddingTop: 12,
+    paddingBottom: 24,
+    paddingHorizontal: 4,
+  },
+  eyebrow: {
+    ...typography.label,
+    color: colors.textSubtle,
+    marginBottom: 10,
   },
   greeting: {
     ...typography.hero,
     color: colors.text,
-    fontSize: 28,
-    marginBottom: 4,
+    marginBottom: 8,
   },
   subtitle: {
     ...typography.body,
     color: colors.textMuted,
-  },
-  selfCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 18,
-    marginBottom: 24,
-  },
-  selfLabel: {
-    ...typography.label,
-    color: colors.whisper,
-    marginBottom: 8,
-  },
-  selfTitle: {
-    ...typography.subtitle,
-    color: colors.text,
-    marginBottom: 4,
-  },
-  selfFeeling: {
-    ...typography.caption,
-    color: colors.textMuted,
-    textTransform: 'none',
-    letterSpacing: 0,
-  },
-  modes: {
-    flex: 1,
   },
 });

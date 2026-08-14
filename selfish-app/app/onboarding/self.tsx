@@ -40,11 +40,11 @@ export default function SelfScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.label}>Your self</Text>
+        <Text style={styles.eyebrow}>Your self</Text>
         <Text style={styles.title}>Tonight, who do you want to be?</Text>
-        <Text style={styles.hint}>Not a profile. A mood. You can change this later.</Text>
+        <Text style={styles.hint}>Not a profile. A mood.</Text>
 
-        <View style={styles.cards}>
+        <View style={styles.list}>
           {selfOptions.map((option) => (
             <SelfCard
               key={option.id}
@@ -70,7 +70,7 @@ export default function SelfScreen() {
       </ScrollView>
 
       <View style={styles.actions}>
-        <Button label="I'm ready" onPress={handleReady} />
+        <Button label="I'm ready" onPress={handleReady} variant="link" />
       </View>
     </SafeAreaView>
   );
@@ -86,43 +86,42 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 28,
-    paddingTop: 24,
+    paddingTop: 28,
     paddingBottom: 16,
   },
-  label: {
+  eyebrow: {
     ...typography.label,
-    color: colors.whisper,
-    marginBottom: 12,
+    color: colors.textSubtle,
+    marginBottom: 14,
   },
   title: {
-    ...typography.title,
+    ...typography.hero,
+    fontSize: 30,
+    marginBottom: 10,
     color: colors.text,
-    marginBottom: 8,
   },
   hint: {
     ...typography.body,
     color: colors.textMuted,
     marginBottom: 28,
   },
-  cards: {
-    marginBottom: 28,
+  list: {
+    marginBottom: 36,
   },
   nameLabel: {
     ...typography.label,
-    color: colors.textMuted,
-    marginBottom: 10,
+    color: colors.textSubtle,
+    marginBottom: 12,
   },
   input: {
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-    padding: 16,
-    fontSize: 17,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingVertical: 12,
+    fontSize: 18,
     color: colors.text,
   },
   actions: {
     paddingHorizontal: 28,
-    paddingBottom: 24,
+    paddingBottom: 32,
   },
 });
