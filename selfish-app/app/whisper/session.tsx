@@ -23,21 +23,28 @@ interface Message {
   content: string;
 }
 
+function personalizeOpening(opening: string, name?: string) {
+  if (!name) return opening;
+  return `${name}. ${opening}`;
+}
+
 export default function WhisperSessionScreen() {
-  const { scenarioId, intensity } = useLocalSearchParams<{
+  const { scenarioId, intensity, firstSession } = useLocalSearchParams<{
     scenarioId: string;
     intensity: Intensity;
+    firstSession?: string;
   }>();
   const router = useRouter();
-  const { decrementFreeSession } = useAppState();
+  const { decrementFreeSession, self, setHasCompletedFirstSession } = useAppState();
   const elena = personas[0];
   const scenario = elena.scenarios.find((s) => s.id === scenarioId) ?? elena.scenarios[0];
+  const isFirstSession = firstSession === '1';
 
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       role: 'assistant',
-      content: scenario.openingLine,
+      content: personalizeOpening(scenario.openingLine, self?.name),
     },
   ]);
   const [inputText, setInputText] = useState('');
@@ -52,6 +59,15 @@ export default function WhisperSessionScreen() {
       decrementFreeSession();
     }
   }, [decrementFreeSession]);
+
+  const handleLeave = () => {
+    if (isFirstSession) {
+      setHasCompletedFirstSession(true);
+      router.replace('/(tabs)');
+      return;
+    }
+    router.back();
+  };
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || isThinking) return;
@@ -90,13 +106,15 @@ export default function WhisperSessionScreen() {
     <LinearGradient colors={['#1A1218', '#0D0B0E']} style={styles.gradient}>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.closeButton}>
+          <Pressable onPress={handleLeave} style={styles.closeButton}>
             <Text style={styles.closeText}>✕</Text>
           </Pressable>
           <View style={styles.headerInfo}>
             <Text style={styles.personaName}>{elena.name}</Text>
             <Text style={styles.scenarioTitle}>
-              {scenario.title} · {intensity}
+              {scenario.title}
+              {self?.name ? ` · you as ${self.name}` : ''}
+              {intensity ? ` · ${intensity}` : ''}
             </Text>
           </View>
         </View>

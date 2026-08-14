@@ -10,13 +10,13 @@ import { typography } from '../src/theme/typography';
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { hasCompletedAgeGate } = useAppState();
+  const { hasCompletedOnboarding, hasCompletedFirstSession } = useAppState();
 
   useEffect(() => {
-    if (hasCompletedAgeGate) {
+    if (hasCompletedOnboarding && hasCompletedFirstSession) {
       router.replace('/(tabs)');
     }
-  }, [hasCompletedAgeGate, router]);
+  }, [hasCompletedOnboarding, hasCompletedFirstSession, router]);
 
   return (
     <LinearGradient colors={['#0D0B0E', '#1A1218', '#0D0B0E']} style={styles.gradient}>
@@ -24,16 +24,11 @@ export default function WelcomeScreen() {
         <View style={styles.hero}>
           <Text style={styles.brand}>Selfish</Text>
           <Text style={styles.tagline}>Time that's just yours.</Text>
-          <Text style={styles.description}>
-            A private space for focus and intimate voice exploration. Headphones recommended.
-          </Text>
         </View>
 
         <View style={styles.actions}>
           <Button label="Begin" onPress={() => router.push('/age-gate')} />
-          <Text style={styles.disclaimer}>
-            For adults 18+. Your sessions stay private.
-          </Text>
+          <Text style={styles.disclaimer}>Headphones recommended. Adults 18+.</Text>
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -62,13 +57,6 @@ const styles = StyleSheet.create({
   tagline: {
     ...typography.subtitle,
     color: colors.accent,
-    marginBottom: 24,
-  },
-  description: {
-    ...typography.body,
-    color: colors.textMuted,
-    maxWidth: 300,
-    lineHeight: 24,
   },
   actions: {
     gap: 16,

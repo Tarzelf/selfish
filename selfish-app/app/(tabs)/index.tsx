@@ -2,37 +2,50 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ModeCard } from '../../src/components/ModeCard';
+import { getSelfOption } from '../../src/constants/self';
+import { useAppState } from '../../src/context/AppContext';
 import { colors } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { self } = useAppState();
+  const selfOption = self ? getSelfOption(self.feeling) : null;
+  const greeting = self?.name ? `Welcome back, ${self.name}` : 'Welcome back';
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Good evening</Text>
-        <Text style={styles.subtitle}>What do you need right now?</Text>
+        <Text style={styles.greeting}>{greeting}</Text>
+        <Text style={styles.subtitle}>
+          {selfOption
+            ? `You can keep being ${selfOption.title.toLowerCase()} — or try another self.`
+            : 'What do you need right now?'}
+        </Text>
       </View>
+
+      {selfOption ? (
+        <View style={styles.selfCard}>
+          <Text style={styles.selfLabel}>Your self tonight</Text>
+          <Text style={styles.selfTitle}>{selfOption.title}</Text>
+          <Text style={styles.selfFeeling}>{selfOption.feeling}</Text>
+        </View>
+      ) : null}
 
       <View style={styles.modes}>
         <ModeCard
-          title="Focus"
-          subtitle="Calm your mind. Find your flow."
-          accentColor={colors.focus}
-          onPress={() => router.push('/(tabs)/focus')}
-        />
-        <ModeCard
           title="Whisper"
-          subtitle="A voice that listens. A story that's yours."
+          subtitle="Continue. Or start a new scene."
           accentColor={colors.whisper}
           onPress={() => router.push('/(tabs)/whisper')}
         />
+        <ModeCard
+          title="Focus"
+          subtitle="Quiet, if you need it."
+          accentColor={colors.focus}
+          onPress={() => router.push('/(tabs)/focus')}
+        />
       </View>
-
-      <Text style={styles.hint}>
-        Headphones recommended for the full experience.
-      </Text>
     </SafeAreaView>
   );
 }
@@ -45,7 +58,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingTop: 16,
-    paddingBottom: 32,
+    paddingBottom: 20,
   },
   greeting: {
     ...typography.hero,
@@ -57,15 +70,31 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textMuted,
   },
-  modes: {
-    flex: 1,
+  selfCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 18,
+    marginBottom: 24,
   },
-  hint: {
+  selfLabel: {
+    ...typography.label,
+    color: colors.whisper,
+    marginBottom: 8,
+  },
+  selfTitle: {
+    ...typography.subtitle,
+    color: colors.text,
+    marginBottom: 4,
+  },
+  selfFeeling: {
     ...typography.caption,
-    color: colors.textSubtle,
-    textAlign: 'center',
+    color: colors.textMuted,
     textTransform: 'none',
     letterSpacing: 0,
-    paddingBottom: 16,
+  },
+  modes: {
+    flex: 1,
   },
 });

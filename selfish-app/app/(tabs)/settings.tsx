@@ -1,30 +1,44 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getSelfOption } from '../../src/constants/self';
+import { useAppState } from '../../src/context/AppContext';
 import { colors } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
 
 export default function SettingsScreen() {
+  const { self } = useAppState();
+  const selfOption = self ? getSelfOption(self.feeling) : null;
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>You</Text>
+        <Text style={styles.subtitle}>
+          A private self. Not a profile. Nobody else sees this.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>This version of you</Text>
+        <SettingsRow
+          label="Name here"
+          hint={self?.name ? self.name : 'Unnamed — that is fine'}
+        />
+        <SettingsRow
+          label="Feeling"
+          hint={selfOption ? `${selfOption.title} — ${selfOption.feeling}` : 'Not set'}
+        />
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Privacy</Text>
         <SettingsRow label="Delete session history" hint="Coming soon" />
-        <SettingsRow label="Memory" hint="Opt-in only" />
+        <SettingsRow label="Memory" hint="Off until you ask" />
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Subscription</Text>
-        <SettingsRow label="Selfish+" hint="Coming soon — $9.99/mo" />
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
-        <SettingsRow label="Version" hint="1.0.0 (MVP)" />
-        <SettingsRow label="Privacy Policy" hint="Coming soon" />
+        <SettingsRow label="Selfish+" hint="After you want to keep going" />
       </View>
     </SafeAreaView>
   );
@@ -52,6 +66,11 @@ const styles = StyleSheet.create({
   title: {
     ...typography.title,
     color: colors.text,
+    marginBottom: 8,
+  },
+  subtitle: {
+    ...typography.body,
+    color: colors.textMuted,
   },
   section: {
     marginBottom: 32,
@@ -62,9 +81,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
@@ -72,6 +88,7 @@ const styles = StyleSheet.create({
   rowLabel: {
     ...typography.body,
     color: colors.text,
+    marginBottom: 4,
   },
   rowHint: {
     ...typography.caption,

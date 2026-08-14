@@ -16,6 +16,8 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="age-gate" />
+        <Stack.Screen name="onboarding/promise" />
+        <Stack.Screen name="onboarding/self" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="focus/[id]"

@@ -145,7 +145,9 @@
 ### In scope
 
 - [ ] iOS app (Expo, iPhone only, no iPad)
-- [ ] Auth (email OTP via Supabase)
+- [ ] Four-screen onboarding → first Whisper session (no home, no quiz)
+- [ ] Self persona (soft / playful / bold) — who *they* get to be
+- [ ] Auth (email OTP after first good session)
 - [ ] Age gate (18+ self-declaration + terms)
 - [ ] Focus mode: 3 ambient sessions (pre-loaded audio)
 - [ ] Whisper mode: 2 personas, 3 scenarios each

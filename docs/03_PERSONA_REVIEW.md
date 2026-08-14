@@ -123,3 +123,17 @@ Based on persona review:
 6. ✅ Reduce launch personas to 1 primary + 1 secondary
 7. ⏳ Sleep timer → v1.1 (not MVP blocker)
 8. ⏳ Test App Store name/tagline with 5 real users before submission
+
+---
+
+## Cycle 2: Maya reviews onboarding
+
+> "If you ask me to pick my kinks on screen three I will close the app. If you ask me how I want to *feel*, I'll answer. If Elena is talking thirty seconds later, I'm yours."
+
+> "The Self thing is actually what I wanted from Replika and never got. I don't want to build *her*. I want a place I can be a little different and not be weird about it."
+
+> "Don't tell me it's healing. Let it feel that way."
+
+**Onboarding verdict**: Four screens, then voice. Self over quiz. No home until after session 1. ✅
+
+See `docs/06_ONBOARDING.md`.

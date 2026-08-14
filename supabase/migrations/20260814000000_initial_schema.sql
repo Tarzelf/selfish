@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS profiles (
   birth_date DATE,
   memory_enabled BOOLEAN DEFAULT FALSE,
   intensity_preference TEXT DEFAULT 'warm' CHECK (intensity_preference IN ('soft', 'warm', 'bold')),
+  self_feeling TEXT CHECK (self_feeling IN ('soft', 'playful', 'bold')),
+  self_name TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
