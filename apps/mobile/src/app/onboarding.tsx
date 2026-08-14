@@ -1,16 +1,88 @@
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { Body, Button, Caption, Chip, Display, Screen } from '@/components/ui';
 import { fonts, palette, radius, spacing } from '@/constants/theme';
+import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { useAppState } from '@/lib/store';
 import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
 
 type Step = 'welcome' | 'age' | 'honesty' | 'moods' | 'heat' | 'limits' | 'done';
 
 const STEPS: Step[] = ['welcome', 'age', 'honesty', 'moods', 'heat', 'limits', 'done'];
+
+/** The landing: dramatize the value props, let them HEAR it, then begin. */
+function Landing({ onBegin }: { onBegin: () => void }) {
+  const player = useAudioPlayer(VOICE_PREVIEW_AUDIO['v-jasper'] ?? null);
+  const status = useAudioPlayerStatus(player);
+
+  const toggle = () => {
+    if (status.playing) {
+      player.pause();
+      return;
+    }
+    if (status.duration > 0 && status.currentTime >= status.duration - 0.05) player.seekTo(0);
+    player.play();
+  };
+
+  return (
+    <Screen>
+      <Text style={styles.landingWordmark}>SELFISH</Text>
+      <Text style={styles.landingHero}>Time that&apos;s{'\n'}just for you.</Text>
+      <Body dim style={styles.landingLede}>
+        Intimate audio fiction and unhurried sleep stories — written with care, whispered up close,
+        and tuned to exactly the mood you&apos;re in tonight.
+      </Body>
+
+      <LinearGradient colors={['#2B1631', '#7E2F4E']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.listenCard}>
+        <View style={styles.listenOrb} />
+        <Text style={styles.listenKicker}>PUT YOUR HEADPHONES ON</Text>
+        <Text style={styles.listenTitle}>Hear how close{'\n'}close can get.</Text>
+        <View style={styles.listenRow}>
+          <Pressable
+            onPress={toggle}
+            accessibilityRole="button"
+            accessibilityLabel={status.playing ? 'Pause sample' : 'Play sample'}
+            style={({ pressed }) => [styles.listenPlay, pressed && { opacity: 0.8 }]}
+          >
+            <Text style={styles.listenPlayGlyph}>{status.playing ? '❚❚' : '▶'}</Text>
+          </Pressable>
+          <Text style={styles.listenMeta}>Jasper · a 30-second whisper{'\n'}Rendered by our engine — no human recorded this.</Text>
+        </View>
+      </LinearGradient>
+
+      <View style={styles.props}>
+        <View style={styles.prop}>
+          <Text style={styles.propTitle}>Made to your mood</Text>
+          <Text style={styles.propBody}>
+            Comforted, adored, teased, in charge. Pick the feeling and the heat; every story comes in
+            softer, slower, and further versions — switch with one tap.
+          </Text>
+        </View>
+        <View style={styles.prop}>
+          <Text style={styles.propTitle}>Private by design</Text>
+          <Text style={styles.propBody}>
+            Nothing revealing on your lock screen. No feed, no profiles, no judgment. Hard limits you
+            set once and never see crossed. Deletion that actually deletes.
+          </Text>
+        </View>
+        <View style={styles.prop}>
+          <Text style={styles.propTitle}>Honest AI, human-made</Text>
+          <Text style={styles.propBody}>
+            Every voice is synthetic and we say so — built from recordings narrators licensed for
+            exactly this, with a share of revenue for as long as they&apos;re in the app.
+          </Text>
+        </View>
+      </View>
+
+      <Button label="Begin — it takes a minute" onPress={onBegin} style={styles.landingCta} />
+      <Caption style={styles.landingFoot}>For adults. Free to explore; no card required.</Caption>
+    </Screen>
+  );
+}
 
 export default function Onboarding() {
   const router = useRouter();
@@ -51,6 +123,10 @@ export default function Onboarding() {
     router.replace('/(tabs)');
   };
 
+  if (step === 'welcome') {
+    return <Landing onBegin={next} />;
+  }
+
   return (
     <Screen scroll={false}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
@@ -59,31 +135,6 @@ export default function Onboarding() {
             <View key={s} style={[styles.progressDot, i <= stepIndex && { backgroundColor: palette.gold }]} />
           ))}
         </View>
-
-        {step === 'welcome' && (
-          <View style={styles.stepBody}>
-            <LinearGradient
-              colors={['#3D2244', '#8A3B5C']}
-              start={{ x: 0.1, y: 0.05 }}
-              end={{ x: 0.95, y: 1 }}
-              style={styles.welcomeArt}
-            >
-              <View style={styles.welcomeRing} />
-              <Text style={styles.welcomeMonogram}>S</Text>
-            </LinearGradient>
-            <Display style={styles.welcomeTitle}>Selfish</Display>
-            <Body dim style={[styles.lede, styles.welcomeLede]}>
-              Audio made for exactly one person tonight: you.
-            </Body>
-            <Body dim style={[styles.lede, styles.welcomeLede]}>
-              Stories to fall asleep to. Stories that are very much not for sleeping. Every one of
-              them written with care, performed up close, and tuned to your mood.
-            </Body>
-            <View style={styles.spacer} />
-            <Button label="Begin" onPress={next} />
-            <Text style={styles.headphoneHint}>🎧 Best experienced with headphones</Text>
-          </View>
-        )}
 
         {step === 'age' && (
           <View style={styles.stepBody}>
@@ -126,7 +177,7 @@ export default function Onboarding() {
             <View style={styles.spacer} />
             <Button label="Sounds fair — I agree" onPress={next} />
             <Caption style={styles.finePrint}>
-              You can read the full voice transparency page any time in Settings.
+              The full voice transparency page is always one tap away in Settings.
             </Caption>
           </View>
         )}
@@ -135,7 +186,7 @@ export default function Onboarding() {
           <View style={styles.stepBody}>
             <Display>How do you want to feel?</Display>
             <Body dim style={styles.lede}>
-              Pick any that ring true. This tunes your Tonight page — you can change it whenever.
+              Pick any that ring true. This tunes your Tonight page — change it whenever you like.
             </Body>
             <View style={styles.chipWrap}>
               {MOODS.map((m) => (
@@ -151,8 +202,8 @@ export default function Onboarding() {
           <View style={styles.stepBody}>
             <Display>Set your heat</Display>
             <Body dim style={styles.lede}>
-              This caps what appears anywhere in the app. It starts gentle; you can turn it up (or
-              down) in Settings whenever you like. Nothing above your setting is ever shown.
+              This caps what appears anywhere in the app. It starts gentle; turn it up (or down) in
+              Settings whenever you like. Nothing above your setting is ever shown.
             </Body>
             <View style={styles.chipWrap}>
               {(['comfort', 'slow-burn', 'spicy'] as HeatLevel[]).map((h) => (
@@ -238,33 +289,60 @@ const styles = StyleSheet.create({
     fontSize: 15,
     padding: spacing.sm,
   },
-  welcomeArt: {
-    width: 128,
-    height: 128,
-    borderRadius: 32,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-  },
-  welcomeRing: {
-    position: 'absolute',
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.16)',
-  },
-  welcomeMonogram: { fontFamily: fonts.display, fontSize: 56, color: palette.text },
-  welcomeTitle: { textAlign: 'center' },
-  welcomeLede: { textAlign: 'center' },
-  headphoneHint: {
+
+  // Landing
+  landingWordmark: {
     fontFamily: fonts.body,
-    fontSize: 13,
-    color: palette.textFaint,
-    textAlign: 'center',
+    fontSize: 12,
+    letterSpacing: 3.5,
+    fontWeight: '700',
+    color: palette.gold,
+    marginTop: spacing.xl,
+  },
+  landingHero: {
+    fontFamily: fonts.display,
+    fontSize: 52,
+    lineHeight: 58,
+    color: palette.text,
     marginTop: spacing.md,
   },
+  landingLede: { marginTop: spacing.md, fontSize: 17, lineHeight: 26, maxWidth: 560 },
+  listenCard: {
+    borderRadius: radius.lg + 6,
+    padding: spacing.lg,
+    marginTop: spacing.xl,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.09)',
+  },
+  listenOrb: {
+    position: 'absolute',
+    width: 300,
+    height: 300,
+    borderRadius: 300,
+    top: -150,
+    right: -90,
+    backgroundColor: 'rgba(224,138,120,0.32)',
+  },
+  listenKicker: { fontFamily: fonts.body, fontSize: 11, letterSpacing: 2.2, fontWeight: '700', color: '#E8B98A' },
+  listenTitle: { fontFamily: fonts.display, fontSize: 30, lineHeight: 36, color: palette.text, marginTop: spacing.sm },
+  listenRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.md },
+  listenPlay: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: 'rgba(255,255,255,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  listenPlayGlyph: { color: palette.text, fontSize: 18, marginLeft: 2 },
+  listenMeta: { flex: 1, fontFamily: fonts.body, fontSize: 12.5, lineHeight: 18, color: 'rgba(243,237,247,0.75)' },
+  props: { marginTop: spacing.xl, gap: spacing.lg },
+  prop: { borderLeftWidth: 2, borderLeftColor: palette.goldSoft, paddingLeft: spacing.md },
+  propTitle: { fontFamily: fonts.display, fontSize: 21, color: palette.text },
+  propBody: { fontFamily: fonts.body, fontSize: 14.5, lineHeight: 22, color: palette.textDim, marginTop: spacing.xs },
+  landingCta: { marginTop: spacing.xl },
+  landingFoot: { textAlign: 'center', marginTop: spacing.md },
 });
