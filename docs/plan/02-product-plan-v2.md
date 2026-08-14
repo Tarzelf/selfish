@@ -294,22 +294,67 @@ policy problem for our TTS vendor.
 | Procedural focus soundscapes and room tone | Built |
 | Automated QC: loudness, true peak, LRA, silence, spatial collapse, mono fold | Built |
 | ASR round-trip transcript verification | Built |
-| Safety / ceiling / craft linters | Built, 28 tests |
+| Safety / ceiling / craft linters | Built |
 | Evidence-derived content taxonomy with enforced invariants | Built |
+| Beat-level assembly with programmable pacing arcs | Built, measured |
 
-Measured throughput: ~90 s of single-core CPU per finished 20-minute episode. Audio
-production is not a bottleneck; **human editorial review is**, which is where tooling
+66 tests. Measured throughput: ~90 s of single-core CPU per finished 20-minute episode.
+Audio production is not a bottleneck; **human editorial review is**, which is where tooling
 investment belongs.
 
-### 6.2 Client platform
+Beat assembly is measured rather than assumed: three arcs produce materially different
+runtimes from one set of recordings, joins sit inside the episode's own signal envelope
+rather than standing out as clicks, per-beat loudness matches the arc's target to 0.000 LU,
+and runtime targeting is accurate to 0.16 s. See `docs/research/08-assembly-validation.md`.
 
-Pending the engineering review's verdict in `docs/debate/03-engineering-review.md`. The
-question is not audio — pre-rendering all DSP offline means the app only needs to play a
-stereo file well, which Expo can do. The question is whether **Apple's Declared Age Range
-API** (`AgeRangeService`, `PermissionKit`, StoreKit age-rating property,
-`RESCIND_CONSENT` notifications — all iOS 26.2+ native surface, required even for 18+ apps
-in mandated regions since Texas SB 2420 became enforceable on 4 June 2026) forces native
-Swift or can live behind a config plugin.
+### 6.2 Client platform: Expo, with one small native module
+
+Reviewed and settled. **Expo, not native Swift.**
+
+The audio question resolves itself: pre-rendering all DSP offline means the app only has to
+play a stereo file well, and 9 of 11 audio requirements are already first-party in Expo.
+
+Age assurance, which looked like the decisive threat, does not change the decision. Expo
+ships a first-party `expo-age-range` module wrapping Apple's `DeclaredAgeRange` framework —
+including the `selfDeclared | guardianDeclared | confirmed` assurance signal and the
+significant-update acknowledgement flow. Three of the four required surfaces arrive with an
+`npx expo install`, and the fourth (`RESCIND_CONSENT`) is a server webhook with no native
+component at all.
+
+**The one real gap is audio session and route policy** — precisely the thing the discretion
+subsystem depends on. Expo's audio API exposes no `AVAudioSession.CategoryOptions`, no
+route-change events, and no control over which remote commands are registered, so
+suppressing CarPlay/Bluetooth auto-resume needs a small native module (~250 lines). That is
+the cheapest kind of native code to own: no real-time constraints, no audio graph, and it
+changes roughly never.
+
+One useful correction: the CarPlay *entitlement* is not what causes the auto-resume problem.
+The head unit simply sends a remote `play` command on connection. The fix is to not register
+that command and to refuse to resume on route changes — which is reachable from a small
+shim, and Face ID lock (already wanted for privacy) turns out to be an accidental second
+line of defence.
+
+### 6.3 Rendering: eager batch, not lazy on request
+
+v0 proposed rendering variants on first request. Reviewed and reversed. A cold render takes
+minutes and can fail QC, so there is no acceptable synchronous user experience behind it —
+and storage was never the constraint ($3–8/month), while TTS or performer time is ~99.9% of
+a variant's marginal cost. So the correct move is not to defer the spend but to **shrink the
+grid** and render it all before submission.
+
+Two supporting decisions: every render is **content-addressed and never invalidated**, which
+eliminates the entire "app is playing the stale version" bug class for about thirty lines of
+work; and the multi-stem "mix it yourself" dial is implemented as **3–5 pre-rendered balance
+variants** rather than live multi-stream gain, because three simultaneous players drift out
+of sync and the pipeline can do the mix perfectly for free.
+
+### 6.4 Cut from v1
+
+Ranked by maintenance burden removed per unit of product value lost: the web/explicit second
+catalogue (which alone removes an adult payment processor, card-network registration and
+reporting, a third-party age-assurance vendor, a second billing system, and a disclosure
+risk), the name-whisper feature, the POV and Length axes, live multi-stem gain, lazy
+rendering, the alternate app icon, and server-side recommendations.
 
 ---
 
