@@ -1,9 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { PrimaryButton, Sanctuary } from '../components/ui';
+import { GhostButton, PrimaryButton, Sanctuary } from '../components/ui';
 import { space, type } from '../theme';
 
-export function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
+export function WelcomeScreen({
+  onContinue,
+  onBrowse,
+}: {
+  onContinue: () => void;
+  onBrowse: () => void;
+}) {
   return (
     <Sanctuary>
       <SafeAreaView style={styles.safe}>
@@ -17,7 +23,8 @@ export function WelcomeScreen({ onContinue }: { onContinue: () => void }) {
             is not optional.
           </Text>
         </View>
-        <PrimaryButton label="I have an hour" onPress={onContinue} />
+        <PrimaryButton label="Help me choose" onPress={onContinue} />
+        <GhostButton label="Show me the rooms first" onPress={onBrowse} />
       </SafeAreaView>
     </Sanctuary>
   );

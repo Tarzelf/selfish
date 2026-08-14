@@ -71,11 +71,11 @@ Open the phone → age and quiet welcome (once) → “what do you need tonight�
 ## Information architecture (six screens)
 
 1. Age gate
-2. Welcome
-3. Onboarding (three questions)
+2. Welcome (help me choose, or show me the rooms)
+3. Onboarding (three questions — optional)
 4. Home (Tonight + Still + Want)
 5. Session (synopsis, heat, voice, begin)
-6. Player (chapters, listen, skip to aftercare)
+6. Player (chapters, listen, skip to aftercare always in the top bar)
 
 Settings is a seventh, small door: voice, heat, wipe, about.
 

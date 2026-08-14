@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AgeGateScreen } from './src/screens/AgeGateScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
@@ -45,8 +45,8 @@ export default function App() {
     );
   }
 
-  return (
-    <SafeAreaProvider>
+  const room = (
+    <>
       <StatusBar style="light" />
       {screen.name === 'gate' && (
         <AgeGateScreen
@@ -57,7 +57,20 @@ export default function App() {
         />
       )}
       {screen.name === 'welcome' && (
-        <WelcomeScreen onContinue={() => setScreen({ name: 'onboarding' })} />
+        <WelcomeScreen
+          onContinue={() => setScreen({ name: 'onboarding' })}
+          onBrowse={() => {
+            persist({
+              ...profile,
+              gift: 'unsure',
+              pace: 'unhurried',
+              voiceId: 'ash',
+              heat: 1,
+              onboardingComplete: true,
+            });
+            setScreen({ name: 'home' });
+          }}
+        />
       )}
       {screen.name === 'onboarding' && (
         <OnboardingScreen
@@ -101,6 +114,18 @@ export default function App() {
           }}
         />
       )}
+    </>
+  );
+
+  return (
+    <SafeAreaProvider>
+      {Platform.OS === 'web' ? (
+        <View style={styles.stage}>
+          <View style={styles.phone}>{room}</View>
+        </View>
+      ) : (
+        room
+      )}
     </SafeAreaProvider>
   );
 }
@@ -111,5 +136,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  stage: {
+    flex: 1,
+    backgroundColor: '#070605',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  phone: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 430,
+    maxHeight: 900,
+    overflow: 'hidden',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: colors.line,
   },
 });

@@ -59,18 +59,18 @@ export function SettingsScreen({
         </Text>
         <View style={styles.bottom}>
           <PrimaryButton
-            label="Wipe this phone"
+            label="Reset this room"
             onPress={() => {
               const message =
                 'This removes your birth year, gift, voice, and heat from this device.';
               if (Platform.OS === 'web') {
                 const confirmed =
                   typeof globalThis.confirm === 'function' &&
-                  globalThis.confirm(`Wipe the room\n\n${message}`);
+                  globalThis.confirm(`Reset this room\n\n${message}`);
                 if (confirmed) onWipe();
                 return;
               }
-              Alert.alert('Wipe the room', message, [
+              Alert.alert('Reset this room', message, [
                 { text: 'Keep them', style: 'cancel' },
                 { text: 'Wipe', style: 'destructive', onPress: onWipe },
               ]);

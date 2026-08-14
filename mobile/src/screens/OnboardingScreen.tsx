@@ -52,7 +52,7 @@ export function OnboardingScreen({
         <Text style={type.caption}>Tonight · {step + 1} of 3</Text>
         {step === 0 && (
           <View style={styles.block}>
-            <Text style={type.display}>What would feel like a gift?</Text>
+            <Text style={type.display}>How do you want to feel?</Text>
             <Text style={[type.body, styles.help]}>
               Not a census. A temperature. You can change this later.
             </Text>
@@ -88,12 +88,15 @@ export function OnboardingScreen({
               {voices.map((voice) => (
                 <Chip
                   key={voice.id}
-                  label={`${voice.name} — ${voice.arrival}`}
+                  label={voice.name}
                   selected={voiceId === voice.id}
                   onPress={() => setVoiceId(voice.id)}
                 />
               ))}
             </View>
+            <Text style={[type.small, styles.help]}>
+              {voices.find((voice) => voice.id === voiceId)?.arrival}
+            </Text>
           </View>
         )}
         {step === 2 && (
@@ -102,14 +105,19 @@ export function OnboardingScreen({
             <Text style={[type.body, styles.help]}>
               We will not push it. Aftercare is always on the other side.
             </Text>
-            {heats.map((item) => (
-              <Chip
-                key={item.id}
-                label={`${item.label} — ${item.detail}`}
-                selected={heat === item.id}
-                onPress={() => setHeat(item.id)}
-              />
-            ))}
+            <View style={styles.wrap}>
+              {heats.map((item) => (
+                <Chip
+                  key={item.id}
+                  label={item.label}
+                  selected={heat === item.id}
+                  onPress={() => setHeat(item.id)}
+                />
+              ))}
+            </View>
+            <Text style={[type.small, styles.help]}>
+              {heats.find((item) => item.id === heat)?.detail}
+            </Text>
           </View>
         )}
         <PrimaryButton label={step === 2 ? 'Open the room' : 'Continue'} onPress={next} />

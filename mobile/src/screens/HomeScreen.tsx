@@ -35,6 +35,7 @@ export function HomeScreen({
           </View>
           <Text style={styles.meta}>
             {voice.name} · {heatLabel(profile.heat)}
+            {profile.gift === 'unsure' ? ' · You can still tune the room' : ''}
           </Text>
 
           {tonight && (

@@ -104,8 +104,16 @@ export function PlayerScreen({
         <View style={styles.top}>
           <GhostButton label="Leave quietly" onPress={onExit} />
           <GhostButton
-            label={showText ? 'Hide words' : 'Show words'}
-            onPress={() => setShowText((value) => !value)}
+            label="Skip to aftercare"
+            onPress={() => {
+              narrator.skipTo(aftercareIndex);
+              setIndex(aftercareIndex);
+              setEnded(false);
+              if (!playing) {
+                narrator.play();
+                setPlaying(true);
+              }
+            }}
           />
         </View>
         <Text style={type.caption}>
@@ -143,21 +151,11 @@ export function PlayerScreen({
           }}
         />
         <View style={styles.row}>
-          <Pressable
-            onPress={() => {
-              narrator.skipTo(aftercareIndex);
-              setIndex(aftercareIndex);
-              if (!playing) {
-                narrator.play();
-                setPlaying(true);
-              }
-            }}
-            style={styles.link}
-          >
-            <Text style={styles.linkText}>Skip to aftercare</Text>
+          <Pressable onPress={() => setShowText((value) => !value)} style={styles.link}>
+            <Text style={styles.linkText}>{showText ? 'Hide words' : 'Show words'}</Text>
           </Pressable>
           <Pressable onPress={report} style={styles.link}>
-            <Text style={styles.linkText}>Report this line</Text>
+            <Text style={styles.linkText}>This line felt wrong</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -184,14 +182,14 @@ const styles = StyleSheet.create({
     lineHeight: 36,
   },
   progressTrack: {
-    height: 2,
+    height: 4,
     backgroundColor: colors.line,
     borderRadius: 2,
     overflow: 'hidden',
     marginBottom: space.sm,
   },
   progress: {
-    height: 2,
+    height: 4,
     backgroundColor: colors.gold,
   },
   count: { ...type.small, marginBottom: space.lg },
