@@ -55,27 +55,33 @@ function Landing({ onBegin }: { onBegin: () => void }) {
       </LinearGradient>
 
       <View style={styles.props}>
-        <View style={styles.prop}>
-          <Text style={styles.propTitle}>Made to your mood</Text>
-          <Text style={styles.propBody}>
-            Comforted, adored, teased, in charge. Pick the feeling and the heat; every story comes in
-            softer, slower, and further versions — switch with one tap.
-          </Text>
-        </View>
-        <View style={styles.prop}>
-          <Text style={styles.propTitle}>Private by design</Text>
-          <Text style={styles.propBody}>
-            Nothing revealing on your lock screen. No feed, no profiles, no judgment. Hard limits you
-            set once and never see crossed. Deletion that actually deletes.
-          </Text>
-        </View>
-        <View style={styles.prop}>
-          <Text style={styles.propTitle}>Honest AI, human-made</Text>
-          <Text style={styles.propBody}>
-            Every voice is synthetic and we say so — built from recordings narrators licensed for
-            exactly this, with a share of revenue for as long as they&apos;re in the app.
-          </Text>
-        </View>
+        {(
+          [
+            {
+              title: 'Made to your mood',
+              body: 'Comforted, adored, teased, in charge. Pick the feeling and the heat; every story comes in softer, slower, and further versions — switch with one tap.',
+              rule: ['#E8B98A', '#7E2F4E'] as const,
+            },
+            {
+              title: 'Private by design',
+              body: 'Nothing revealing on your lock screen. No feed, no profiles, no judgment. Hard limits you set once and never see crossed. Deletion that actually deletes.',
+              rule: ['#D98A9E', '#3D2244'] as const,
+            },
+            {
+              title: 'Honest AI, human-made',
+              body: 'Every voice is synthetic and we say so — built from recordings narrators licensed for exactly this, with a share of revenue for as long as they\u2019re in the app.',
+              rule: ['#DFAE72', '#5E2F57'] as const,
+            },
+          ]
+        ).map((p) => (
+          <View key={p.title} style={styles.prop}>
+            <LinearGradient colors={[p.rule[0], p.rule[1]]} style={styles.propRule} />
+            <View style={styles.propText}>
+              <Text style={styles.propTitle}>{p.title}</Text>
+              <Text style={styles.propBody}>{p.body}</Text>
+            </View>
+          </View>
+        ))}
       </View>
 
       <Button label="Begin — it takes a minute" onPress={onBegin} style={styles.landingCta} />
@@ -339,10 +345,19 @@ const styles = StyleSheet.create({
   },
   listenPlayGlyph: { color: palette.text, fontSize: 18, marginLeft: 2 },
   listenMeta: { flex: 1, fontFamily: fonts.body, fontSize: 12.5, lineHeight: 18, color: 'rgba(243,237,247,0.75)' },
-  props: { marginTop: spacing.xl, gap: spacing.lg },
-  prop: { borderLeftWidth: 2, borderLeftColor: palette.goldSoft, paddingLeft: spacing.md },
-  propTitle: { fontFamily: fonts.display, fontSize: 21, color: palette.text },
-  propBody: { fontFamily: fonts.body, fontSize: 14.5, lineHeight: 22, color: palette.textDim, marginTop: spacing.xs },
+  props: { marginTop: spacing.xxl, gap: 44 },
+  prop: { flexDirection: 'row', gap: spacing.md },
+  propRule: { width: 2, borderRadius: 1, alignSelf: 'stretch' },
+  propText: { flex: 1 },
+  propTitle: { fontFamily: fonts.display, fontSize: 23, lineHeight: 30, color: palette.text },
+  propBody: {
+    fontFamily: fonts.body,
+    fontSize: 15,
+    lineHeight: 24,
+    color: 'rgba(240,229,238,0.72)',
+    marginTop: spacing.sm,
+    maxWidth: 540,
+  },
   landingCta: { marginTop: spacing.xl },
   landingFoot: { textAlign: 'center', marginTop: spacing.md },
 });

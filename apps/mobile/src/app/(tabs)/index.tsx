@@ -109,7 +109,7 @@ export default function Tonight() {
         <Chip label="Take your time" selected={length === 'long'} onPress={() => setLength(length === 'long' ? 'any' : 'long')} />
       </View>
 
-      <Heading>{rest.length > 0 ? 'Found for you' : matches.length === 0 ? 'Nothing matches that exact feeling' : 'Found for you'}</Heading>
+      <Heading>{matches.length === 0 ? 'Nothing matches that exact feeling' : 'More for tonight'}</Heading>
       {matches.length === 0 && (
         <Caption style={{ marginBottom: spacing.md }}>Loosen a filter — or let the pick above surprise you.</Caption>
       )}

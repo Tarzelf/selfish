@@ -139,10 +139,9 @@ export function Chip({
 export function HeatBadge({ heat, locked }: { heat: HeatLevel; locked?: boolean }) {
   const color = heatColor[heat];
   return (
-    <View style={[styles.heatBadge, { borderColor: color }]}>
-      <View style={[styles.heatDot, { backgroundColor: color }]} />
+    <View style={[styles.heatBadge, { backgroundColor: `${color}24` }]}>
       <Text style={[styles.heatLabel, { color }]}>
-        {HEAT_LABEL[heat]}
+        {HEAT_LABEL[heat].toLowerCase()}
         {locked ? ' · opt in' : ''}
       </Text>
     </View>
@@ -214,17 +213,12 @@ const styles = StyleSheet.create({
   chipLabel: { fontFamily: fonts.body, fontSize: 14, color: palette.text, fontWeight: '500' },
   chipHint: { fontFamily: fonts.body, fontSize: 11, color: palette.textFaint, marginTop: 2 },
   heatBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 1,
     borderRadius: radius.pill,
-    paddingVertical: 3,
-    paddingHorizontal: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 11,
     alignSelf: 'flex-start',
-    gap: 6,
   },
-  heatDot: { width: 6, height: 6, borderRadius: 3 },
-  heatLabel: { fontSize: 12, fontWeight: '600' },
+  heatLabel: { fontFamily: fonts.display, fontStyle: 'italic', fontSize: 13, letterSpacing: 0.3 },
   card: {
     backgroundColor: palette.surface,
     borderRadius: radius.lg,
