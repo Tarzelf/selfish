@@ -87,32 +87,30 @@ This maps to the romance novel → choose-your-own-adventure → live conversati
 
 ### Architecture options
 
-| Approach | Latency | Voice quality | Cost/min | Best for |
-|----------|---------|---------------|----------|----------|
-| **Grok Voice Agent API** | Sub-second, full-duplex | Good (Ara, Eve, Leo) | $0.05–0.08 | Real-time conversation, proven spicy dialogue |
+| Approach | Latency | Voice quality | Cost | Best for |
+|----------|---------|---------------|------|----------|
+| **Grok STT API** | Low (streaming) | — | $0.20/hr | Voice input transcription |
+| **Grok TTS API** | Fast | Speech tags (`[whisper]`, `[sigh]`) | $15/1M chars | Intimate voice output |
+| **Grok Voice Agent API** | Sub-second, full-duplex | Good (Ara, Eve, Leo) | $0.05–0.08/min | Real-time conversation |
 | **OpenAI Realtime API** | Low | Good presets | Higher | Tool use, reasoning-heavy |
-| **ElevenLabs + LLM pipeline** | Moderate | Best-in-class | ~$0.09–0.14 assembled | Premium voice identity, character consistency |
-| **Text LLM + TTS batch** | 2–5s per turn | Excellent (ElevenLabs) | Lower | MVP, scripted-with-branches |
+| **ElevenLabs + LLM pipeline** | Moderate | Best-in-class | ~$0.09–0.14/min | Fallback if Grok voice insufficient |
+| **Text LLM + TTS batch** | 2–5s per turn | Excellent (Grok TTS) | Lower | MVP turn-based pipeline |
 
 ### Recommendation for MVP → Scale
 
 ```
-Phase 1 (MVP):     Text LLM (Grok) → ElevenLabs TTS → stream to app
-Phase 2 (Premium): Grok Voice Agent API for live conversation mode
-Phase 3 (Scale):   Hybrid — ElevenLabs voice + Grok brain via custom pipeline
+Phase 1 (MVP):     Grok text → Grok TTS (with [whisper] tags) → stream to app
+                   Grok STT for voice input (streaming WebSocket)
+Phase 2 (Premium): Grok Voice Agent API for live full-duplex conversation
+Phase 3 (Scale):   All-xAI stack — no third-party voice providers needed
 ```
 
-**Why not start with full realtime voice?**
-- Higher cost during iteration ($0.08/min adds up in testing)
-- Harder to moderate/log/review conversations
-- Text intermediary allows content filtering before speech
-- Easier to maintain — one prompt change, not voice pipeline debugging
-
-**Why Grok as the brain?**
-- Founder-validated for intimate dialogue quality
-- $0.05–0.08/min for voice when we upgrade
-- OpenAI Realtime-compatible WebSocket protocol
-- Voices: Eve (female), Leo (male) — test both, default Eve for women-first
+**Why all-xAI?**
+- Founder-validated Grok dialogue quality
+- Apr 2026 standalone STT + TTS APIs simplify the stack (one vendor, one API key)
+- Speech tags (`[whisper]`, `[sigh]`, `[laugh]`) are perfect for intimate/ASMR delivery
+- Same voice roster (Ara, Eve, Leo) across TTS and Voice Agent
+- Easier to maintain than Grok + ElevenLabs + Deepgram assembly
 
 ### iOS audio requirements
 
@@ -140,7 +138,7 @@ Phase 3 (Scale):   Hybrid — ElevenLabs voice + Grok brain via custom pipeline
 - App icon and UI look like Calm/Headspace
 - Categories: "Romance," "Self-discovery," "Confidence," "Sleep"
 - Stories are **suggestive**, not graphic — imagination fills the gap
-- Professional voice actors, not robotic TTS (we'll need ElevenLabs quality)
+- Professional voice quality via Grok TTS (speech tags for intimacy, not robotic)
 
 ### Risk mitigation
 
@@ -166,8 +164,10 @@ Phase 3 (Scale):   Hybrid — ElevenLabs voice + Grok brain via custom pipeline
 
 ## 7. Key Research Questions (for Cycle 2)
 
-- [ ] ElevenLabs vs Grok native voice — blind test for "Eve" intimate dialogue
+- [x] ~~ElevenLabs vs Grok native voice~~ → **Use Grok TTS** (standalone API, speech tags)
+- [x] ~~STT: Apple vs Deepgram vs Grok~~ → **Use Grok STT** streaming (single vendor)
 - [ ] Optimal session length before fatigue (15 min? 30 min?)
+- [ ] Grok TTS speech tag tuning for Elena persona (`[whisper]` intensity mapping)
 - [ ] Branching narrative vs freeform conversation — which converts better?
 - [ ] Focus mode: ambient soundscapes only, or guided voice?
 - [ ] Pricing: $9.99/mo vs $14.99/mo vs freemium with 3 free sessions
@@ -183,5 +183,6 @@ Phase 3 (Scale):   Hybrid — ElevenLabs voice + Grok brain via custom pipeline
 - Frontiers: Proximity Prediction Hypothesis for ASMR
 - Sexual Health Research Lab: Audio erotica psychology
 - Healthline: Audio porn / mental framing
+- xAI: [Grok STT and TTS APIs](https://x.ai/news/grok-stt-and-tts-apis) (Apr 2026)
 - xAI: Grok Voice Agent API docs
 - Apple App Review Guidelines 1.1.4, 1.2.1, age rating updates (2025)

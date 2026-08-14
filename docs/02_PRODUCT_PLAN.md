@@ -53,7 +53,7 @@
 - **Job**: Help me explore fantasy, feel desired, get emotionally + physically aroused through voice
 - **Content**: AI personas (e.g., "The Stranger," "Slow Burn," "After Hours") with distinct voices and personalities
 - **Interaction**: User speaks or types → AI responds in character → TTS plays response
-- **AI role**: Core product — Grok powers dialogue, ElevenLabs powers voice
+- **AI role**: Core product — Grok powers dialogue, Grok TTS powers voice (with `[whisper]` tags)
 - **Monetization**: Subscription ($9.99–14.99/mo), limited free sessions
 - **App Store**: 18+ rating, age gate, wellness positioning
 
@@ -130,8 +130,9 @@
 | Mobile | **Expo (React Native)** | iOS-first, OTA updates, founder has Expo experience |
 | Backend | **Supabase** | Auth, DB, Edge Functions, storage — proven in prior project |
 | AI text | **Grok API** (xAI) | Founder-validated dialogue quality |
-| Voice TTS | **ElevenLabs** | Best voice quality for intimate content |
-| Voice realtime | **Grok Voice Agent** (Phase 2) | Same provider, OpenAI-compatible |
+| Voice STT | **Grok STT API** (xAI) | Streaming transcription, single vendor |
+| Voice TTS | **Grok TTS API** (xAI) | Speech tags (`[whisper]`, `[sigh]`) for intimate delivery |
+| Voice realtime | **Grok Voice Agent** (Phase 2) | Same provider, full-duplex |
 | Payments | **RevenueCat** | Subscription management (Dipsea uses RevenueCat) |
 | Analytics | **PostHog** or **Amplitude** | Funnel + retention |
 
@@ -148,7 +149,7 @@
 - [ ] Age gate (18+ self-declaration + terms)
 - [ ] Focus mode: 3 ambient sessions (pre-loaded audio)
 - [ ] Whisper mode: 2 personas, 3 scenarios each
-- [ ] Turn-based voice interaction (hold to talk → STT → Grok → ElevenLabs → play)
+- [ ] Turn-based voice interaction (hold to talk → Grok STT → Grok → Grok TTS → play)
 - [ ] Text input fallback (for privacy in public)
 - [ ] Session history (last 5 conversations)
 - [ ] Paywall: 3 free Whisper sessions, then subscribe
@@ -193,8 +194,8 @@
 
 **Unit economics (rough)**:
 - Avg Whisper session: 15 min
-- Cost: ~$0.02 (Grok text) + ~$0.15 (ElevenLabs TTS for ~2000 chars) = ~$0.17/session
-- At 20 sessions/mo = ~$3.40 COGS → 66% gross margin at $9.99
+- Cost: ~$0.02 (Grok text) + ~$0.01 (Grok TTS ~500 chars) + ~$0.05 (Grok STT 15min) ≈ **~$0.08/session**
+- At 20 sessions/mo = ~$1.60 COGS → **84% gross margin** at $9.99
 
 ---
 
@@ -212,7 +213,7 @@
 
 ## Open Questions for Cycle 2
 
-1. ElevenLabs voice cloning vs stock voices — do we need a custom "Elena"?
-2. STT: Apple native vs Deepgram vs Grok — latency/accuracy tradeoff
+1. Grok TTS speech tag tuning for Elena — map intensity (soft/warm/bold) to `[whisper]` / `[sigh]` density
+2. ~~STT: Apple native vs Deepgram vs Grok~~ → Grok STT streaming
 3. Content ceiling: how explicit can Whisper be while staying on App Store?
 4. Should Focus and Whisper feel like different apps or one unified experience?

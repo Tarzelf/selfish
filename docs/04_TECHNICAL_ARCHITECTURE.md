@@ -31,10 +31,10 @@
                     ┌────────────────────────────┼────────────────┐
                     ▼                            ▼                ▼
               ┌──────────┐              ┌─────────────┐  ┌───────────┐
-              │ Grok API │              │ ElevenLabs  │  │ Deepgram  │
-              │ (xAI)    │              │ TTS         │  │ STT       │
-              │ text +   │              │             │  │ (or Apple)│
-              │ voice v2 │              │             │  │           │
+              │ Grok API │              │ Grok TTS    │  │ Grok STT  │
+              │ (xAI)    │              │ (xAI)       │  │ (xAI)     │
+              │ text +   │              │ [whisper],  │  │ streaming │
+              │ voice v2 │              │ [sigh] tags │  │ WebSocket │
               └──────────┘              └─────────────┘  └───────────┘
 ```
 
@@ -48,7 +48,8 @@
 | **Secure** | API keys live in Supabase Edge Functions, never in app bundle |
 | **Cloud-agent friendly** | Edge functions are small, testable TypeScript files |
 | **Cost-aware** | Text-first pipeline is 5–10x cheaper than realtime voice |
-| **Upgradeable** | Swap STT/TTS/LLM providers without app update |
+| **Single vendor** | xAI for text, STT, TTS, and realtime voice — one API key, one bill |
+| **Upgradeable** | Abstract provider interfaces; can swap if needed |
 
 ---
 
@@ -89,7 +90,7 @@ app/
 2. expo-av records → uploads audio blob to edge function
 3. Edge function: STT → text
 4. Edge function: Grok chat (with persona prompt + history) → response text
-5. Edge function: ElevenLabs TTS → audio URL
+5. Edge function: Grok TTS (with speech tags like `[whisper]`) → audio URL
 6. App streams/plays audio
 7. Repeat until user ends session
 ```
@@ -117,7 +118,7 @@ profiles (
 personas (
   id uuid PRIMARY KEY,
   name text,                 -- "Elena"
-  voice_id text,             -- ElevenLabs voice ID
+  voice_id text,             -- Grok TTS voice ID (e.g. ara, eve)
   system_prompt text,        -- character instructions
   is_active boolean
 )
@@ -169,9 +170,9 @@ subscriptions (
 
 | Function | Purpose | External APIs |
 |----------|---------|---------------|
-| `whisper-chat` | Orchestrates full turn: STT → LLM → TTS | Grok, ElevenLabs, Deepgram |
-| `transcribe-audio` | STT only (if split needed) | Deepgram or Grok |
-| `synthesize-speech` | TTS only | ElevenLabs |
+| `whisper-chat` | Orchestrates full turn: STT → LLM → TTS | Grok STT, Grok text, Grok TTS |
+| `transcribe-audio` | STT only (if split needed) | Grok STT (streaming WebSocket) |
+| `synthesize-speech` | TTS only | Grok TTS (REST or WebSocket) |
 | `revenuecat-webhook` | Sync subscription status | RevenueCat |
 
 ### `whisper-chat` Flow (pseudocode)
@@ -188,7 +189,7 @@ subscriptions (
 5. Build messages array with system prompt (persona + scenario + intensity + guardrails)
 6. Call Grok chat completions → assistantText
 7. Content filter check on assistantText (block if too explicit for tier)
-8. Call ElevenLabs TTS → audio buffer
+8. Call Grok TTS (inject speech tags like `[whisper]` per intensity) → audio buffer
 9. Upload audio to Supabase Storage
 10. Save messages to DB
 11. Return { text, audioUrl, sessionId }
@@ -226,16 +227,23 @@ RULES:
 OPENING (if first message): {scenario.opening_line}
 ```
 
-### ElevenLabs (Voice)
+### Grok TTS (Voice)
 
-- **Voice**: Custom or stock female voice (warm, intimate, close-mic feel)
-- **Settings**: stability 0.5, similarity 0.75, style 0.4 (more expressive)
-- **Model**: `eleven_multilingual_v2` or `eleven_turbo_v2_5` for speed
+- **API**: Standalone Text-to-Speech endpoint ([announced Apr 2026](https://x.ai/news/grok-stt-and-tts-apis))
+- **Pricing**: $15 per 1M characters
+- **Voices**: Ara, Eve, Leo (same roster as Grok Voice Agent)
+- **Speech tags**: Inline prosody controls — `[whisper]`, `[sigh]`, `[laugh]` — ideal for intimate/ASMR delivery
+- **Modes**: REST (batch) or WebSocket (real-time streaming)
+- **Why Grok over ElevenLabs**: Single vendor, speech tags for intimacy, same stack as Voice Agent
 
-### STT
+### Grok STT (Speech Input)
 
-- **MVP**: Deepgram `nova-2` (fast, accurate, $0.0043/min)
-- **Alternative**: Apple Speech framework (free, on-device, iOS only)
+- **API**: Standalone Speech-to-Text endpoint ([announced Apr 2026](https://x.ai/news/grok-stt-and-tts-apis))
+- **Pricing**: $0.10/hr batch, $0.20/hr streaming
+- **Modes**: REST (batch) or WebSocket (lowest-latency realtime)
+- **Features**: Word-level timestamps, speaker diarization, 25+ languages
+- **Why Grok over Deepgram**: Single vendor, strong entity recognition, beats Deepgram on benchmarks
+- **Fallback**: Apple Speech framework (free, on-device) if offline/privacy needed
 
 ---
 
@@ -265,7 +273,7 @@ OPENING (if first message): {scenario.opening_line}
 
 ## Phase 2 Upgrades (not MVP)
 
-1. **Grok Voice Agent API** — replace turn-based with full-duplex for premium tier
+1. **Grok Voice Agent API** — replace turn-based with full-duplex for premium tier (same xAI stack)
 2. **Session memory across sessions** — vector store or summary compression
 3. **Pre-rendered scenario intros** — hybrid scripted opening + AI continuation
 4. **Focus mode personalization** — AI-generated ambient based on mood check-in

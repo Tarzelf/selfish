@@ -44,7 +44,7 @@
 |------|-------|--------|
 | Supabase schema (personas, scenarios, sessions, messages) | Agent | Pending |
 | Seed data: Elena persona + 3 scenarios | Agent | Pending |
-| `whisper-chat` edge function (Grok + ElevenLabs) | Agent | Pending |
+| `whisper-chat` edge function (Grok STT + Grok text + Grok TTS) | Agent | Pending |
 | Content guardrails in system prompt | Agent | Pending |
 | API key management (Supabase secrets) | Agent | Pending |
 | Unit test: single turn round-trip | Agent | Pending |
@@ -98,7 +98,7 @@
 | EAS build → TestFlight | Agent | Pending |
 | Test with 5–10 real users (including "Maya" archetype) | Human | Pending |
 | Latency optimization (<3s target) | Agent | Pending |
-| Voice quality tuning (ElevenLabs settings) | Agent | Pending |
+| Voice quality tuning (Grok TTS speech tags) | Agent | Pending |
 | Prompt engineering based on session logs | Agent | Pending |
 | App Store metadata + screenshots | Agent | Pending |
 | Privacy policy + terms of service | Agent | Pending |
@@ -144,10 +144,8 @@ SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
 
-# AI Providers
-XAI_API_KEY=              # Grok text + voice
-ELEVENLABS_API_KEY=       # TTS
-DEEPGRAM_API_KEY=         # STT (optional, can use Apple)
+# AI Providers (all xAI — single vendor)
+XAI_API_KEY=              # Grok text + STT + TTS + Voice Agent
 
 # RevenueCat
 REVENUECAT_API_KEY=
@@ -167,6 +165,6 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 | App Store rejection | Medium | High | Wellness positioning, content guardrails, 18+ gate |
 | AI produces too-explicit content | Medium | High | Output filter + prompt constraints + human review |
 | Latency too high | Medium | Medium | Turbo TTS model, edge function optimization |
-| Voice sounds robotic | Low | High | ElevenLabs premium voices, prompt brevity |
+| Voice sounds robotic | Low | Medium | Grok TTS speech tags (`[whisper]`, `[sigh]`), prompt brevity |
 | Cost per user too high | Low | Medium | Session limits on free tier, text-first pipeline |
 | Grok API changes pricing | Low | Medium | Abstract LLM provider, can swap to Claude/GPT |
