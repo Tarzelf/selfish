@@ -30,7 +30,15 @@ npm install
 npm run web        # or: npx expo start (iOS simulator / Expo Go)
 ```
 
-The preview build runs entirely on-device: seed catalog in `src/data/catalog.ts`, preferences in AsyncStorage, simulated playback (no audio assets in the repo). Payments, Supabase sync, and real audio streaming are stubbed by design.
+The preview build runs entirely on-device: seed catalog in `src/data/catalog.ts`, preferences in AsyncStorage. **Sessions with a ▶ badge play real audio** rendered by the live pipeline (Grok script → safety classifier → Grok TTS → automated audio-QA); the voice transparency page has playable engine previews for every voice persona. Sessions without bundled audio use a simulated clock. Payments and Supabase sync are stubbed by design.
+
+### Web deploy (for user testing)
+
+```bash
+cd apps/mobile
+npx expo export --platform web     # static site in dist/
+npx netlify deploy --prod --dir dist   # or any static host; netlify.toml included
+```
 
 ## Running the pipeline demo
 
