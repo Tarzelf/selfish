@@ -6,6 +6,7 @@
   "description": "Selfish content pipeline: brief -> LLM draft -> safety classifier -> editorial gate -> TTS render -> post -> publish. Runs fully offline with mock providers.",
   "scripts": {
     "demo": "tsx src/run.ts briefs/back-to-yours.json --approve",
+    "test": "tsx --test src/**/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
