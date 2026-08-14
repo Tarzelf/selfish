@@ -137,3 +137,11 @@ Based on persona review:
 **Onboarding verdict**: Four screens, then voice. Self over quiz. No home until after session 1. ✅
 
 See `docs/06_ONBOARDING.md`.
+
+---
+
+## Cycle 2: Maya on vibration apps
+
+> "If the app looks like those vibrator apps I'm out. If Elena is talking and the phone answers in my hand, that's actually the thing. Let me turn it off. Don't make me explain it to anyone."
+
+**Verdict**: Body as a quiet layer. On for session 1. Never the brand. See `docs/07_HAPTICS_SIGNAL.md`.

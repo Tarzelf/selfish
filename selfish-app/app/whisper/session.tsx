@@ -14,6 +14,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { personas, Intensity } from '../../src/constants/personas';
 import { useAppState } from '../../src/context/AppContext';
+import { pulsePresence, startBodyPattern } from '../../src/lib/haptics';
 import { colors } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
 
@@ -50,15 +51,31 @@ export default function WhisperSessionScreen() {
   const [inputText, setInputText] = useState('');
   const [isThinking, setIsThinking] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [bodyOn, setBodyOn] = useState(true);
   const hasStarted = useRef(false);
   const scrollRef = useRef<ScrollView>(null);
+  const stopBodyRef = useRef<(() => void) | null>(null);
+  const sessionIntensity: Intensity = intensity ?? 'warm';
 
   useEffect(() => {
     if (!hasStarted.current) {
       hasStarted.current = true;
       decrementFreeSession();
+      pulsePresence(sessionIntensity);
     }
-  }, [decrementFreeSession]);
+  }, [decrementFreeSession, sessionIntensity]);
+
+  useEffect(() => {
+    stopBodyRef.current?.();
+    stopBodyRef.current = null;
+    if (bodyOn) {
+      stopBodyRef.current = startBodyPattern(sessionIntensity);
+    }
+    return () => {
+      stopBodyRef.current?.();
+      stopBodyRef.current = null;
+    };
+  }, [bodyOn, sessionIntensity]);
 
   const handleLeave = () => {
     if (isFirstSession) {
@@ -100,6 +117,7 @@ export default function WhisperSessionScreen() {
 
     setMessages((prev) => [...prev, assistantMessage]);
     setIsThinking(false);
+    pulsePresence(sessionIntensity);
   };
 
   return (
@@ -117,6 +135,14 @@ export default function WhisperSessionScreen() {
               {intensity ? ` · ${intensity}` : ''}
             </Text>
           </View>
+          <Pressable
+            onPress={() => setBodyOn((prev) => !prev)}
+            style={[styles.bodyToggle, bodyOn && styles.bodyToggleOn]}
+          >
+            <Text style={[styles.bodyToggleText, bodyOn && styles.bodyToggleTextOn]}>
+              Body {bodyOn ? 'on' : 'off'}
+            </Text>
+          </Pressable>
         </View>
 
         <ScrollView
@@ -227,6 +253,27 @@ const styles = StyleSheet.create({
     color: colors.textSubtle,
     textTransform: 'none',
     letterSpacing: 0,
+  },
+  bodyToggle: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  bodyToggleOn: {
+    borderColor: colors.whisper,
+    backgroundColor: 'rgba(184, 125, 158, 0.15)',
+  },
+  bodyToggleText: {
+    ...typography.caption,
+    color: colors.textSubtle,
+    textTransform: 'none',
+    letterSpacing: 0,
+    fontSize: 12,
+  },
+  bodyToggleTextOn: {
+    color: colors.whisper,
   },
   messages: {
     flex: 1,

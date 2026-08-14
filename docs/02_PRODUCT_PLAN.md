@@ -17,9 +17,10 @@
 
 1. **Women-first, not women-only** — Design for Maya's psychology (imagination, pacing, safety) but don't exclude others.
 2. **Interactive > passive** — Our moat is conversation, not content library size.
-3. **Wellness wrapper, intimate core** — App Store survival requires taste and positioning.
-4. **Easy to maintain** — Expo + Supabase + managed APIs. No custom ML. No content farm.
-5. **AI as co-author, not autopilot** — Curated personas with guardrails, not infinite unmoderated chat.
+3. **Wellness wrapper, intimate core** — App Store survival requires taste and positioning. Vibration/massage apps at 4.8★ prove Apple already allows a body layer.
+4. **Body is a layer, not a mode** — Taptic Engine follows the voice. We do not ship a vibrator tab.
+5. **Easy to maintain** — Expo + Supabase + managed APIs. No custom ML. No content farm.
+6. **AI as co-author, not autopilot** — Curated personas with guardrails, not infinite unmoderated chat.
 
 ---
 
@@ -53,6 +54,7 @@
 - **Job**: Help me explore fantasy, feel desired, get emotionally + physically aroused through voice
 - **Content**: AI personas (e.g., "The Stranger," "Slow Burn," "After Hours") with distinct voices and personalities
 - **Interaction**: User speaks or types → AI responds in character → TTS plays response
+- **Body**: Optional Taptic Engine pattern (on for first session). Follows intensity. Not a separate mode.
 - **AI role**: Core product — Grok powers dialogue, Grok TTS powers voice (with `[whisper]` tags)
 - **Monetization**: Subscription ($9.99–14.99/mo), limited free sessions
 - **App Store**: 18+ rating, age gate, wellness positioning
