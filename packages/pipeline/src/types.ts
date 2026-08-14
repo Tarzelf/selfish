@@ -56,7 +56,7 @@ export interface AuditManifest {
   familyId: string;
   briefHash: string;
   stages: {
-    stage: 'draft' | 'safety' | 'editorial' | 'render' | 'post' | 'publish';
+    stage: 'draft' | 'safety' | 'editorial' | 'render' | 'audio-qa' | 'post' | 'publish';
     at: string;
     detail: Record<string, unknown>;
   }[];

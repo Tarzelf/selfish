@@ -5,6 +5,7 @@ import process from 'node:process';
 
 import { GrokLlm, type LlmProvider, MockLlm } from './providers/llm.js';
 import { ElevenLabsTts, GrokTts, MockTts, SelfHostedTts, type TtsProvider } from './providers/tts.js';
+import { type AudioQa, MockAudioQa, OpenRouterAudioQa } from './stages/audio-qa.js';
 import { RuleBasedSafetyScreen, runSafety } from './stages/safety.js';
 import type { AuditManifest, Brief } from './types.js';
 
@@ -16,6 +17,7 @@ import type { AuditManifest, Brief } from './types.js';
  *   PIPELINE_TTS=grok            + XAI_API_KEY   (optional GROK_TTS_VOICE — overrides the brief's voiceId)
  *   PIPELINE_TTS=elevenlabs      + ELEVENLABS_API_KEY   (soft pipeline only — no explicit content)
  *   PIPELINE_TTS=self-hosted     + SELF_HOSTED_TTS_URL [SELF_HOSTED_TTS_KEY]
+ *   PIPELINE_QA=openrouter       + OPENROUTER_API_KEY   (optional OPENROUTER_QA_MODEL; listens to every take)
  *
  * Usage: tsx src/run.ts briefs/<brief>.json [--approve]
  *   --approve  Editorial auto-approval for local demo runs only. In production
@@ -54,6 +56,15 @@ function makeTts(): TtsProvider {
   }
 }
 
+function makeAudioQa(): AudioQa {
+  if (process.env.PIPELINE_QA === 'openrouter') {
+    const key = process.env.OPENROUTER_API_KEY;
+    if (!key) throw new Error('PIPELINE_QA=openrouter requires OPENROUTER_API_KEY');
+    return new OpenRouterAudioQa(key);
+  }
+  return new MockAudioQa();
+}
+
 async function main() {
   const [briefPath, ...flags] = process.argv.slice(2);
   if (!briefPath) {
@@ -77,8 +88,9 @@ async function main() {
 
   const llm = makeLlm();
   const tts = makeTts();
+  const audioQa = makeAudioQa();
   const screens = [new RuleBasedSafetyScreen()];
-  console.log(`Providers: llm=${llm.name} tts=${tts.name}`);
+  console.log(`Providers: llm=${llm.name} tts=${tts.name} qa=${audioQa.name}`);
 
   for (const variant of brief.variants) {
     console.log(`\n— ${brief.familyId} / ${variant.label} (${variant.heat})`);
@@ -119,7 +131,18 @@ async function main() {
     record('render', { variant: variant.label, provider: render.provider, durationSec: render.durationSec });
     console.log(`  render    ok (~${Math.round(render.durationSec / 60)} min) -> ${render.audioPath}`);
 
-    // 5. Post: binaural placement, breath layering, mastering, and
+    // 5. Audio QA: an audio-input LLM listens to the take, diffs it against
+    // the script, and flags truncation / tag leakage / wording drift.
+    const qaVerdict = await audioQa.review({ audioPath: render.audioPath, script: script.text });
+    record('audio-qa', { variant: variant.label, provider: audioQa.name, verdict: qaVerdict });
+    if (!qaVerdict.ok) {
+      console.warn(`  audio-qa  FLAGGED:\n    ${qaVerdict.issues.join('\n    ')}`);
+      console.warn(`  scores: intimacy ${qaVerdict.scores.intimacy}/10, pacing ${qaVerdict.scores.pacing}/10, naturalness ${qaVerdict.scores.naturalness}/10 — regenerate or route to human review.`);
+    } else {
+      console.log(`  audio-qa  ok${audioQa.name === 'mock-audio-qa' ? ' (mock)' : ` (intimacy ${qaVerdict.scores.intimacy}/10, pacing ${qaVerdict.scores.pacing}/10, naturalness ${qaVerdict.scores.naturalness}/10)`}`);
+    }
+
+    // 6. Post: binaural placement, breath layering, mastering, and
     // machine-readable synthetic-audio marking (EU AI Act Art. 50(2)).
     // Preview: recorded as a manifest stage; production hooks TBD (AudioSeal-class).
     record('post', { variant: variant.label, binaural: 'pending-production-toolchain', watermark: render.watermarked ? 'mock' : 'pending' });
