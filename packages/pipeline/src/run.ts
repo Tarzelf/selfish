@@ -6,6 +6,7 @@ import process from 'node:process';
 import { GrokLlm, type LlmProvider, MockLlm } from './providers/llm.js';
 import { ElevenLabsTts, GrokTts, MockTts, SelfHostedTts, type TtsProvider } from './providers/tts.js';
 import { type AudioQa, MockAudioQa, OpenRouterAudioQa } from './stages/audio-qa.js';
+import { prepareForTts } from './stages/prepare.js';
 import { RuleBasedSafetyScreen, runSafety } from './stages/safety.js';
 import type { AuditManifest, Brief } from './types.js';
 
@@ -64,6 +65,7 @@ function makeAudioQa(): AudioQa {
   }
   return new MockAudioQa();
 }
+
 
 async function main() {
   const [briefPath, ...flags] = process.argv.slice(2);
@@ -127,13 +129,14 @@ async function main() {
     const ext = tts.name === 'mock-tts' ? 'audio' : 'mp3';
     const audioPath = join(outDir, `${variant.label.toLowerCase().replace(/\s+/g, '-')}.${ext}`);
     const providerVoice = process.env.GROK_TTS_VOICE ?? brief.voiceId;
-    const render = await tts.render({ text: script.text, voiceId: providerVoice, outPath: audioPath, variantLabel: variant.label });
+    const spokenText = prepareForTts(script.text);
+    const render = await tts.render({ text: spokenText, voiceId: providerVoice, outPath: audioPath, variantLabel: variant.label });
     record('render', { variant: variant.label, provider: render.provider, durationSec: render.durationSec });
     console.log(`  render    ok (~${Math.round(render.durationSec / 60)} min) -> ${render.audioPath}`);
 
     // 5. Audio QA: an audio-input LLM listens to the take, diffs it against
     // the script, and flags truncation / tag leakage / wording drift.
-    const qaVerdict = await audioQa.review({ audioPath: render.audioPath, script: script.text });
+    const qaVerdict = await audioQa.review({ audioPath: render.audioPath, script: spokenText });
     record('audio-qa', { variant: variant.label, provider: audioQa.name, verdict: qaVerdict });
     if (!qaVerdict.ok) {
       console.warn(`  audio-qa  FLAGGED:\n    ${qaVerdict.issues.join('\n    ')}`);

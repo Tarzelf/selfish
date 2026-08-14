@@ -1,5 +1,4 @@
 [all characters are established adults; ages stated in scene one]
-That dinner was something, wasn't it? I kept thinking about the way you leaned in when we laughed over that ridiculous story about the host's dog. [pause] You looked at me across the table and I almost forgot what I was saying. It felt like we were the only two people there for a minute. 
-Now the street is quiet. I took this way on purpose. The shorter route would have dropped us off already, but I wanted a little more time with you like this, just walking and talking. [breath] Is that alright?
-Here we are. [pause] I had a really good time tonight. The way you smiled when our hands brushed under the table... it stayed with me. 
-I'd like to kiss you goodnight, if you're feeling the same. May I?
+That dinner really was something, wasn't it? I kept catching your eye across the table every time someone brought up that ridiculous story about the lost reservation. You were trying so hard not to laugh. [pause] I liked seeing you like that, relaxed and a little mischievous. 
+I know the usual route is quicker, but I took the long way on purpose tonight. The streets are quiet this time of evening, and I wanted a few more minutes just walking beside you, no rush, no one else around. [breath] It feels good, having this stretch of time that belongs only to us.
+Here we are. [pause] I had a really nice evening with you. Can I kiss you goodnight? I'd like to, if you want that too.
