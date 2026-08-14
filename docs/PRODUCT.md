@@ -26,7 +26,7 @@ Men looking for an obedient chat partner. People who want video. People who want
 - **Live chat**: works for men; makes many women perform; App Store poison.
 - **Hybrid**: authored ritual, personalized opening, heat and voice as doors, later a server that rewrites the middle without turning the home screen into a prompt box.
 
-**Decision:** hybrid. v1 is authored + assembly. The AI is a craftsman in the back room, not the product face.
+**Decision:** hybrid. v1 should feel **80% composed, 20% alive**. Authored bones, assembled opening, later a server that can notice a whisper. If she never speaks, the night is still complete. The AI is a craftsman in the back room, not the product face.
 
 ### One app or two
 
@@ -52,9 +52,11 @@ Not pink wellness. Not black porn chrome. **Warm dark sanctuary** — lamp light
 
 Three questions. Not a kink quiz.
 
-1. What would feel like a gift tonight?
+1. How do you want to feel?
 2. How should a voice arrive?
 3. How far do you want the door open?
+
+She can also skip this and browse the rooms first.
 
 ### Aftercare
 

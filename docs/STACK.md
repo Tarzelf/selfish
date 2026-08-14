@@ -23,7 +23,7 @@ POST /v1/listen
 ```
 
 - LLM: xAI Grok, server-side, to rewrite the middle of an authored session — not an open chat.
-- TTS: chosen only after TOS review. ElevenLabs is quality-best and legally gray for Want. Still can use it more safely. Always have a fallback.
+- TTS: **ElevenLabs v3** on a paid plan + no-train DPA, never Music/Agents. **xAI TTS** as TOS-aligned backup. Self-host if a vendor flinches. Pre-render to AAC and cache. Device speech remains the v0 stand-in.
 - Cache audio. Never put keys on the device. Never log the gift.
 
 ## What we will not add to keep the app small
