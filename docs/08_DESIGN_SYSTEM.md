@@ -1,7 +1,7 @@
 # Design System: Mood + Components
 
 > Lock the look before we build every screen.  
-> Figma is not connected in this environment — this file + `app/dev/design-board.tsx` is the living board.
+> **Open `design-board.html` in a browser.** That is the living mood + component board. Figma can copy it later.
 
 ---
 

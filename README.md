@@ -28,6 +28,9 @@ supabase/             # Edge functions + database (coming in Phase 2)
 ## Development
 
 ```bash
+# Mood + component board (open in a browser)
+open design-board.html
+
 cd selfish-app
 npm install
 npx expo start

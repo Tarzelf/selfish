@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Selfish — Design board</title>
+  <style>
+    :root {
+      --bg: #0D0B0E;
+      --surface: #1A1619;
+      --elevated: #241F23;
+      --border: #2E282C;
+      --text: #F5F0EB;
+      --muted: #9A8F96;
+      --subtle: #6B6168;
+      --accent: #C9A87C;
+      --accent-muted: #8B7355;
+      --whisper: #B87D9E;
+      --whisper-muted: #7A5268;
+      --focus: #7BA7BC;
+      --danger: #C45C5C;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 48px 32px 96px;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 40px;
+      font-weight: 300;
+      letter-spacing: -0.6px;
+      margin-bottom: 8px;
+    }
+
+    .lede {
+      color: var(--muted);
+      font-size: 17px;
+      max-width: 520px;
+      margin-bottom: 40px;
+    }
+
+    nav {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    nav a:hover { color: var(--accent); }
+
+    section { margin-bottom: 72px; }
+
+    h2 {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .mood-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 12px;
+    }
+
+    .mood-grid img {
+      width: 100%;
+      height: 280px;
+      object-fit: cover;
+      border-radius: 16px;
+      display: block;
+    }
+
+    .mood-grid img.tall { height: 280px; }
+
+    .words {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .word {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+    }
+
+    .word strong { display: block; margin-bottom: 4px; font-weight: 500; }
+    .word span { color: var(--muted); font-size: 13px; }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .swatch {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .swatch .chip { height: 64px; }
+    .swatch figcaption {
+      padding: 10px 12px 12px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .swatch code {
+      display: block;
+      color: var(--subtle);
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .type-spec p { margin-bottom: 14px; }
+    .hero { font-size: 34px; font-weight: 300; letter-spacing: -0.5px; }
+    .title { font-size: 24px; font-weight: 400; }
+    .body { font-size: 16px; color: var(--muted); }
+    .label {
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--subtle);
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .col-head {
+      font-size: 11px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--subtle);
+      margin-bottom: 14px;
+    }
+
+    .phone {
+      width: 320px;
+      max-width: 100%;
+      background: #111;
+      border-radius: 36px;
+      border: 1px solid var(--border);
+      padding: 14px 12px 20px;
+      margin: 0 auto;
+    }
+
+    .phone-bar {
+      height: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .notch {
+      width: 96px;
+      height: 18px;
+      background: #000;
+      border-radius: 12px;
+    }
+
+    .screen {
+      background: var(--bg);
+      border-radius: 24px;
+      min-height: 560px;
+      padding: 28px 20px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn {
+      display: block;
+      width: 100%;
+      border: 0;
+      border-radius: 28px;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .btn-primary { background: var(--accent); color: var(--bg); }
+    .btn-secondary {
+      background: var(--elevated);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost { background: transparent; color: var(--accent); }
+    .btn + .btn { margin-top: 8px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 18px;
+      margin-bottom: 10px;
+    }
+
+    .mode {
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    .mode .bar { width: 4px; align-self: stretch; }
+    .mode .inner { padding: 18px 16px; flex: 1; }
+    .mode h3 { font-size: 18px; font-weight: 400; }
+    .mode p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+    .self.selected {
+      border-color: var(--whisper);
+      background: rgba(184, 125, 158, 0.12);
+    }
+
+    .self h3 { font-size: 17px; font-weight: 400; }
+    .self.selected h3 { color: var(--whisper); }
+    .self p { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+    .dial { display: flex; gap: 8px; }
+    .dial button {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 12px 8px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .dial button.on {
+      border-color: var(--whisper);
+      background: rgba(184, 125, 158, 0.12);
+      color: var(--whisper);
+    }
+
+    .field {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-size: 16px;
+      font-family: inherit;
+    }
+
+    .field::placeholder { color: var(--subtle); }
+
+    .bubble {
+      max-width: 85%;
+      border-radius: 18px;
+      padding: 14px;
+      font-size: 15px;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+
+    .bubble.her {
+      background: var(--elevated);
+      border-bottom-left-radius: 4px;
+    }
+
+    .bubble.me {
+      background: var(--whisper-muted);
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+    }
+
+    .thinking {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--whisper);
+    }
+
+    .promise-line {
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.35;
+      margin-bottom: 14px;
+    }
+
+    .hint { color: var(--subtle); font-size: 13px; text-align: center; }
+
+    .grow { flex: 1; }
+
+    .screen-title { font-size: 22px; font-weight: 400; margin-bottom: 6px; }
+    .screen-sub { color: var(--muted); font-size: 15px; margin-bottom: 20px; }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .body-on {
+      font-size: 12px;
+      color: var(--whisper);
+      border: 1px solid var(--whisper);
+      background: rgba(184, 125, 158, 0.15);
+      border-radius: 12px;
+      padding: 6px 10px;
+    }
+
+    @media (max-width: 980px) {
+      .mood-grid, .cols, .swatches, .words { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <p class="eyebrow">Selfish · living board</p>
+    <h1>Time that's just yours.</h1>
+    <p class="lede">
+      Open this file in a browser. Click around. This is the mood and component board —
+      lock it here before we draw every screen in the app.
+    </p>
+
+    <nav>
+      <a href="#mood">Mood</a>
+      <a href="#color">Color</a>
+      <a href="#type">Type</a>
+      <a href="#components">Components</a>
+      <a href="#screens">Screens</a>
+    </nav>
+
+    <section id="mood">
+      <h2>Mood</h2>
+      <div class="mood-grid">
+        <img src="docs/mood/mood-atmosphere.png" alt="Headphones, dusk, private" />
+        <img class="tall" src="docs/mood/mood-device.png" alt="Dark phone on linen" />
+      </div>
+      <img src="docs/mood/mood-materials.png" alt="Gold silk, pearl, rose" style="width:100%;height:220px;object-fit:cover;border-radius:16px;margin-top:12px;display:block;" />
+      <div class="words">
+        <div class="word"><strong>Private</strong><span>Closed door. Headphones.</span></div>
+        <div class="word"><strong>Warm</strong><span>Gold, rose, linen, cream.</span></div>
+        <div class="word"><strong>Slow</strong><span>One idea per screen.</span></div>
+        <div class="word"><strong>Adult</strong><span>Without announcing it.</span></div>
+      </div>
+    </section>
+
+    <section id="color">
+      <h2>Color</h2>
+      <div class="swatches">
+        <figure class="swatch"><div class="chip" style="background:#0D0B0E"></div><figcaption>background<code>#0D0B0E</code></figcaption></figure>
+        <figure class="swatch"><div class="chip" style="background:#1A1619"></div><figcaption>surface<code>#1A1619</code></figcaption></figure>
+        <figure class="swatch"><div class="chip" style="background:#C9A87C"></div><figcaption>accent<code>#C9A87C</code></figcaption></figure>
+        <figure class="swatch"><div class="chip" style="background:#B87D9E"></div><figcaption>whisper<code>#B87D9E</code></figcaption></figure>
+        <figure class="swatch"><div class="chip" style="background:#7BA7BC"></div><figcaption>focus<code>#7BA7BC</code></figcaption></figure>
+        <figure class="swatch"><div class="chip" style="background:#F5F0EB"></div><figcaption>text<code>#F5F0EB</code></figcaption></figure>
+      </div>
+    </section>
+
+    <section id="type">
+      <h2>Type</h2>
+      <div class="type-spec">
+        <p class="hero">Time that's just yours.</p>
+        <p class="title">Tonight, who do you want to be?</p>
+        <p class="body">Nobody is watching. You can want things here.</p>
+        <p class="label">Your self</p>
+      </div>
+    </section>
+
+    <section id="components">
+      <h2>Components</h2>
+      <div class="cols">
+        <div>
+          <p class="col-head">Buttons</p>
+          <button class="btn btn-primary">Begin</button>
+          <button class="btn btn-secondary">Secondary</button>
+          <button class="btn btn-ghost">Ghost</button>
+        </div>
+        <div>
+          <p class="col-head">Self + intensity</p>
+          <div class="card self selected">
+            <h3>Playful</h3>
+            <p>Curious. A little reckless.</p>
+          </div>
+          <div class="card self">
+            <h3>Soft</h3>
+            <p>Held. Wanted. Unhurried.</p>
+          </div>
+          <div class="dial" id="dial">
+            <button type="button">Soft</button>
+            <button type="button" class="on">Warm</button>
+            <button type="button">Bold</button>
+          </div>
+        </div>
+        <div>
+          <p class="col-head">Session</p>
+          <div class="bubble her">I've been watching you from across the room. You haven't noticed yet.</div>
+          <div class="bubble me">I noticed.</div>
+          <p class="thinking">listening...</p>
+          <input class="field" style="margin-top:16px" placeholder="Type your response..." />
+        </div>
+      </div>
+    </section>
+
+    <section id="screens">
+      <h2>Screens · first path</h2>
+      <div class="cols">
+        <div>
+          <p class="col-head">Welcome</p>
+          <div class="phone"><div class="phone-bar"><div class="notch"></div></div>
+            <div class="screen">
+              <div class="grow" style="display:flex;flex-direction:column;justify-content:center;">
+                <p class="hero">Selfish</p>
+                <p style="color:var(--accent);margin-top:8px;">Time that's just yours.</p>
+              </div>
+              <button class="btn btn-primary">Begin</button>
+              <p class="hint" style="margin-top:14px;">Headphones recommended. Adults 18+.</p>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="col-head">Promise</p>
+          <div class="phone"><div class="phone-bar"><div class="notch"></div></div>
+            <div class="screen">
+              <div class="grow" style="display:flex;flex-direction:column;justify-content:center;">
+                <p class="label" style="color:var(--accent);margin-bottom:22px;">A promise</p>
+                <p class="promise-line">Nobody is watching.</p>
+                <p class="promise-line">You can want things here.</p>
+                <p class="promise-line">You can leave whenever you want.</p>
+                <p class="hint" style="text-align:left;margin-top:16px;">This is not therapy. Your sessions stay on your terms.</p>
+              </div>
+              <button class="btn btn-primary">I understand</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="col-head">Self</p>
+          <div class="phone"><div class="phone-bar"><div class="notch"></div></div>
+            <div class="screen">
+              <p class="label" style="color:var(--whisper);margin-bottom:10px;">Your self</p>
+              <p class="screen-title">Tonight, who do you want to be?</p>
+              <p class="screen-sub">Not a profile. A mood.</p>
+              <div class="card self"><h3>Soft</h3><p>Held. Wanted. Unhurried.</p></div>
+              <div class="card self selected"><h3>Playful</h3><p>Curious. A little reckless.</p></div>
+              <div class="card self"><h3>Bold</h3><p>In charge. No apology.</p></div>
+              <input class="field" placeholder="Skip — surprise me" style="margin:8px 0 16px;" />
+              <button class="btn btn-primary">I'm ready</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cols" style="margin-top:28px;">
+        <div>
+          <p class="col-head">Session</p>
+          <div class="phone"><div class="phone-bar"><div class="notch"></div></div>
+            <div class="screen">
+              <div class="header-row">
+                <div>
+                  <p style="color:var(--whisper);font-size:16px;">Elena</p>
+                  <p style="color:var(--subtle);font-size:12px;">The Hotel Bar · you as Maya</p>
+                </div>
+                <span class="body-on">Body on</span>
+              </div>
+              <div class="grow">
+                <div class="bubble her">Maya. I've been watching you from across the room. You haven't noticed yet.</div>
+                <div class="bubble me">I noticed.</div>
+                <p class="thinking">listening...</p>
+              </div>
+              <input class="field" placeholder="Type your response..." />
+              <button class="btn btn-primary" style="margin-top:10px;background:var(--whisper);color:var(--text);">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="col-head">Home · after first session</p>
+          <div class="phone"><div class="phone-bar"><div class="notch"></div></div>
+            <div class="screen">
+              <p class="hero" style="font-size:26px;">Welcome back, Maya</p>
+              <p class="screen-sub">You can keep being playful — or try another self.</p>
+              <div class="card">
+                <p class="label" style="color:var(--whisper);margin-bottom:8px;">Your self tonight</p>
+                <p>Playful</p>
+                <p style="color:var(--muted);font-size:13px;margin-top:4px;">Curious. A little reckless.</p>
+              </div>
+              <div class="card mode">
+                <div class="bar" style="background:var(--whisper)"></div>
+                <div class="inner">
+                  <h3>Whisper</h3>
+                  <p>Continue. Or start a new scene.</p>
+                </div>
+              </div>
+              <div class="card mode">
+                <div class="bar" style="background:var(--focus)"></div>
+                <div class="inner">
+                  <h3>Focus</h3>
+                  <p>Quiet, if you need it.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <p class="col-head">You</p>
+          <div class="phone"><div class="phone-bar"><div class="notch"></div></div>
+            <div class="screen">
+              <p class="screen-title">You</p>
+              <p class="screen-sub">A private self. Not a profile.</p>
+              <p class="label" style="margin-bottom:10px;">This version of you</p>
+              <div class="card"><p>Name here</p><p style="color:var(--subtle);font-size:13px;margin-top:4px;">Maya</p></div>
+              <div class="card"><p>Feeling</p><p style="color:var(--subtle);font-size:13px;margin-top:4px;">Playful — Curious. A little reckless.</p></div>
+              <p class="label" style="margin:16px 0 10px;">Privacy</p>
+              <div class="card"><p>Memory</p><p style="color:var(--subtle);font-size:13px;margin-top:4px;">Off until you ask</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.getElementById("dial").addEventListener("click", (event) => {
+      if (event.target.tagName !== "BUTTON") return;
+      for (const button of event.currentTarget.querySelectorAll("button")) {
+        button.classList.toggle("on", button === event.target);
+      }
+    });
+  </script>
+</body>
+</html>
