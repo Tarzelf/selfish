@@ -33,15 +33,18 @@ export function useMockPlayback(durationMin: number, onProgress?: (p: number) =>
   useEffect(() => {
     if (!playing) return;
     const interval = setInterval(() => {
-      setElapsedSec((prev) => {
-        const next = Math.min(prev + PREVIEW_SPEED / 4, durationSec);
-        if (next >= durationSec) setPlaying(false);
-        onProgressRef.current?.(next / durationSec);
-        return next;
-      });
+      setElapsedSec((prev) => Math.min(prev + PREVIEW_SPEED / 4, durationSec));
     }, 250);
     return () => clearInterval(interval);
   }, [playing, durationSec]);
+
+  // Progress side effects live outside the state updater (updaters must stay
+  // pure) — this is also what notifies the Continue rail.
+  useEffect(() => {
+    if (durationSec === 0) return;
+    if (elapsedSec >= durationSec) setPlaying(false);
+    if (elapsedSec > 0) onProgressRef.current?.(elapsedSec / durationSec);
+  }, [elapsedSec, durationSec]);
 
   const toggle = useCallback(() => setPlaying((p) => !p), []);
 
