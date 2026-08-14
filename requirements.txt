@@ -1,0 +1,13 @@
+# Studio pipeline dependencies, pinned.
+#
+# Pinned because the pipeline's docstrings promise reproducible renders, and a
+# render is only reproducible if the filter and resampler implementations behind
+# it are fixed. A scipy minor release changing a default would silently alter
+# every master we produce.
+numpy==2.5.2
+scipy==1.18.0
+soundfile==0.13.1
+pyloudnorm==0.1.1
+
+# Testing
+pytest==8.4.2

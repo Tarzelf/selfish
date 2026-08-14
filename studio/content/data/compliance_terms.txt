@@ -1,0 +1,180 @@
+# Compliance term lists for the editorial gate.
+#
+# PURPOSE
+# Two independent lines are enforced here, and they must not be confused:
+#
+#   [ceiling]  Apple's age-rating taxonomy permits "non-explicit depictions of
+#              sexual behavior... implied sexual activity, or erotic or sensual
+#              dialog" at 18+, but classes "explicit, detailed depictions of
+#              sexual activity" as content that "can't be published on the App
+#              Store" at any frequency. Terms below signal that a draft has
+#              crossed from sensual into graphic. They are a QUALITY AND
+#              DISTRIBUTION gate, not a morality gate — and the research is
+#              clear that the sensual register is also the better literary
+#              target for this audience.
+#
+#   [blocked]  Content that must never be produced under any circumstances,
+#              at any intensity tier, for any user. Not a matter of ratings.
+#
+# THE LISTS ARE NECESSARILY INCOMPLETE. Lexical matching cannot understand
+# context: it will miss graphic writing that avoids these words and will flag
+# innocent uses. It is a cheap first pass that routes work to a human, never a
+# substitute for the human editorial gate. Escalations are the point, not noise.
+#
+# Format: "[section] term" — one per line, matched case-insensitively on word
+# boundaries. Regex is permitted where marked with re:.
+
+# =============================================================================
+# [ceiling] Anatomical and graphic-act vocabulary that exceeds "sensual dialog"
+# =============================================================================
+# Clinical anatomical terms: acceptable in a wellness/educational context, but
+# in a narrative erotic scene they mark a shift to explicit description.
+[ceiling] clitoris
+[ceiling] labia
+[ceiling] vulva
+[ceiling] vagina
+[ceiling] penis
+[ceiling] erection
+[ceiling] scrotum
+[ceiling] testicles
+
+# Vulgar anatomical terms — strong signal of the graphic register.
+[ceiling] cock
+[ceiling] cunt
+[ceiling] pussy
+[ceiling] dick
+
+# Graphic act description.
+[ceiling] penetration
+[ceiling] penetrated
+[ceiling] thrusting into
+[ceiling] thrust into
+[ceiling] ejaculate
+[ceiling] ejaculation
+[ceiling] cum
+[ceiling] cumming
+[ceiling] orgasm
+[ceiling] climaxed
+
+# =============================================================================
+# [blocked] Never produce. These route to a hard stop, not to a human.
+# =============================================================================
+# --- Minors. The highest-severity category by a wide margin. ---
+# Any explicit age below 18 stated near sexual context.
+[blocked] re:\b(?:1[0-7]|[1-9])[\s-]?years?[\s-]?old\b
+[blocked] re:\baged?\s+(?:1[0-7]|[1-9])\b
+[blocked] underage
+[blocked] minor
+[blocked] child
+[blocked] children
+[blocked] kid
+[blocked] toddler
+[blocked] preteen
+[blocked] pre-teen
+[blocked] teenager
+[blocked] teenage
+[blocked] adolescent
+[blocked] schoolgirl
+[blocked] schoolboy
+[blocked] high school
+[blocked] highschool
+[blocked] middle school
+[blocked] elementary school
+[blocked] freshman
+[blocked] sophomore
+[blocked] jailbait
+[blocked] loli
+[blocked] shota
+[blocked] barely legal
+
+# --- Non-consent. Fantasy framing is handled editorially (see the taxonomy's
+# --- guidance on power-exchange content); depictions of actual assault are not
+# --- produced at all.
+[blocked] rape
+[blocked] raped
+[blocked] raping
+[blocked] molest
+[blocked] molested
+[blocked] drugged
+[blocked] roofie
+[blocked] unconscious
+[blocked] passed out
+[blocked] asleep when
+[blocked] didn't consent
+[blocked] did not consent
+[blocked] against her will
+[blocked] against his will
+[blocked] against their will
+
+# --- Family. Includes step- and in-law framings that read as incest.
+[blocked] incest
+[blocked] stepdaughter
+[blocked] stepson
+[blocked] stepdad
+[blocked] stepfather
+[blocked] stepmom
+[blocked] stepmother
+[blocked] my daughter
+[blocked] my son
+[blocked] my father
+[blocked] my mother
+[blocked] my brother
+[blocked] my sister
+[blocked] my niece
+[blocked] my nephew
+[blocked] my cousin
+
+# --- Bestiality.
+[blocked] bestiality
+[blocked] zoophilia
+
+# --- Trafficking and exploitation.
+[blocked] trafficking
+[blocked] prostitute
+[blocked] prostitution
+[blocked] escort service
+[blocked] sold her
+[blocked] bought her
+
+# =============================================================================
+# [review] Ambiguous signals: legitimate in adult fiction, but the surrounding
+# context decides. Never auto-blocked, always escalated to a human editor.
+# =============================================================================
+# Age-play and diminutives are common and lawful in consensual adult content,
+# and are also exactly how minor-coded content arrives. A human decides.
+[review] little girl
+[review] little boy
+[review] good girl
+[review] good boy
+[review] daddy
+[review] babygirl
+[review] baby girl
+[review] innocent
+[review] virgin
+[review] first time
+[review] young
+
+# Power exchange and restraint: core, popular, legitimate territory that needs
+# consent framing verified rather than removed.
+[review] choke
+[review] choking
+[review] hands around your throat
+[review] tied
+[review] tie you
+[review] restrain
+[review] restrained
+[review] handcuff
+[review] blindfold
+[review] beg
+[review] begging
+[review] punish
+[review] punishment
+[review] obey
+[review] safe word
+[review] safeword
+
+# Substances near sexual context: not blocked, but the consent question is live.
+[review] drunk
+[review] wasted
+[review] high on
+[review] tipsy

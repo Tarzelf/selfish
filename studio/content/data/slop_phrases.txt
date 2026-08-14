@@ -1,0 +1,156 @@
+# Cliché collocations to flag in draft scripts.
+#
+# WHY THIS FILE IS A LINTER AND NOT A PROMPT:
+# Research on anti-slop methods (arXiv 2510.15061) found that listing banned
+# phrases in the system prompt has "limited efficacy and may induce a backfire
+# effect due to the pink elephant problem" — telling a model not to write
+# "trembling" makes "trembling" more available to it, not less. Naive token
+# banning via logit_bias is worse still: it caused "catastrophic quality
+# collapse". So the list lives here, in a deterministic post-generation gate,
+# and the prompt carries positive style direction instead.
+#
+# THE CENTRAL DIFFICULTY FOR THIS GENRE:
+# The measured slop vocabulary of LLM creative writing overlaps almost entirely
+# with the natural vocabulary of intimate audio — whispers, breath, shivers,
+# trembling, hammering hearts. We therefore CANNOT ban the genre's own words.
+# A whisper is the product. Every entry below must be a CLICHÉD COLLOCATION,
+# never a bare word that a good writer would legitimately need.
+#
+# Format: one phrase per line, matched case-insensitively on word boundaries
+# with flexible internal whitespace. Lines starting with # are comments.
+
+# --- The measured worst offenders (over-representation vs human text) ---
+# Source: Antislop framework, 2,000 generations per model vs wordfreq/Reddit/Gutenberg
+elara
+unsettlingly
+shimmered
+heart hammered against her ribs
+heart hammered against his ribs
+heart hammering against her ribs
+voice trembling slightly
+voice devoid of
+felt a profound sense
+eyes never leaving
+voice barely a whisper
+barely above a whisper
+barely a whisper
+
+# `flickered` appears on 98.5% of models' top-overused lists. Flagged as a bare
+# word by deliberate exception, because there is almost no sentence in intimate
+# narration that needs it and its presence is a reliable tell.
+flickered
+
+# --- Whisper/voice clichés specific to our genre, and therefore our worst risk ---
+voice low and rough
+voice rough with want
+voice thick with desire
+voice husky with
+low, dangerous whisper
+whisper against your ear
+whispers against your ear
+warm breath against your ear
+breath hot against your ear
+breath tickling your ear
+lips brushing your ear
+so close you can feel
+close enough to feel
+
+# --- Shiver/tremble family ---
+shiver down your spine
+shivers down your spine
+shiver run down your spine
+sent a shiver
+shudder run through
+trembling with anticipation
+trembled with anticipation
+knees weak
+knees go weak
+legs turn to jelly
+
+# --- Heartbeat and breath cliché ---
+heart skipped a beat
+heart skips a beat
+heart pounding in your chest
+heart racing in your chest
+pulse quickened
+pulse quickens
+breath catches in your throat
+breath hitched
+breath hitches
+forgot how to breathe
+forget how to breathe
+stealing your breath
+
+# --- Heat/fire metaphor, thoroughly exhausted ---
+heat pooling
+heat pools
+fire in your veins
+electricity shot through
+electricity sparked
+sparks flying
+liquid heat
+white-hot
+burning need
+aching need
+delicious ache
+sweet torture
+sweet agony
+
+# --- Narrative tells and throat-clearing ---
+little did she know
+little did you know
+little did he know
+unbeknownst to
+in that moment
+at that moment
+time seemed to stand still
+time stood still
+the world melted away
+everything else faded away
+faded into the background
+lost in the moment
+in a way that
+somehow, someway
+a testament to
+sent a jolt
+
+# --- Dialogue-tag and gesture crutches ---
+he growled
+she purred
+he rasped
+she breathed
+voice barely audible
+letting the words hang
+let the words hang
+letting that sink in
+trailing off
+her breath hitching
+his jaw tightened
+jaw clenched
+eyes darkened
+eyes darkening
+gaze darkened
+pupils blown
+
+# --- Consent-theatre phrasing (the intent is right, the language is dead) ---
+# Consent language is REQUIRED in this catalogue. It must simply be written
+# freshly rather than copy-pasted, so these flag as warnings to rewrite, not
+# as instructions to remove the consent beat.
+is this okay
+tell me if you want me to stop
+say the word and I'll stop
+we can stop whenever you want
+do you want me to keep going
+
+# --- Structural filler ---
+a mixture of
+a combination of
+some part of you
+part of you
+every fiber of your being
+every inch of
+inch by inch
+slowly but surely
+without warning
+before you can respond
+before you can answer
