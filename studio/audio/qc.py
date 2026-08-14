@@ -112,7 +112,15 @@ def check_render(
     rate: int,
     target: MasterTarget | None = None,
     expect_binaural: bool = True,
+    max_expected_silence_s: float = 1.5,
 ) -> QcReport:
+    """Inspect a finished render.
+
+    `max_expected_silence_s` must be supplied by the assembler when a pacing arc
+    creates deliberately long pauses. Without it this check flags every slow-burn
+    episode as having a dropped line, and a gate that cries wolf gets ignored —
+    which would cost us the genuinely missing lines it exists to catch.
+    """
     target = target or MasterTarget(rate=rate)
     report = QcReport()
 
@@ -165,9 +173,13 @@ def check_render(
             "either the performance is monotone or the chain over-compressed it"
         )
 
-    if silence > 3.0:
-        report.fail(f"{silence:.1f}s of continuous near-silence — a line may be missing")
-    elif silence > 1.5:
+    silence_fail_at = max(3.0, max_expected_silence_s * 2.0)
+    if silence > silence_fail_at:
+        report.fail(
+            f"{silence:.1f}s of continuous near-silence exceeds twice the longest "
+            f"expected pause ({max_expected_silence_s:.1f}s) — a line may be missing"
+        )
+    elif silence > max_expected_silence_s:
         report.warn(f"{silence:.1f}s of near-silence")
 
     if expect_binaural and corr > 0.98:

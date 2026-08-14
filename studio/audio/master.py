@@ -92,6 +92,11 @@ def normalise(stereo: np.ndarray, target: MasterTarget) -> tuple[np.ndarray, dic
     if stereo.ndim != 2 or stereo.shape[1] != 2:
         raise ValueError("normalise expects stereo (n, 2)")
 
+    # Final DC safety. Filters and convolution each leave a tiny offset behind,
+    # and by the master stage they have accumulated. DC costs headroom and can
+    # make quiet passages audibly unclean on small transducers.
+    stereo = stereo - stereo.mean(axis=0, keepdims=True)
+
     meter = pyln.Meter(target.rate)
     measured = meter.integrated_loudness(stereo)
     if not np.isfinite(measured):
@@ -101,10 +106,18 @@ def normalise(stereo: np.ndarray, target: MasterTarget) -> tuple[np.ndarray, dic
     limited = _limit_true_peak(gained, target.rate, target.true_peak_dbtp)
 
     final_lufs = meter.integrated_loudness(limited)
+    # A high-crest-factor mix can hit the true-peak ceiling before it reaches the
+    # loudness target, and the static trim then leaves it quieter than asked. That
+    # is the right trade to make silently for headphones, but not for the speaker
+    # master, where level is already scarce — so the shortfall is reported rather
+    # than swallowed, and the caller decides whether it needs real limiting.
+    shortfall = target.integrated_lufs - float(final_lufs)
     return limited, {
         "input_lufs": float(measured),
         "output_lufs": float(final_lufs),
         "true_peak_dbtp": true_peak_dbtp(limited, target.rate),
+        "loudness_shortfall_db": float(max(0.0, shortfall)),
+        "peak_limited": bool(shortfall > 0.5),
     }
 
 

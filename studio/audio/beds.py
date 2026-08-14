@@ -60,6 +60,9 @@ def room_tone(
     left, right = sosfilt(sos, left), sosfilt(sos, right)
 
     bed = np.stack([left, right], axis=1)
+    # Lowpassing near-DC noise leaves an offset behind; remove it here so it does
+    # not accumulate into the mix and trip the QC gate downstream.
+    bed -= bed.mean(axis=0, keepdims=True)
     bed /= np.max(np.abs(bed)) + 1e-12
     return bed * (10.0 ** (level_db / 20.0))
 
