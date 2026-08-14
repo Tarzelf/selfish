@@ -8,11 +8,22 @@ ambitious.
 
 from .beds import drifting_soundscape, fade, room_tone
 from .hrtf import KemarHrtf, Placement, render_binaural, render_binaural_path
-from .master import MasterTarget, encode_delivery, mix_bed, normalise, resample_to, write_wav
+from .master import (
+    SPEAKER_TARGET,
+    MasterTarget,
+    encode_delivery,
+    mix_bed,
+    mono_compatibility_db,
+    normalise,
+    resample_to,
+    to_speaker_safe,
+    write_wav,
+)
 from .qc import QcReport, check_render, verify_transcript
 from .voice_chain import VoicePreset, process_voice
 
 __all__ = [
+    "SPEAKER_TARGET",
     "KemarHrtf",
     "MasterTarget",
     "Placement",
@@ -23,7 +34,9 @@ __all__ = [
     "encode_delivery",
     "fade",
     "mix_bed",
+    "mono_compatibility_db",
     "normalise",
+    "to_speaker_safe",
     "process_voice",
     "render_binaural",
     "render_binaural_path",

@@ -108,6 +108,61 @@ def normalise(stereo: np.ndarray, target: MasterTarget) -> tuple[np.ndarray, dic
     }
 
 
+def mono_compatibility_db(stereo: np.ndarray) -> float:
+    """Level change when the two channels are summed, in dB.
+
+    A near-field binaural render deliberately creates large interaural
+    differences, and summing to mono makes those differences interfere. Around
+    0 dB means the mix survives a mono speaker; a large negative number means
+    parts of the voice cancel and the file will sound thin or hollow on a phone.
+    """
+    if stereo.ndim != 2 or stereo.shape[1] != 2:
+        raise ValueError("expected stereo (n, 2)")
+    left, right = stereo[:, 0], stereo[:, 1]
+    stereo_rms = np.sqrt(np.mean(left**2 + right**2) / 2.0) + 1e-12
+    mono_rms = np.sqrt(np.mean((0.5 * (left + right)) ** 2)) + 1e-12
+    return float(20.0 * np.log10(mono_rms / stereo_rms))
+
+
+def to_speaker_safe(
+    stereo: np.ndarray,
+    rate: int,
+    width: float = 0.25,
+    highpass_hz: float = 130.0,
+) -> np.ndarray:
+    """Fold a binaural master into a mix that holds up on a phone speaker.
+
+    The anchor listening context for this catalogue is bed at night, and a
+    meaningful share of that is the phone's own speaker rather than headphones.
+    Binaural rendering is built on interaural difference, so on a single small
+    speaker — or on two speakers a few centimetres apart — it partially cancels
+    and the intimacy it was created for turns into hollowness.
+
+    Rather than ship one compromised mix, the studio produces two masters. This
+    one keeps most of the mid signal, retains only a trace of width, and removes
+    low frequencies a phone speaker cannot reproduce anyway and would otherwise
+    waste headroom on.
+    """
+    if stereo.ndim != 2 or stereo.shape[1] != 2:
+        raise ValueError("expected stereo (n, 2)")
+
+    left, right = stereo[:, 0], stereo[:, 1]
+    mid = 0.5 * (left + right)
+    side = 0.5 * (left - right)
+
+    out = np.stack([mid + width * side, mid - width * side], axis=1)
+
+    from scipy.signal import butter, sosfilt
+
+    sos = butter(2, highpass_hz / (rate / 2.0), btype="highpass", output="sos")
+    return sosfilt(sos, out, axis=0)
+
+
+# Speaker playback needs more level than headphone playback: small transducers
+# lose the low end, and the listener has no volume headroom left on a phone.
+SPEAKER_TARGET = MasterTarget(integrated_lufs=-18.0, min_loudness_range=4.0)
+
+
 def resample_to(x: np.ndarray, src_rate: int, dst_rate: int) -> np.ndarray:
     if src_rate == dst_rate:
         return x

@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 import numpy as np
 import pyloudnorm as pyln
 
-from .master import MasterTarget, true_peak_dbtp
+from .master import MasterTarget, mono_compatibility_db, true_peak_dbtp
 
 
 @dataclass
@@ -129,6 +129,7 @@ def check_render(
     hf = _hf_energy_ratio(stereo, rate)
     clipped = int(np.sum(np.abs(stereo) >= 0.999))
     dc = float(np.mean(stereo))
+    mono_fold = mono_compatibility_db(stereo)
 
     report.measurements = {
         "duration_s": stereo.shape[0] / rate,
@@ -137,6 +138,7 @@ def check_render(
         "loudness_range_lu": float(lra),
         "longest_silence_s": float(silence),
         "stereo_correlation": float(corr),
+        "mono_fold_db": float(mono_fold),
         "hf_energy_ratio_above_8k": float(hf),
         "clipped_samples": clipped,
         "dc_offset": dc,
@@ -171,6 +173,13 @@ def check_render(
     if expect_binaural and corr > 0.98:
         report.fail(
             f"channel correlation {corr:.3f} — the binaural image has collapsed to mono"
+        )
+
+    if not expect_binaural and mono_fold < -3.0:
+        # A master intended for speakers must survive being summed.
+        report.fail(
+            f"summing to mono loses {abs(mono_fold):.1f} dB — this master will sound "
+            "hollow on a phone speaker"
         )
 
     if hf < 0.002:
