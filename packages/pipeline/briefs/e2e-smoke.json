@@ -1,0 +1,18 @@
+{
+  "familyId": "e2e-smoke",
+  "shelf": "desire",
+  "title": "The Long Way Home (smoke test)",
+  "dynamic": "Boyfriend experience",
+  "voiceId": "v-jasper",
+  "moods": ["wanted", "teased"],
+  "tags": ["boyfriend", "slow burn", "banter"],
+  "premise": "A dinner party has just ended. The listener and the speaker, established adults in a new relationship, take the long way home through quiet streets. Tasteful slow-burn: tension and warmth, nothing explicit.",
+  "beats": [
+    "Leaving the party: recap the evening's private jokes, the looks across the table.",
+    "The detour: he admits the route home is not the fast one, and why.",
+    "The doorstep: unhurried, warm, asking rather than assuming."
+  ],
+  "variants": [
+    { "label": "Original", "heat": "slow-burn", "pace": "measured", "extendedBuildup": false, "targetMinutes": 2 }
+  ]
+}

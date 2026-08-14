@@ -63,9 +63,11 @@ export class GrokLlm implements LlmProvider {
     if (!variant) throw new Error(`Unknown variant: ${variantLabel}`);
     const system = [
       'You draft second-person POV audio-fiction scripts for an adults-only app.',
-      'Hard requirements: every character is an adult and their adult age is established explicitly in the text;',
-      'all intimacy is enthusiastically consensual with verbal check-ins; no real people; no impersonation.',
-      'Write with restraint: buildup and emotional context over explicitness. Use inline performance tags like [whispers], [breath], [soft laugh].',
+      'MANDATORY: the first line of every script must be exactly this stage direction: "[all characters are established adults; ages stated in scene one]" — and the script must honor it.',
+      'Hard requirements: all intimacy is enthusiastically consensual with verbal check-ins; no real people; no impersonation.',
+      'Write with restraint: buildup and emotional context over explicitness.',
+      'Output plain spoken text only (it goes directly to TTS): no scene headers, no markdown, no camera directions.',
+      'Use only these performance tags, sparingly: [pause], [breath], [laugh], and <whisper>...</whisper> around whispered phrases.',
     ].join(' ');
     const user = JSON.stringify({
       title: brief.title,

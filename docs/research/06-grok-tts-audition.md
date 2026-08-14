@@ -56,6 +56,17 @@ Deep-test clips for all six (3 probes each) are committed at `samples/tts-auditi
 - Custom voice cloning (`POST /v1/custom-voices`) is **Enterprise-gated** — relevant later for licensed-narrator voices; built-ins carry no likeness-license story of our own, so production still needs the licensed-voice plan.
 - Binaural/HRTF post-processing is not provided by the API; stays in our post stage as planned.
 
+## End-to-end pipeline test (Grok LLM → safety → Grok TTS)
+
+Ran the full production chain live with `PIPELINE_LLM=grok PIPELINE_TTS=grok GROK_TTS_VOICE=castor` on a tasteful slow-burn smoke brief (`briefs/e2e-smoke.json`):
+
+- **Draft (grok-4):** 768-char script in ~5 s; followed the mandated adult-age header, used tags sparingly, and modeled consent unprompted-quality ("Is that alright?", "May I?"). Tone: warm slow-burn, restraint over explicitness — exactly the brief.
+- **Safety classifier:** passed all 6 checks (and the header requirement is now enforced in the Grok system prompt).
+- **Render (castor):** 39 s of audio in ~3.5 s.
+- **Audit manifest:** full provenance chain recorded.
+
+Artifacts: `samples/e2e-smoke--castor.mp3` + `samples/e2e-smoke--script.md`. This validates the entire v1 content factory on real providers; remaining production gaps are the post stage (binaural, watermark) and human editorial workflow.
+
 ## Reproduce
 
 ```bash
