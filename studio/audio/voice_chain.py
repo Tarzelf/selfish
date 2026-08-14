@@ -45,16 +45,30 @@ class VoicePreset:
     """
 
     highpass_hz: float = 75.0
-    # Gentle tonal shaping. Low shelf for chest warmth, a small dip where close
-    # speech gets boxy, presence for intelligibility at low levels, and an air
-    # shelf for the detail that carries tingles.
-    low_shelf_db: float = 2.0
-    low_shelf_hz: float = 160.0
-    air_shelf_db: float = 2.5
+
+    # TONAL SHAPING — and note that this reverses the usual advice.
+    #
+    # Mixing tutorials for ASMR almost universally say to brighten: boost presence
+    # and add an air shelf, on the theory that tingles live in 4-16 kHz sibilance.
+    # The published evidence points the other way. Barratt (2017) found listeners
+    # preferred lower-pitched ASMR 56% to 12%; Kondo (2019) found ASMR-effective
+    # material sits below a 1.5 kHz spectral centroid; and Terashima (2024) found
+    # *lower* 5 kHz envelope amplitude predicted *stronger* tingling (r = 0.52).
+    #
+    # So the defaults are warm, with a small cut where close speech turns harsh,
+    # rather than bright. Crucially this is not the same as throwing away high
+    # frequencies: bandwidth is still preserved end to end (QC checks for that),
+    # because losing the band and choosing not to emphasise it are different acts.
+    #
+    # This contradicts prevailing practice, so `bright()` keeps the conventional
+    # curve available for a listening test rather than settling it by assertion.
+    low_shelf_db: float = 2.5
+    low_shelf_hz: float = 180.0
+    air_shelf_db: float = 0.0
     air_shelf_hz: float = 9000.0
     peaking: tuple[PeakingEq, ...] = (
         PeakingEq(freq_hz=430.0, gain_db=-1.5, q=0.9),
-        PeakingEq(freq_hz=3400.0, gain_db=1.5, q=0.8),
+        PeakingEq(freq_hz=3200.0, gain_db=-2.0, q=0.8),
     )
 
     deess_band_hz: tuple[float, float] = (5200.0, 9500.0)
@@ -79,13 +93,32 @@ class VoicePreset:
         """Even lighter touch, for content that is whispered throughout."""
         return replace(
             self,
-            low_shelf_db=1.2,
-            air_shelf_db=3.5,
+            low_shelf_db=1.5,
+            air_shelf_db=0.0,
             comp_ratio=1.6,
             comp_threshold_db=-32.0,
             deess_max_reduction_db=3.0,
             breath_gain_db=2.5,
             saturation_drive=0.08,
+        )
+
+    def bright(self) -> "VoicePreset":
+        """The conventional 'brighten it' curve, kept for comparison.
+
+        This is what most ASMR mixing guidance prescribes and what the evidence
+        cited above argues against. It exists so the question can be settled by a
+        listening test with real voices rather than by whichever source we read
+        last — the studies are on non-speech triggers and small samples, and the
+        practitioners are numerous but uncontrolled.
+        """
+        return replace(
+            self,
+            low_shelf_db=2.0,
+            air_shelf_db=2.5,
+            peaking=(
+                PeakingEq(freq_hz=430.0, gain_db=-1.5, q=0.9),
+                PeakingEq(freq_hz=3400.0, gain_db=1.5, q=0.8),
+            ),
         )
 
 

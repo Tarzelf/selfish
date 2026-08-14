@@ -298,7 +298,11 @@ policy problem for our TTS vendor.
 | Evidence-derived content taxonomy with enforced invariants | Built |
 | Beat-level assembly with programmable pacing arcs | Built, measured |
 
-66 tests. Measured throughput: ~90 s of single-core CPU per finished 20-minute episode.
+79 tests, including an unvoiced-ratio gate that distinguishes a real whisper from the
+soft voiced speech a synthesiser produces when asked for one — see
+`docs/plan/03-round-2-corrections.md`.
+
+Measured throughput: ~90 s of single-core CPU per finished 20-minute episode.
 Audio production is not a bottleneck; **human editorial review is**, which is where tooling
 investment belongs.
 

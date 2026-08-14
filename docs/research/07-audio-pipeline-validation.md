@@ -131,12 +131,27 @@ correctness, not aesthetics. But two of its limitations turn out to be the same
 limitations real TTS vendors have, so the QC gates caught issues that matter:
 
 **1. Sample rate is a hard requirement, not a preference.** espeak outputs
-22.05 kHz, an 11 kHz Nyquist limit, and QC flagged that only 0.09% of energy sat
-above 8 kHz. ASMR's tingle content lives at roughly 4–16 kHz. Many TTS APIs
-return 24 kHz audio, which caps usable content at 12 kHz and silently truncates
-the top of that band — no amount of post-processing recovers detail that was
-never synthesised. **Any TTS vendor we adopt must deliver 44.1 or 48 kHz.** This
-should be treated as a disqualifying criterion in `03-voice-and-tts.md`.
+22.05 kHz, an 11 kHz Nyquist limit, and QC measures the render's bandwidth
+ceiling at 8.7 kHz. Many TTS APIs return 24 kHz audio, which caps usable content
+at 12 kHz — and no amount of post-processing recovers a band that was never
+synthesised. **Any TTS vendor we adopt must deliver 44.1 or 48 kHz.** This should
+be treated as a disqualifying criterion in `03-voice-and-tts.md`.
+
+> **Correction (round 2).** An earlier version of this note said "ASMR's tingle
+> content lives at roughly 4–16 kHz" and QC warned when high-frequency energy was
+> *low*. The audio-engineering research contradicts that premise: Barratt (2017)
+> found listeners preferred lower-pitched ASMR 56% to 12%, Kondo (2019) found
+> effective material sits below a 1.5 kHz spectral centroid, and Terashima (2024)
+> found *lower* 5 kHz envelope amplitude predicted *stronger* tingling (r = 0.52).
+>
+> The distinction that survives is between **bandwidth** and **brightness**.
+> Preserving the high band matters, because a truncated source is an unrecoverable
+> defect. *Emphasising* it appears to be actively wrong. So the gate now measures
+> where spectral content stops and fails a truncated source, while the voice chain
+> no longer boosts air and cuts 2 dB at 3.2 kHz instead. The conventional bright
+> curve is preserved as `VoicePreset.bright()` for a listening test, because the
+> studies are small and on non-speech triggers while the practitioners are
+> numerous but uncontrolled.
 
 **2. Flat delivery is detectable automatically.** The source measured 1.18 LU of
 loudness range and the chain passed it through at 0.96 LU, so the chain is not

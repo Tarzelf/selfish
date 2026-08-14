@@ -165,9 +165,26 @@ def main() -> int:
     print("is exactly why the QC gate below flags it.")
 
     nyquist_hz = src_rate / 2
-    print(f"\nSource Nyquist limit: {nyquist_hz:.0f} Hz. ASMR detail lives at 4-16 kHz,")
-    print("so any TTS engine returning 22-24 kHz audio silently truncates the top of")
-    print("the tingle band. Vendor selection must require 44.1/48 kHz output.")
+    print(f"\nSource Nyquist limit: {nyquist_hz:.0f} Hz. Any TTS engine returning 22-24 kHz")
+    print("audio imposes a hard ceiling no later processing can undo, so vendor")
+    print("selection must require 44.1/48 kHz output.")
+
+    section("3b. Is it actually a whisper?")
+    from studio.audio.voicing import (
+        COMMERCIAL_TTS_UNVOICED_RATIO,
+        REAL_ASMR_UNVOICED_RATIO,
+        measure_unvoiced_ratio,
+    )
+
+    voicing = measure_unvoiced_ratio(mono44, HRIR_RATE)
+    print(voicing.summary())
+    print()
+    print("A whisper is aperiodic — the vocal folds do not vibrate. What a synthesiser")
+    print("returns when asked to whisper is soft *voiced* speech, which is a different")
+    print(f"acoustic object: real performers measure {REAL_ASMR_UNVOICED_RATIO:.1%} unvoiced frames against")
+    print(f"{COMMERCIAL_TTS_UNVOICED_RATIO:.1%} for the best commercial engine. This gate is the acceptance")
+    print("test for any voice source, and it is the only check here that a convincingly")
+    print("breathy fake would fail.")
 
     section("4. Binaural placement, static")
     for label, placement in (

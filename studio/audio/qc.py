@@ -95,36 +95,58 @@ def _stereo_correlation(stereo: np.ndarray) -> float:
     return float(np.corrcoef(left, right)[0, 1])
 
 
-def _hf_energy_ratio(stereo: np.ndarray, rate: int, split_hz: float = 8000.0) -> float:
-    """Fraction of spectral energy above `split_hz` — a proxy for ASMR detail.
+def _average_spectrum(stereo: np.ndarray, rate: int) -> tuple[np.ndarray, np.ndarray]:
+    """Welch-style average spectrum across the whole file.
 
-    Averaged across the whole file rather than measured on the opening. The first
-    thirty seconds of an intimate episode are typically its quietest and most
-    whispered passage, so judging detail there measures the least representative
-    part of the render.
+    Averaged rather than measured on the opening, because the first thirty seconds
+    of an intimate episode are typically its quietest and most whispered passage —
+    the least representative part of the render.
     """
     mono = stereo.mean(axis=1)
     if mono.size == 0:
-        return 0.0
+        return np.zeros(1), np.zeros(1)
 
     segment = min(mono.size, rate * 4)
     window = np.hanning(segment)
     freqs = np.fft.rfftfreq(segment, 1.0 / rate)
-    high_band = freqs >= split_hz
 
     accumulated = np.zeros(freqs.size)
-    count = 0
+    blocks = 0
     for start in range(0, mono.size - segment + 1, segment):
-        block = mono[start : start + segment] * window
-        accumulated += np.abs(np.fft.rfft(block)) ** 2
-        count += 1
-    if count == 0:
-        accumulated = np.abs(np.fft.rfft(mono[:segment] * window[: mono.size])) ** 2
+        accumulated += np.abs(np.fft.rfft(mono[start : start + segment] * window)) ** 2
+        blocks += 1
+    if blocks == 0:
+        padded = np.zeros(segment)
+        padded[: mono.size] = mono[:segment]
+        accumulated = np.abs(np.fft.rfft(padded * window)) ** 2
+    return freqs, accumulated
 
-    total = accumulated.sum()
+
+def _hf_energy_ratio(stereo: np.ndarray, rate: int, split_hz: float = 8000.0) -> float:
+    """Fraction of spectral energy above `split_hz`. Reported, not gated."""
+    freqs, spectrum = _average_spectrum(stereo, rate)
+    total = spectrum.sum()
     if total <= 0:
         return 0.0
-    return float(accumulated[high_band].sum() / total)
+    return float(spectrum[freqs >= split_hz].sum() / total)
+
+
+def _bandwidth_hz(stereo: np.ndarray, rate: int, energy_fraction: float = 0.999) -> float:
+    """Frequency below which `energy_fraction` of the spectral energy sits.
+
+    This is the measurement that actually matters, and it is not the same as
+    brightness. Whether a mix *emphasises* high frequencies is an aesthetic choice
+    the evidence argues against; whether the high band is *present at all* is a
+    defect question, because a 24 kHz TTS source or an over-compressed encode
+    imposes a hard ceiling that no later processing can undo.
+    """
+    freqs, spectrum = _average_spectrum(stereo, rate)
+    total = spectrum.sum()
+    if total <= 0:
+        return 0.0
+    cumulative = np.cumsum(spectrum) / total
+    index = int(np.searchsorted(cumulative, energy_fraction))
+    return float(freqs[min(index, freqs.size - 1)])
 
 
 def check_render(
@@ -161,6 +183,7 @@ def check_render(
     silence = _longest_silence_s(stereo, rate)
     corr = _stereo_correlation(stereo)
     hf = _hf_energy_ratio(stereo, rate)
+    bandwidth = _bandwidth_hz(stereo, rate)
     clipped = int(np.sum(np.abs(stereo) >= 0.999))
     dc = float(np.mean(stereo))
     mono_fold = mono_compatibility_db(stereo)
@@ -174,6 +197,7 @@ def check_render(
         "stereo_correlation": float(corr),
         "mono_fold_db": float(mono_fold),
         "hf_energy_ratio_above_8k": float(hf),
+        "bandwidth_hz": float(bandwidth),
         "clipped_samples": clipped,
         "dc_offset": dc,
     }
@@ -225,10 +249,16 @@ def check_render(
             "hollow on a phone speaker"
         )
 
-    if hf < 0.002:
-        report.warn(
-            f"only {hf * 100:.2f}% of energy above 8 kHz — render may lack ASMR detail"
+    # Bandwidth, not brightness. A quiet high band is a legitimate aesthetic
+    # choice; a missing one means the source or the encode threw it away.
+    if rate >= 44100 and bandwidth < 12000.0:
+        report.fail(
+            f"spectral content stops at {bandwidth / 1000:.1f} kHz — the source is "
+            "probably 24 kHz or the encode is too lossy; no later processing "
+            "recovers a band that was never captured"
         )
+    elif rate >= 44100 and bandwidth < 15000.0:
+        report.warn(f"spectral content stops at {bandwidth / 1000:.1f} kHz")
 
     return report
 

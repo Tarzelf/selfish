@@ -21,6 +21,7 @@ from .master import (
 )
 from .qc import QcReport, check_render, verify_transcript
 from .voice_chain import VoicePreset, process_voice
+from .voicing import VoicingReport, check_whisper, measure_unvoiced_ratio
 
 __all__ = [
     "SPEAKER_TARGET",
@@ -29,8 +30,11 @@ __all__ = [
     "Placement",
     "QcReport",
     "VoicePreset",
+    "VoicingReport",
     "check_render",
+    "check_whisper",
     "drifting_soundscape",
+    "measure_unvoiced_ratio",
     "encode_delivery",
     "fade",
     "mix_bed",

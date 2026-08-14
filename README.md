@@ -14,7 +14,8 @@ and the offline studio pipeline that produces the audio.
 | Document | What it is |
 | --- | --- |
 | [`docs/plan/02-product-plan-v2.md`](docs/plan/02-product-plan-v2.md) | **The plan.** Read this one |
-| [`docs/plan/01-research-synthesis.md`](docs/plan/01-research-synthesis.md) | Seven research tracks condensed to the decisions they force |
+| [`docs/plan/03-round-2-corrections.md`](docs/plan/03-round-2-corrections.md) | What the final research wave changed, including two unresolved challenges to the plan |
+| [`docs/plan/01-research-synthesis.md`](docs/plan/01-research-synthesis.md) | Eight research tracks condensed to the decisions they force |
 | [`docs/plan/00-product-thesis.md`](docs/plan/00-product-thesis.md) | The original hypothesis, kept unedited so the reversals are visible |
 
 ## The five findings that shaped it
@@ -60,18 +61,29 @@ studio/
     validate_assembly.py beat-assembly validation, with measurements
 ```
 
-Two deliberate inversions of normal practice, both explained in the source:
+Three deliberate inversions of normal practice, all explained in the source:
 
-- **Do not de-ess hard.** The 5–9 kHz band a de-esser attacks is the band that carries ASMR
-  detail. Broadcast de-essing removes the thing the product sells.
 - **Do not master to −16 LUFS.** Podcast levels make a whisper as loud as a conversation.
   Delivery is −22 LUFS with loudness *range* protected rather than minimised.
+- **Do not de-ess hard.** Capped at a few dB, because heavy de-essing removes detail the
+  product is selling.
+- **Do not brighten.** This one reverses most ASMR mixing guidance. Three studies find lower
+  spectral centroid and *lower* 5 kHz envelope amplitude predict stronger tingling, so the
+  defaults are warm. Bandwidth is still preserved end to end and QC fails a truncated source —
+  losing the high band and choosing not to emphasise it are different acts. The conventional
+  bright curve is kept as `VoicePreset.bright()` for a listening test.
+
+`studio/audio/voicing.py` deserves separate mention: it measures the share of speech frames
+with no detectable fundamental, which is what separates a real whisper (91.8% in published
+measurement of real performers) from the soft *voiced* speech a synthesiser returns when asked
+to whisper (35.4%). It is the only gate here that a convincingly breathy fake fails, and it is
+the acceptance test for any voice source before a performer is booked or a vendor is paid.
 
 ## Setup
 
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install numpy scipy soundfile pyloudnorm pytest
+.venv/bin/pip install -r requirements.txt
 ./studio/tools/fetch_hrtf.sh          # MIT KEMAR; see licence note in the script
 sudo apt-get install -y espeak-ng     # placeholder voice for the validators only
 ```
@@ -79,7 +91,7 @@ sudo apt-get install -y espeak-ng     # placeholder voice for the validators onl
 ## Verify
 
 ```bash
-.venv/bin/python -m pytest studio/ -q            # 66 tests
+.venv/bin/python -m pytest studio/ -q            # 79 tests
 .venv/bin/python -m studio.tools.validate_chain
 .venv/bin/python -m studio.tools.validate_assembly
 ```
