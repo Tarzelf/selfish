@@ -1,6 +1,6 @@
 # Research brief — Selfish
 
-Last updated: 14 August 2026. Adult product. 18+ only. All fantasy is fictional and consensual.
+Last updated: 14 August 2026 (loop 2 after Maya’s first listen). Adult product. 18+ only. All fantasy is fictional and consensual.
 
 This brief is the study behind the product, not a pitch deck. It exists so we do not build the wrong thing: a male spicy-chat port wearing a prettier skin.
 
