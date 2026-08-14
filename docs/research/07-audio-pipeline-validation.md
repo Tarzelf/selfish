@@ -155,6 +155,25 @@ check available, because dropped and mispronounced words are synthetic speech's
 most frequent and most immersion-breaking defect, and this catches them at scale
 without a human hearing every minute of output.
 
+## Throughput (measured, single CPU core)
+
+| Stage | Speed | Per 20-minute episode |
+| --- | --- | --- |
+| Voice chain (EQ, de-ess, compression, breath) | 0.018× realtime | ~22 s |
+| Static binaural placement | 0.005× realtime | ~6 s |
+| Moving binaural (blockwise, interpolated HRIRs) | 0.046× realtime | ~55 s |
+
+So a finished 20-minute episode costs roughly **90 seconds of single-core CPU**, and the
+work is embarrassingly parallel across episodes and variants. Even a 200-episode library
+rendered across a dozen voice/intensity combinations is on the order of tens of core-hours
+— a few dollars of compute, trivially absorbed by CI or a laptop overnight.
+
+This matters strategically. The envelope followers are per-sample Python loops, which
+looked like an obvious bottleneck worth optimising; measured, they are not. Nothing in
+audio post-production constrains how fast this catalogue can grow. **The binding
+constraint on catalogue growth is human editorial review, not compute** — which is where
+tooling investment should go.
+
 ## Open items
 
 - KEMAR's licence permits research use; commercial terms need confirming, or
