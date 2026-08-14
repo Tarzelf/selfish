@@ -1,0 +1,23 @@
+{
+  "familyId": "f-back-to-yours",
+  "shelf": "desire",
+  "title": "Back to Yours",
+  "dynamic": "Boyfriend experience",
+  "voiceId": "v-jasper",
+  "seriesId": "s-latekeys",
+  "episode": 1,
+  "moods": ["wanted", "teased"],
+  "tags": ["boyfriend", "slow burn", "banter"],
+  "premise": "A dinner party has just ended. The listener and Jasper, established adults in a new relationship, take the long way home through quiet streets.",
+  "beats": [
+    "Leaving the party: recap the evening's private jokes, the looks across the table.",
+    "The detour: he admits the route home is not the fast one, and why.",
+    "The doorstep: unhurried, warm, asking rather than assuming.",
+    "Inside: banter softens into closeness; explicit verbal check-in before anything more."
+  ],
+  "variants": [
+    { "label": "Original", "heat": "slow-burn", "pace": "measured", "extendedBuildup": false, "targetMinutes": 14 },
+    { "label": "Softer", "heat": "comfort", "pace": "slow", "extendedBuildup": false, "targetMinutes": 13 },
+    { "label": "More buildup", "heat": "slow-burn", "pace": "slow", "extendedBuildup": true, "targetMinutes": 19 }
+  ]
+}

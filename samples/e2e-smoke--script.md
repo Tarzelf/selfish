@@ -1,0 +1,4 @@
+[all characters are established adults; ages stated in scene one]
+That dinner really was something, wasn't it? I kept catching your eye across the table every time someone brought up that ridiculous story about the lost reservation. You were trying so hard not to laugh. [pause] I liked seeing you like that, relaxed and a little mischievous. 
+I know the usual route is quicker, but I took the long way on purpose tonight. The streets are quiet this time of evening, and I wanted a few more minutes just walking beside you, no rush, no one else around. [breath] It feels good, having this stretch of time that belongs only to us.
+Here we are. [pause] I had a really nice evening with you. Can I kiss you goodnight? I'd like to, if you want that too.

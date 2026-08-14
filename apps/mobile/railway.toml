@@ -1,0 +1,10 @@
+# Railway deployment of the Selfish web preview.
+# Deploy from apps/mobile: RAILWAY_TOKEN=<project-token> railway up --detach
+
+[build]
+buildCommand = "npm ci --include=dev && npx expo export --platform web"
+
+[deploy]
+startCommand = "npx serve dist -l ${PORT}"
+healthcheckPath = "/"
+restartPolicyType = "ON_FAILURE"

@@ -1,0 +1,18 @@
+{
+  "name": "@selfish/pipeline",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Selfish content pipeline: brief -> LLM draft -> safety classifier -> editorial gate -> TTS render -> post -> publish. Runs fully offline with mock providers.",
+  "scripts": {
+    "demo": "tsx src/run.ts briefs/back-to-yours.json --approve",
+    "test": "tsx --test src/**/*.test.ts",
+    "tts:audition": "tsx src/tts-test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.0"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/session/*", "destination": "/session/[id].html" },
+    { "source": "**", "destination": "/+not-found.html" }
+  ]
+}
