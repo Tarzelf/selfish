@@ -1,0 +1,8 @@
+.venv/
+build/
+studio/data/hrtf/
+__pycache__/
+*.pyc
+.DS_Store
+node_modules/
+.expo/
