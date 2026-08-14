@@ -16,6 +16,8 @@ People want two related but distinct experiences from audio:
 
 The breakthrough insight from founder testing: **interactive AI voice conversation** (via Grok) creates a qualitatively different experience than scripted audio. It responds to *you*. It adapts. It feels alive.
 
+**Founder-validated**: Grok excels at sexy 18+ persona dialogue — spicy, responsive, and convincingly in-character. Unlike Replika (removed erotic features in 2023) or Character.AI (strict filtering), Grok via API supports adult persona work with proper age gating. This is a core competitive advantage, not just a tech choice.
+
 **The opportunity**: Combine ASMR-quality production values with AI-driven interactivity — primarily for women who already prefer audio erotica over visual porn.
 
 ---
@@ -106,10 +108,11 @@ Phase 3 (Scale):   All-xAI stack — no third-party voice providers needed
 ```
 
 **Why all-xAI?**
-- Founder-validated Grok dialogue quality
+- Founder-validated Grok dialogue quality — **especially for sexy 18+ personas** (responsive, in-character, convincingly spicy)
 - Apr 2026 standalone STT + TTS APIs simplify the stack (one vendor, one API key)
 - Speech tags (`[whisper]`, `[sigh]`, `[laugh]`) are perfect for intimate/ASMR delivery
 - Same voice roster (Ara, Eve, Leo) across TTS and Voice Agent
+- No platform censorship like Replika/Character.AI — we control prompts and age gating
 - Easier to maintain than Grok + ElevenLabs + Deepgram assembly
 
 ### iOS audio requirements

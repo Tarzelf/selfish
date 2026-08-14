@@ -202,7 +202,19 @@ subscriptions (
 ### Grok (Text Brain)
 
 - **Model**: `grok-3` or latest chat model
-- **System prompt structure**:
+- **Strength**: Sexy 18+ persona dialogue — founder-validated. Grok stays in character, escalates naturally, responds to user cues without breaking immersion. Key differentiator vs Quinn (passive) and filtered AI companions.
+- **Content tiers**: Two prompt variants per persona — see below.
+
+#### Content tiers (App Store vs full experience)
+
+| Tier | Audience | Content ceiling | Use case |
+|------|----------|-----------------|----------|
+| **App Store** | 18+ verified, on iOS | Suggestive, sensual, fade-to-black. No graphic anatomy. Wellness-framed. | Quinn/Dipsea competitive — gets us on App Store |
+| **Full** | 18+ verified, subscribers | Spicier, more direct. Still no minors/non-consent. Founder-validated Grok strength. | Web or post-App-Review "mature" tier if needed |
+
+Start with App Store tier in v1. Grok can do more — we dial intensity via prompts, not platform limits.
+
+#### System prompt structure (App Store tier)
 
 ```
 You are {persona.name}, {persona.description}.
@@ -226,6 +238,10 @@ RULES:
 
 OPENING (if first message): {scenario.opening_line}
 ```
+
+#### Full tier prompt delta (future)
+
+For subscribers who want the founder-validated experience: relax the "fade-to-black" and anatomical constraints. Keep hard limits: no minors, non-consent, violence. Grok handles this well — prompt engineering, not model limitation.
 
 ### Grok TTS (Voice)
 

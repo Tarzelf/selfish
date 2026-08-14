@@ -66,7 +66,7 @@
 | Option | Pros | Cons |
 |--------|------|------|
 | **A. Turn-based** (speak → pause → response) | Cheaper, easier to moderate, ship faster | Less magical, breaks immersion |
-| **B. Full duplex realtime** (Grok Voice) | Scarily good, founder-validated | $0.08/min, harder to filter, complex |
+| **B. Full duplex realtime** (Grok Voice) | Scarily good, founder-validated for spicy 18+ dialogue | $0.08/min, harder to filter, complex |
 | **C. Hybrid** | Free/cheap turn-based; premium realtime | Two systems to maintain |
 
 **Recommendation: C (Hybrid)**  
@@ -129,7 +129,7 @@
 |-------|--------|-----|
 | Mobile | **Expo (React Native)** | iOS-first, OTA updates, founder has Expo experience |
 | Backend | **Supabase** | Auth, DB, Edge Functions, storage — proven in prior project |
-| AI text | **Grok API** (xAI) | Founder-validated dialogue quality |
+| AI text | **Grok API** (xAI) | Founder-validated for sexy 18+ personas; responsive, in-character |
 | Voice STT | **Grok STT API** (xAI) | Streaming transcription, single vendor |
 | Voice TTS | **Grok TTS API** (xAI) | Speech tags (`[whisper]`, `[sigh]`) for intimate delivery |
 | Voice realtime | **Grok Voice Agent** (Phase 2) | Same provider, full-duplex |
@@ -167,6 +167,8 @@
 ---
 
 ## Personas (Whisper Mode, Launch)
+
+> **Why Grok?** Founder testing confirmed Grok handles sexy 18+ persona dialogue exceptionally well — responsive, adaptive, convincingly in-character. Unlike filtered platforms (Replika, Character.AI), we own the prompts and age gate. Grok is the product moat for Whisper mode.
 
 ### Persona 1: "Elena" — Slow Burn
 - **Voice**: Warm, lower register, unhurried
