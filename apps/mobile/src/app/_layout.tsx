@@ -1,4 +1,3 @@
-import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
@@ -18,43 +17,28 @@ import '@/styles/atmosphere.css';
 // and stays painted — Today, Browse, and Rest ghost through each other.
 enableScreens(true);
 
-const NAV_THEME = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: 'transparent',
-    card: 'transparent',
-    primary: '#FFB457',
-    text: '#F5F5F7',
-    border: 'transparent',
-    notification: '#FFB457',
-  },
-};
-
 function ThemedStack() {
   const { palette } = useAtmosphere();
   return (
-    <ThemeProvider value={NAV_THEME}>
-      <View style={{ flex: 1, backgroundColor: '#060608', overflow: 'hidden' }}>
-        <AtmosphereSky />
-        <StatusBar style={palette.status} />
-        <View style={{ flex: 1, zIndex: 1 }}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: 'none',
-              contentStyle: { backgroundColor: 'transparent', flex: 1 },
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="session/[id]" options={{ presentation: 'modal' }} />
-            <Stack.Screen name="transparency" options={{ presentation: 'modal' }} />
-          </Stack>
-        </View>
+    <View style={{ flex: 1, backgroundColor: '#060608', overflow: 'hidden' }}>
+      <AtmosphereSky />
+      <StatusBar style={palette.status} />
+      <View style={{ flex: 1, zIndex: 1 }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            animation: 'none',
+            contentStyle: { backgroundColor: 'transparent', flex: 1 },
+          }}
+        >
+          <Stack.Screen name="index" />
+          <Stack.Screen name="onboarding" options={{ gestureEnabled: false }} />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="session/[id]" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="transparency" options={{ presentation: 'modal' }} />
+        </Stack>
       </View>
-    </ThemeProvider>
+    </View>
   );
 }
 
