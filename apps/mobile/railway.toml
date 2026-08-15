@@ -1,5 +1,7 @@
 # Railway deployment of the Selfish web preview.
-# Deploy from apps/mobile: RAILWAY_TOKEN=<project-token> railway up --detach
+# Always upload from this directory (apps/mobile), not the monorepo root:
+#   RAILWAY_TOKEN=<project-token> railway up --detach --service selfish --environment production
+# GitHub auto-deploys must use root directory apps/mobile or Railpack cannot find package.json.
 
 [build]
 buildCommand = "npm ci --include=dev && npx expo export --platform web"
