@@ -138,7 +138,28 @@ export default function SessionScreen() {
     if (next && heatAllowed(next.heat)) setVariantId(next.id);
   };
 
-  if (!family || !variant || !voice) {
+  if (!family || !voice) {
+    return (
+      <Screen scroll={false}>
+        <Display>Not found</Display>
+        <Button label="Back" onPress={() => router.back()} />
+      </Screen>
+    );
+  }
+
+  if (isClose && prefs.heatCap !== 'spicy') {
+    return (
+      <Screen scroll={false}>
+        <Display>This room is closed</Display>
+        <Body dim style={{ marginBottom: spacing.lg }}>
+          Close loops stay behind the heat cap. Raise it to Close in You if you want back in.
+        </Body>
+        <Button label="Back" onPress={() => router.back()} />
+      </Screen>
+    );
+  }
+
+  if (!variant) {
     return (
       <Screen scroll={false}>
         <Display>Not found</Display>

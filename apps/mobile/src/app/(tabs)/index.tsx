@@ -66,7 +66,7 @@ function EditorialTonight() {
 
   const continueFamilies = continueList
     .map((e) => ({ entry: e, family: getFamily(e.familyId) }))
-    .filter((x) => x.family && !x.family.tags.some((t) => prefs.hardLimits.includes(t)));
+    .filter((x) => x.family && visibleCatalog.some((f) => f.id === x.family!.id));
 
   const firstName = prefs.displayName.split(' ')[0];
   const hour = new Date().getHours();
