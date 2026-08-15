@@ -1,9 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, type ViewStyle } from 'react-native';
 
-import { fonts, palette } from '@/constants/theme';
+import { fonts, palette, radius as radii } from '@/constants/theme';
 import type { SessionFamily } from '@/lib/types';
+
+export type CoverAspect = 'square' | 'portrait' | 'wide';
 
 interface CoverPalette {
   base: [string, string];
@@ -20,6 +22,12 @@ const REST: CoverPalette[] = [
   { base: [palette.restInk, palette.inkHigh], accent: palette.rest },
   { base: [palette.ink, palette.inkLift], accent: palette.boneDim },
 ];
+
+const ASPECT: Record<CoverAspect, number> = {
+  square: 1,
+  portrait: 3 / 4,
+  wide: 16 / 9,
+};
 
 function hashString(s: string): number {
   let h = 0;
@@ -40,32 +48,47 @@ function coverWord(title: string): string {
 export function CoverArt({
   family,
   size,
-  radius = 12,
+  aspect = 'square',
+  radius = radii.md,
 }: {
   family: Pick<SessionFamily, 'id' | 'shelf' | 'title'>;
-  size: number;
+  size?: number;
+  aspect?: CoverAspect;
   radius?: number;
 }) {
   const p = coverPalette(family);
   const word = coverWord(family.title);
+  const ratio = ASPECT[aspect];
+  const [measured, setMeasured] = useState(size ?? 0);
+  const width = size ?? measured;
+  const wordSize = width ? Math.min(Math.max(width * 0.2, 22), 56) : 28;
+
+  const box: ViewStyle =
+    size != null
+      ? { width: size, height: size / ratio, borderRadius: radius }
+      : { width: '100%', aspectRatio: ratio, borderRadius: radius };
 
   return (
     <LinearGradient
       colors={[p.base[0], p.base[1]]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      style={[styles.cover, { width: size, height: size, borderRadius: radius }]}
+      onLayout={(e) => {
+        const next = e.nativeEvent.layout.width;
+        if (size == null && Math.abs(next - measured) > 1) setMeasured(next);
+      }}
+      style={[styles.cover, box]}
     >
       <Text
         numberOfLines={1}
         style={[
           styles.word,
           {
-            fontSize: size * 0.28,
+            fontSize: wordSize,
             color: p.accent,
-            bottom: size * 0.08,
-            left: size * 0.1,
-            width: size * 1.3,
+            bottom: width ? width * 0.08 : 16,
+            left: width ? width * 0.1 : 16,
+            width: width ? width * 1.3 : '80%',
           },
         ]}
       >

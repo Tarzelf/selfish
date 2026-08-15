@@ -37,7 +37,7 @@ export function Screen({
   const insets = useSafeAreaInsets();
   const bg = tone === 'rest' ? palette.restInk : palette.ink;
   const inner = (
-    <View style={[styles.shell, padded && { paddingHorizontal: spacing.md }]}>{children}</View>
+    <View style={[styles.shell, padded && { paddingHorizontal: spacing.lg }]}>{children}</View>
   );
   if (!scroll) {
     return <View style={[styles.screen, { backgroundColor: bg, paddingTop: insets.top }]}>{inner}</View>;
@@ -206,22 +206,24 @@ export function HeatBadge({ heat, locked }: { heat: HeatLevel; locked?: boolean 
 export function Card({
   children,
   onPress,
+  flush,
   style,
 }: {
   children: React.ReactNode;
   onPress?: () => void;
+  flush?: boolean;
   style?: StyleProp<ViewStyle>;
 }) {
-  if (!onPress) return <View style={[styles.card, style]}>{children}</View>;
+  const look = [styles.card, flush && styles.cardFlush, style];
+  if (!onPress) return <View style={look}>{children}</View>;
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
       style={(state: PressState) => [
-        styles.card,
+        ...look,
         state.hovered && { backgroundColor: palette.inkHigh },
         state.pressed && { opacity: 0.88 },
-        style,
       ]}
     >
       {children}
@@ -362,7 +364,7 @@ export function StepScreen({
   const insets = useSafeAreaInsets();
   const frame = (
     <View style={[styles.screen, { backgroundColor: palette.ink, paddingTop: insets.top }]}>
-      <View style={[styles.shell, { paddingHorizontal: spacing.md }]}>
+      <View style={[styles.shell, { paddingHorizontal: spacing.lg }]}>
         {chrome}
         <ScrollView
           style={styles.stepScroll}
@@ -427,6 +429,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     marginBottom: spacing.md,
   },
+  cardFlush: { padding: 0, overflow: 'hidden' },
   divider: { height: StyleSheet.hairlineWidth, backgroundColor: palette.line, marginVertical: spacing.xl },
   play: {
     backgroundColor: palette.bone,

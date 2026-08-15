@@ -2,7 +2,7 @@ import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Body, Caption, PlayControl, Title } from '@/components/ui';
+import { Caption, HitLabel, Title } from '@/components/ui';
 import { palette, radius, spacing, type } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { VOICES } from '@/data/catalog';
@@ -37,24 +37,20 @@ function VoiceCard({
       onPress={onSelect}
       style={({ pressed }) => [styles.card, selected && styles.cardSelected, pressed && { opacity: 0.85 }]}
     >
-      <View style={styles.topRow}>
-        <Title style={styles.initial}>{voice.name.charAt(0)}</Title>
-        {source != null && (
-          <PlayControl
-            playing={status.playing}
-            onPress={toggleSample}
-            size="sm"
-            label={`Hear ${voice.name}`}
-          />
-        )}
-      </View>
-      <Body style={selected ? undefined : { color: palette.boneDim }}>{voice.name}</Body>
+      <Title style={styles.initial}>{voice.name.charAt(0)}</Title>
+      <Caption style={selected ? styles.nameOn : undefined}>{voice.name}</Caption>
       <Caption>
-        {voice.gender === 'M' ? 'he/him' : voice.gender === 'F' ? 'she/her' : 'they/them'} · {voice.accent}
+        {voice.gender === 'M' ? 'he/him' : voice.gender === 'F' ? 'she/her' : 'they/them'}
       </Caption>
-      <Caption style={styles.descriptor} numberOfLines={3}>
-        {voice.descriptor}
-      </Caption>
+      {source != null && (
+        <View style={styles.hear}>
+          <HitLabel
+            label={status.playing ? 'pause' : 'hear'}
+            onPress={toggleSample}
+            accessibilityLabel={status.playing ? `Pause ${voice.name}` : `Hear ${voice.name}`}
+          />
+        </View>
+      )}
     </Pressable>
   );
 }
@@ -67,7 +63,12 @@ export function VoiceRail({
   onSelect: (voiceId: string | null) => void;
 }) {
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.rail} contentContainerStyle={{ paddingRight: spacing.md }}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.rail}
+      contentContainerStyle={{ paddingRight: spacing.lg }}
+    >
       {VOICES.map((v) => (
         <VoiceCard
           key={v.id}
@@ -81,16 +82,16 @@ export function VoiceRail({
 }
 
 const styles = StyleSheet.create({
-  rail: { marginTop: spacing.sm, marginHorizontal: -spacing.md, paddingHorizontal: spacing.md },
+  rail: { marginTop: spacing.sm, marginHorizontal: -spacing.lg, paddingHorizontal: spacing.lg },
   card: {
-    width: 168,
+    width: 140,
     marginRight: spacing.sm,
     borderRadius: radius.lg,
     backgroundColor: palette.inkLift,
     padding: spacing.md,
   },
   cardSelected: { backgroundColor: palette.inkHigh },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  initial: { ...type.title, color: palette.boneDim },
-  descriptor: { marginTop: spacing.sm },
+  initial: { ...type.title, color: palette.boneDim, marginBottom: spacing.sm },
+  nameOn: { color: palette.bone },
+  hear: { marginTop: spacing.sm },
 });

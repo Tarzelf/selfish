@@ -3,10 +3,22 @@ import React, { useState } from 'react';
 import { StyleSheet, Switch, View } from 'react-native';
 
 import { MembershipCtas } from '@/components/membership-ctas';
-import { Body, Button, Caption, Card, Chip, ChipRow, Display, Divider, Heading, Screen, TextLink } from '@/components/ui';
+import {
+  Body,
+  Button,
+  Caption,
+  Card,
+  Choice,
+  ChoiceStack,
+  Display,
+  Divider,
+  Heading,
+  Screen,
+  TextLink,
+} from '@/components/ui';
 import { palette, spacing } from '@/constants/theme';
 import { useAppState } from '@/lib/store';
-import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS } from '@/lib/types';
+import { HEAT_HINT, HEAT_LABEL, type HeatLevel, LIMIT_TAGS } from '@/lib/types';
 
 export default function You() {
   const router = useRouter();
@@ -23,32 +35,36 @@ export default function You() {
   return (
     <Screen>
       <Display>{prefs.displayName ? prefs.displayName : 'You'}</Display>
-      <Body dim>Your settings. Your limits.</Body>
+      <Caption>Your settings. Your limits.</Caption>
 
       <Heading>Heat cap</Heading>
       <Caption>Nothing above this appears, anywhere.</Caption>
-      <ChipRow>
+      <ChoiceStack>
         {(['comfort', 'slow-burn', 'spicy'] as HeatLevel[]).map((h) => (
-          <Chip key={h} label={HEAT_LABEL[h]} selected={prefs.heatCap === h} onPress={() => setPrefs({ heatCap: h })} />
+          <Choice
+            key={h}
+            label={HEAT_LABEL[h]}
+            hint={HEAT_HINT[h]}
+            selected={prefs.heatCap === h}
+            onPress={() => setPrefs({ heatCap: h })}
+          />
         ))}
-      </ChipRow>
+      </ChoiceStack>
 
       <Heading>Hard limits</Heading>
       <Caption>Filtered out everywhere, permanently.</Caption>
-      <ChipRow>
+      <ChoiceStack>
         {LIMIT_TAGS.map((t) => (
-          <Chip key={t} label={t} selected={prefs.hardLimits.includes(t)} onPress={() => toggleLimit(t)} />
+          <Choice key={t} label={t} selected={prefs.hardLimits.includes(t)} onPress={() => toggleLimit(t)} />
         ))}
-      </ChipRow>
+      </ChoiceStack>
 
       <Heading>Discretion</Heading>
       <Card>
         <View style={styles.switchRow}>
           <View style={styles.switchText}>
             <Body>Discreet mode</Body>
-            <Caption>
-              Lock screen and CarPlay show only “Selfish — Session”. On by default.
-            </Caption>
+            <Caption>Lock screen shows only “Selfish — Session”. On by default.</Caption>
           </View>
           <Switch
             value={prefs.discreetMode}
@@ -62,7 +78,7 @@ export default function You() {
       <Heading>How this is made</Heading>
       <Card onPress={() => router.push('/transparency')}>
         <Body>Voice transparency</Body>
-        <Caption>Every voice is synthetic, licensed, and paid. Read how.</Caption>
+        <Caption>Every voice is synthetic, licensed, and paid.</Caption>
       </Card>
 
       <Heading>The rest of the catalog</Heading>
@@ -72,14 +88,29 @@ export default function You() {
 
       <Divider />
 
-      <Button kind="ghost" label="Replay onboarding" onPress={() => { setPrefs({ onboarded: false }); router.replace('/onboarding'); }} />
+      <Button
+        kind="ghost"
+        label="Replay onboarding"
+        onPress={() => {
+          setPrefs({ onboarded: false });
+          router.replace('/onboarding');
+        }}
+      />
       <View style={{ height: spacing.md }} />
       {confirmingDelete ? (
         <Card>
           <Body>Delete everything?</Body>
           <Caption>Preferences, limits, and listening history leave this device immediately.</Caption>
           <View style={styles.deleteRow}>
-            <Button kind="danger" label="Yes, delete it all" onPress={() => { resetAll(); router.replace('/onboarding'); }} style={styles.deleteButton} />
+            <Button
+              kind="danger"
+              label="Yes, delete it all"
+              onPress={() => {
+                resetAll();
+                router.replace('/onboarding');
+              }}
+              style={styles.deleteButton}
+            />
             <TextLink label="Cancel" onPress={() => setConfirmingDelete(false)} />
           </View>
         </Card>

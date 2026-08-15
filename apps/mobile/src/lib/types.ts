@@ -12,6 +12,12 @@ export const HEAT_LABEL: Record<HeatLevel, string> = {
   spicy: 'Spicy',
 };
 
+export const HEAT_HINT: Record<HeatLevel, string> = {
+  comfort: 'Soft, warm, nothing sharp.',
+  'slow-burn': 'Patience. The long way around.',
+  spicy: 'Further. Only if you ask.',
+};
+
 export type Mood = 'comforted' | 'adored' | 'teased' | 'wanted' | 'missed' | 'in-charge';
 
 export const MOODS: { id: Mood; label: string; hint: string }[] = [

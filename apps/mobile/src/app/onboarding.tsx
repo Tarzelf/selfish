@@ -22,17 +22,11 @@ import {
 import { spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { useAppState } from '@/lib/store';
-import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
+import { HEAT_HINT, HEAT_LABEL, type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
 
 type Step = 'welcome' | 'age' | 'honesty' | 'moods' | 'heat' | 'limits' | 'done';
 
 const STEPS: Step[] = ['welcome', 'age', 'honesty', 'moods', 'heat', 'limits', 'done'];
-
-const HEAT_HINT: Record<HeatLevel, string> = {
-  comfort: 'Soft, warm, nothing sharp.',
-  'slow-burn': 'Patience. The long way around.',
-  spicy: 'Further. Only if you ask.',
-};
 
 function greeting(hour: number): string {
   if (hour < 12) return 'Good morning';

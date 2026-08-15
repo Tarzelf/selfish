@@ -16,7 +16,7 @@ export default function TabsLayout() {
           borderTopColor: palette.line,
           borderTopWidth: StyleSheet.hairlineWidth,
         },
-        tabBarLabelStyle: { fontFamily: fonts.body, fontSize: 13, fontWeight: '500' },
+        tabBarLabelStyle: { fontFamily: fonts.body, fontSize: 13, fontWeight: '400' },
         tabBarIcon: () => null,
         tabBarIconStyle: { height: 0, width: 0, overflow: 'hidden' },
         sceneStyle: { backgroundColor: palette.ink },

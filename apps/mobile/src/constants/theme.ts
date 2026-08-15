@@ -69,10 +69,10 @@ export const type = {
   numeral: { fontFamily: fonts.display, fontSize: 52, lineHeight: 60, color: palette.bone },
   title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: palette.bone },
   cardTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 24, color: palette.bone },
-  heading: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, fontWeight: '500' as const, color: palette.boneDim },
+  heading: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, fontWeight: '400' as const, color: palette.boneDim },
   body: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: palette.bone },
   caption: { fontFamily: fonts.body, fontSize: 13, lineHeight: 19, color: palette.boneMute },
-  label: { fontFamily: fonts.body, fontSize: 15, lineHeight: 20, fontWeight: '500' as const, color: palette.bone },
+  label: { fontFamily: fonts.body, fontSize: 15, lineHeight: 20, fontWeight: '400' as const, color: palette.bone },
 } as const;
 
 export const spacing = {

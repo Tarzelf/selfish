@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 
 import { SessionCard } from '@/components/session-card';
-import { Body, Caption, Display, Screen } from '@/components/ui';
+import { Caption, Display, Screen } from '@/components/ui';
 import { spacing } from '@/constants/theme';
 import { useAppState } from '@/lib/store';
 
@@ -12,10 +12,7 @@ export default function Rest() {
   return (
     <Screen tone="rest">
       <Display>Rest</Display>
-      <Body dim style={{ marginBottom: spacing.md }}>
-        Nothing to follow, nowhere to be.
-      </Body>
-      <Caption style={{ marginBottom: spacing.lg }}>Headphones. Lights low. They stay until you drift.</Caption>
+      <Caption style={{ marginBottom: spacing.xl }}>Nothing to follow, nowhere to be.</Caption>
       {rest.map((f) => (
         <SessionCard key={f.id} family={f} />
       ))}
