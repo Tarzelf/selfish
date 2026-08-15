@@ -7,8 +7,8 @@ import type { AtmospherePref } from '@/lib/types';
 
 const OPTIONS: { id: AtmospherePref; label: string; hint: string }[] = [
   { id: 'auto', label: 'Auto', hint: 'Follows the clock. Morning until 5pm, then evening.' },
-  { id: 'morning', label: 'Morning', hint: 'Linen. Open window. Soft gold. Still in bed.' },
-  { id: 'evening', label: 'Evening', hint: 'Dreamy summer night. Lamp on. The window is open.' },
+  { id: 'morning', label: 'Morning', hint: 'Mist, first light. The window is open.' },
+  { id: 'evening', label: 'Evening', hint: 'A summer night. Stars over the ridge. In bed.' },
 ];
 
 export function AtmosphereChoice({
@@ -31,7 +31,10 @@ export function AtmosphereChoice({
             onPress={() => onChange(o.id)}
             style={({ pressed }) => [
               styles.card,
-              { borderColor: selected ? palette.gold : palette.border, backgroundColor: selected ? palette.goldSoft : palette.surface },
+              {
+                borderColor: selected ? 'rgba(255,180,87,0.65)' : 'rgba(245,245,247,0.22)',
+                backgroundColor: selected ? 'rgba(255,150,80,0.14)' : 'rgba(10,10,14,0.4)',
+              },
               pressed && { opacity: 0.85 },
             ]}
           >

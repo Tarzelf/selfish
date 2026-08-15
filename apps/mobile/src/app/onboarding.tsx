@@ -37,7 +37,7 @@ function Landing({ onBegin }: { onBegin: () => void }) {
 
   return (
     <Screen>
-      <Text style={[styles.landingWordmark, { color: palette.gold }]}>SELFISH</Text>
+      <Text style={[styles.landingWordmark, { color: palette.text }]}>Selfish</Text>
       <TextsReveal>
         <Text style={[styles.landingHero, { color: palette.text }]}>Time that&apos;s{'\n'}just for you.</Text>
         <Body dim style={styles.landingLede}>
@@ -371,17 +371,21 @@ const styles = StyleSheet.create({
   // Landing
   landingWordmark: {
     fontFamily: fonts.body,
-    fontSize: 12,
-    letterSpacing: 3.5,
+    fontSize: 15,
+    letterSpacing: -0.2,
     fontWeight: '700',
     marginTop: spacing.xl,
   },
   landingHero: {
     fontFamily: fonts.display,
-    fontSize: 52,
-    lineHeight: 58,
-    letterSpacing: -1,
+    fontSize: 56,
+    lineHeight: 56,
+    letterSpacing: -1.6,
+    fontWeight: '700',
     marginTop: spacing.md,
+    textShadowColor: 'rgba(0,0,0,0.45)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 28,
   },
   landingLede: { marginTop: spacing.md, fontSize: 17, lineHeight: 26, maxWidth: 560 },
   listenCard: {

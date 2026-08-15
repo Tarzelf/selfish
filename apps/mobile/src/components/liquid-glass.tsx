@@ -5,9 +5,8 @@ import { Platform, StyleSheet, View, type StyleProp, type ViewStyle } from 'reac
 import { useAtmosphere } from '@/lib/atmosphere';
 
 /**
- * iOS 26+ uses real Liquid Glass. Web gets the same material language:
- * saturate + blur, specular rim, inner highlight. Unsupported native
- * platforms fall back to a translucent plate.
+ * Dark liquid glass. iOS 26 uses the system material; web matches Talkify's
+ * nav: blur(24) saturate(1.4), #0c0c108c, hairline, no milky frost.
  */
 export function LiquidGlass({
   children,
@@ -26,7 +25,7 @@ export function LiquidGlass({
       <GlassView
         glassEffectStyle="regular"
         tintColor={palette.glassTint}
-        colorScheme={part === 'morning' ? 'light' : 'dark'}
+        colorScheme="dark"
         isInteractive
         style={[island && styles.island, style]}
       >
@@ -49,7 +48,6 @@ export function LiquidGlass({
       ]}
       {...{ 'data-part': part }}
     >
-      <View pointerEvents="none" style={styles.spec} />
       {children}
     </View>
   );
@@ -57,20 +55,11 @@ export function LiquidGlass({
 
 const styles = StyleSheet.create({
   island: {
-    borderRadius: 30,
+    borderRadius: 999,
     overflow: 'hidden',
   },
   web: {
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
-  },
-  spec: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    bottom: 0,
-    left: 0,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: 'rgba(255,255,255,0.58)',
   },
 });

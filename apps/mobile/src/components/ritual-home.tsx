@@ -58,7 +58,7 @@ export function RitualHome() {
   if (!cued) {
     return (
       <View style={styles.empty}>
-        <Text style={[styles.wordmark, { color: palette.gold }]}>SELFISH</Text>
+        <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
         <TextsReveal>
           <Text style={[styles.line, { color: palette.text }]}>Raise heat to Close in You — then this room opens.</Text>
         </TextsReveal>
@@ -94,7 +94,7 @@ export function RitualHome() {
 
   return (
     <View style={styles.wrap}>
-      <Text style={[styles.wordmark, { color: palette.gold }]}>SELFISH</Text>
+      <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
       <TextsReveal>
         <Text style={[styles.line, { color: palette.text }]}>{alreadyHere(voice?.gender)}</Text>
         {firstName ? <Text style={[styles.aside, { color: palette.textDim }]}>{firstName}.</Text> : <Text style={[styles.aside, { color: palette.textDim }]}> </Text>}
@@ -159,16 +159,17 @@ const styles = StyleSheet.create({
   empty: { paddingTop: spacing.xxl },
   wordmark: {
     fontFamily: fonts.body,
-    fontSize: 11,
-    letterSpacing: 3,
+    fontSize: 15,
+    letterSpacing: -0.2,
     fontWeight: '700',
   },
   line: {
     fontFamily: fonts.display,
-    fontSize: 36,
-    lineHeight: 44,
+    fontSize: 48,
+    lineHeight: 50,
     marginTop: spacing.md,
-    letterSpacing: -0.7,
+    letterSpacing: -1.2,
+    fontWeight: '700',
   },
   aside: {
     fontFamily: fonts.display,

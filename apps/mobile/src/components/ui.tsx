@@ -87,6 +87,7 @@ export function Button({
       accessibilityRole="button"
       onPress={onPress}
       disabled={disabled}
+      className={kind === 'primary' ? 't-btn-primary' : undefined}
       style={(state: PressState) => [
         styles.button,
         kind === 'primary' && { backgroundColor: palette.gold },
@@ -131,8 +132,8 @@ export function Chip({
       onPress={onPress}
       style={(state: PressState) => [
         styles.chip,
-        { borderColor: palette.border, backgroundColor: palette.surface },
-        selected && { backgroundColor: palette.goldSoft, borderColor: palette.gold },
+        { borderColor: 'rgba(245,245,247,0.22)', backgroundColor: 'rgba(10,10,14,0.4)' },
+        selected && { backgroundColor: 'rgba(255,150,80,0.14)', borderColor: 'rgba(255,180,87,0.65)' },
         state.hovered && !selected && { borderColor: palette.textFaint },
         state.pressed && { opacity: 0.8 },
       ]}
@@ -196,26 +197,31 @@ const styles = StyleSheet.create({
   shell: { flex: 1, width: '100%', maxWidth: SHELL_MAX_WIDTH, alignSelf: 'center' },
   display: {
     fontFamily: fonts.display,
-    fontSize: 34,
-    lineHeight: 40,
-    letterSpacing: -0.6,
+    fontSize: 42,
+    lineHeight: 44,
+    letterSpacing: -0.9,
+    fontWeight: '700',
     marginTop: spacing.lg,
     marginBottom: spacing.sm,
+    textShadowColor: 'rgba(0,0,0,0.45)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 24,
   },
   heading: {
     fontFamily: fonts.display,
-    fontSize: 22,
+    fontSize: 24,
     lineHeight: 28,
-    letterSpacing: -0.3,
+    letterSpacing: -0.45,
+    fontWeight: '700',
     marginTop: spacing.lg,
     marginBottom: spacing.xs,
   },
-  body: { fontFamily: fonts.body, fontSize: 17, lineHeight: 22, letterSpacing: -0.2 },
+  body: { fontFamily: fonts.body, fontSize: 17, lineHeight: 24, letterSpacing: -0.2 },
   caption: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, letterSpacing: -0.08 },
   button: {
     borderRadius: radius.pill,
-    paddingVertical: 14,
-    paddingHorizontal: spacing.lg,
+    paddingVertical: 15,
+    paddingHorizontal: 30,
     alignItems: 'center',
     justifyContent: 'center',
   },

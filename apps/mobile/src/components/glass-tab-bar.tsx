@@ -20,12 +20,12 @@ export function GlassTabBar({ state, navigation }: BottomTabBarProps) {
   const { part, palette } = useAtmosphere();
 
   return (
-    <View pointerEvents="box-none" style={[styles.dock, { paddingBottom: Math.max(insets.bottom, 12) }]}>
+    <View pointerEvents="box-none" style={[styles.dock, { paddingBottom: Math.max(insets.bottom, 14) }]}>
       <LiquidGlass island style={styles.island}>
         <View style={styles.row}>
           {state.routes.map((route, index) => {
             const focused = state.index === index;
-            const color = focused ? palette.gold : palette.textFaint;
+            const color = focused ? palette.text : palette.textFaint;
             return (
               <Pressable
                 key={route.key}
@@ -38,11 +38,13 @@ export function GlassTabBar({ state, navigation }: BottomTabBarProps) {
                     navigation.navigate(route.name, route.params);
                   }
                 }}
-                style={({ pressed }) => [styles.item, pressed && { opacity: 0.72 }]}
+                style={({ pressed }) => [styles.item, pressed && { opacity: 0.7 }]}
               >
-                {focused ? <View className="t-tab-pill" style={[styles.pill, { backgroundColor: palette.goldSoft }]} /> : null}
-                <TabIcon name={route.name} color={color} focused={focused} part={part} />
-                <Text style={[styles.label, { color }]}>{LABEL[route.name] ?? route.name}</Text>
+                {focused ? <View className="t-tab-pill" style={styles.pill} /> : null}
+                <TabIcon name={route.name} color={focused ? palette.gold : color} focused={focused} part={part} />
+                <Text style={[styles.label, { color: focused ? palette.text : palette.textFaint }]}>
+                  {LABEL[route.name] ?? route.name}
+                </Text>
               </Pressable>
             );
           })}
@@ -59,26 +61,26 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 28,
   },
   island: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 360,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingVertical: 6,
-    paddingHorizontal: 6,
+    paddingVertical: 5,
+    paddingHorizontal: 8,
   },
   item: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
-    minHeight: 52,
-    borderRadius: 22,
+    paddingVertical: 5,
+    minHeight: 48,
+    borderRadius: 999,
     overflow: 'hidden',
   },
   pill: {
@@ -87,14 +89,15 @@ const styles = StyleSheet.create({
     right: 4,
     bottom: 3,
     left: 4,
-    borderRadius: 20,
+    borderRadius: 999,
+    backgroundColor: 'rgba(255, 150, 80, 0.14)',
   },
   label: {
     fontFamily: fonts.body,
     fontSize: 10,
     lineHeight: 12,
     fontWeight: '600',
-    letterSpacing: 0.2,
-    marginTop: 4,
+    letterSpacing: -0.1,
+    marginTop: 3,
   },
 });

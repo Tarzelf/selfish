@@ -87,10 +87,10 @@ function EditorialTonight() {
 
   return (
     <Screen>
-      <Text style={[styles.wordmark, { color: palette.gold }]}>SELFISH</Text>
+      <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
       <Text style={[styles.greeting, { color: palette.text }]}>
         {copy.hello}
-        {firstName ? `, ${firstName}` : ''}.
+        {firstName ? `,\n${firstName}` : ''}.
       </Text>
       <Text style={[styles.subline, { color: palette.textDim }]}>{copy.line} Tell us the feeling — we&apos;ll find the session.</Text>
 
@@ -157,19 +157,30 @@ function EditorialTonight() {
 const styles = StyleSheet.create({
   wordmark: {
     fontFamily: fonts.body,
-    fontSize: 11,
-    letterSpacing: 3.2,
+    fontSize: 13,
+    letterSpacing: -0.2,
     fontWeight: '700',
     marginTop: spacing.lg,
   },
   greeting: {
     fontFamily: fonts.display,
-    fontSize: 38,
-    lineHeight: 44,
-    letterSpacing: -0.8,
-    marginTop: spacing.sm,
+    fontSize: 52,
+    lineHeight: 52,
+    letterSpacing: -1.4,
+    fontWeight: '700',
+    marginTop: spacing.md,
+    textShadowColor: 'rgba(0,0,0,0.45)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 28,
   },
-  subline: { fontFamily: fonts.body, fontSize: 16, lineHeight: 22, letterSpacing: -0.2, marginTop: spacing.xs },
+  subline: {
+    fontFamily: fonts.body,
+    fontSize: 17,
+    lineHeight: 24,
+    letterSpacing: -0.2,
+    marginTop: 14,
+    maxWidth: 420,
+  },
   rail: { marginTop: spacing.sm, marginHorizontal: -spacing.md, paddingHorizontal: spacing.md },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm },
   progressTrack: {

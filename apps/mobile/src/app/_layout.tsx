@@ -15,7 +15,7 @@ import '@/styles/transitions.css';
 function ThemedStack() {
   const { palette } = useAtmosphere();
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <View style={{ flex: 1, backgroundColor: '#060608' }}>
       <AtmosphereSky />
       <StatusBar style={palette.status} />
       <Stack
