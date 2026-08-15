@@ -68,8 +68,13 @@ export function SlidingTabs({
 
   if (Platform.OS === 'web') {
     return (
-      <View ref={barRef} className="t-tabs" style={styles.bar} accessibilityRole="tablist">
-        <View className="t-tabs-pill" />
+      <View
+        ref={barRef}
+        className="t-tabs"
+        style={[styles.bar, { backgroundColor: palette.surface }]}
+        accessibilityRole="tablist"
+      >
+        <View className="t-tabs-pill" style={{ backgroundColor: palette.gold }} />
         {tabs.map((tab) => (
           <Pressable
             key={tab.id}
@@ -81,7 +86,14 @@ export function SlidingTabs({
             }}
             onPress={() => onSelect(tab.id)}
           >
-            <Text style={styles.webLabel}>{tab.label}</Text>
+            <Text
+              style={[
+                styles.webLabel,
+                { color: selected === tab.id ? palette.onAccent : palette.text },
+              ]}
+            >
+              {tab.label}
+            </Text>
           </Pressable>
         ))}
       </View>

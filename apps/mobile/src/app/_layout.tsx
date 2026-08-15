@@ -9,9 +9,9 @@ import { AtmosphereSky } from '@/components/atmosphere-sky';
 import { AtmosphereProvider, useAtmosphere } from '@/lib/atmosphere';
 import { AppStateProvider } from '@/lib/store';
 
-import '@/styles/atmosphere.css';
 import '@/styles/transitions-root.css';
 import '@/styles/transitions.css';
+import '@/styles/atmosphere.css';
 
 // Web defaults this off. Without it, every tab/stack scene is position:absolute
 // and stays painted — Today, Browse, and Rest ghost through each other.

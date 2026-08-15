@@ -162,6 +162,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     letterSpacing: -0.2,
     fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.7)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 16,
   },
   line: {
     fontFamily: fonts.display,
@@ -170,12 +173,18 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     letterSpacing: -1.2,
     fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.75)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 28,
   },
   aside: {
     fontFamily: fonts.display,
     fontStyle: 'italic',
     fontSize: 22,
     marginTop: spacing.xs,
+    textShadowColor: 'rgba(0,0,0,0.7)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 16,
   },
   stage: {
     marginTop: spacing.xl,

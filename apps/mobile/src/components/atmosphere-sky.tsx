@@ -4,6 +4,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { useAtmosphere } from '@/lib/atmosphere';
+import { skyWash } from '@/lib/sky-wash';
 
 const PHOTOS = {
   evening: require('../../assets/atmosphere/evening.jpg'),
@@ -11,31 +12,24 @@ const PHOTOS = {
 };
 
 /**
- * The world behind the glass — a photograph, the way Talkify sits on a sunset.
- * Chrome is a separate layer. This is only the place.
+ * Photograph as the world — but the page is always near-black first.
+ * Morning is a bright sunrise; without a floor wash, white ink vanishes.
  */
 export function AtmosphereSky() {
   const { part } = useAtmosphere();
+  const wash = skyWash(part);
 
   return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <View style={styles.void} />
+    <View pointerEvents="none" style={styles.root}>
       <Image
         source={PHOTOS[part]}
-        style={styles.photo}
+        style={[styles.photo, { opacity: wash.photoOpacity }]}
         contentFit="cover"
-        contentPosition={part === 'evening' ? { top: '28%', left: '50%' } : { top: '42%', left: '50%' }}
+        contentPosition={part === 'evening' ? { top: '28%', left: '50%' } : { top: '55%', left: '50%' }}
         cachePolicy="memory-disk"
+        transition={0}
       />
-      <LinearGradient
-        colors={
-          part === 'evening'
-            ? ['rgba(4,4,10,0.55)', 'rgba(4,4,10,0)', 'rgba(6,6,8,0.55)', '#060608']
-            : ['rgba(8,6,4,0.28)', 'rgba(8,6,4,0)', 'rgba(12,8,4,0.42)', '#060608']
-        }
-        locations={[0, 0.22, 0.72, 1]}
-        style={StyleSheet.absoluteFill}
-      />
+      <LinearGradient colors={[...wash.colors]} locations={[...wash.locations]} style={StyleSheet.absoluteFill} />
       <View className="t-grain" style={styles.grain} />
     </View>
   );
@@ -44,7 +38,7 @@ export function AtmosphereSky() {
 const FILL = { position: 'absolute' as const, top: 0, right: 0, bottom: 0, left: 0 };
 
 const styles = StyleSheet.create({
-  void: { ...FILL, backgroundColor: '#060608' },
+  root: { ...FILL, backgroundColor: '#060608' },
   photo: FILL,
   grain: FILL,
 });

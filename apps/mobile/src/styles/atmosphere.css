@@ -17,6 +17,10 @@
   --shimmer-highlight: #f5f5f7;
 }
 
+html {
+  color-scheme: dark;
+}
+
 html,
 body,
 #root {
@@ -26,8 +30,8 @@ body,
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif;
   letter-spacing: -0.011em;
-  background: #060608;
-  color: #f5f5f7;
+  background: #060608 !important;
+  color: #f5f5f7 !important;
 }
 
 html[data-part='evening'],
