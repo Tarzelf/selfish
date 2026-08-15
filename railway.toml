@@ -1,0 +1,13 @@
+# Repo-root Railway config. The preview lives in apps/mobile;
+# this file stops Nixpacks from guessing the pipeline package
+# or running `expo start` as a production server.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+watchPatterns = ["apps/mobile/**", "Dockerfile", "railway.toml"]
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"

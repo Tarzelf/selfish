@@ -67,9 +67,13 @@ Rendered assets (regenerate with `python3 apps/mobile/scripts/render-brand.py`):
 
 ```bash
 cd apps/mobile
-npx expo export --platform web     # static site in dist/
+npm run build                      # static site in dist/
 npx netlify deploy --prod --dir dist   # or any static host; netlify.toml included
 ```
+
+**Railway:** connect the GitHub repo at the **repository root** (not `packages/pipeline`). The root `Dockerfile` exports the Expo web app and serves `dist` on `$PORT`. Node 20. Do not use `expo start` as the production start command.
+
+If the Railway service root directory is already `apps/mobile`, `apps/mobile/railway.toml` + `npm run build` / `npm run serve:web` is the path.
 
 ## Running the pipeline demo
 
