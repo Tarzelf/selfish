@@ -43,6 +43,20 @@ body,
   color: #f5f5f7 !important;
 }
 
+/* Safari paints white behind a transparent overflow scroller. */
+.t-screen {
+  background-color: #060608 !important;
+  background-image: var(--sky-evening) !important;
+  background-size: cover !important;
+  background-position: 50% 28% !important;
+  background-repeat: no-repeat !important;
+}
+
+html[data-part='morning'] .t-screen {
+  background-image: var(--sky-morning) !important;
+  background-position: 50% 28% !important;
+}
+
 html {
   background-image: var(--sky-evening);
   background-size: cover;
@@ -112,11 +126,17 @@ html[data-part='evening'] {
   -webkit-backdrop-filter: none;
 }
 
-/* React Navigation DefaultTheme paints this inline on web. */
+/* React Navigation DefaultTheme / RN-web solid white canvases. */
 #root div[style*='242,242,242'],
 #root div[style*='242, 242, 242'],
-#root div[style*='rgb(242, 242, 242)'] {
-  background-color: transparent !important;
+#root div[style*='rgb(242, 242, 242)'],
+#root div[style*='rgba(255,255,255,1.00)'],
+#root div[style*='rgb(255, 255, 255)'] {
+  background-color: #060608 !important;
+}
+
+.r-14lw9ot {
+  background-color: #060608 !important;
 }
 
 .t-btn-primary {

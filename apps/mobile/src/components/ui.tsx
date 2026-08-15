@@ -42,13 +42,20 @@ export function Screen({
   const inner = (
     <View style={[styles.shell, padded && { paddingHorizontal: spacing.md }]}>{children}</View>
   );
+  // Safari paints white behind overflow:scroll when the view is transparent.
+  // The floor is always near-black so white ink cannot vanish.
   if (!scroll) {
-    return <View style={[styles.screen, { paddingTop: insets.top }]}>{inner}</View>;
+    return (
+      <View className="t-screen" style={[styles.screen, { paddingTop: insets.top }]}>
+        {inner}
+      </View>
+    );
   }
   return (
     <ScrollView
+      className="t-screen"
       style={[styles.screen, { paddingTop: insets.top }]}
-      contentContainerStyle={{ paddingBottom: TAB_ISLAND_SPACE + insets.bottom + spacing.xl }}
+      contentContainerStyle={[styles.screenContent, { paddingBottom: TAB_ISLAND_SPACE + insets.bottom + spacing.xl }]}
       showsVerticalScrollIndicator={false}
     >
       {inner}
@@ -201,8 +208,11 @@ export function Divider() {
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: 'transparent' },
-  shell: { flex: 1, width: '100%', maxWidth: SHELL_MAX_WIDTH, alignSelf: 'center' },
+  screen: { flex: 1, backgroundColor: '#060608' },
+  screenContent: {
+    flexGrow: 1,
+    backgroundColor: '#060608',
+  },
   display: {
     fontFamily: fonts.display,
     fontSize: 42,

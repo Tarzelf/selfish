@@ -14,7 +14,8 @@ export default function Html({ children }: { children: React.ReactNode }) {
         <ScrollViewStyleReset />
         <style
           dangerouslySetInnerHTML={{
-            __html: 'html,body,#root{background-color:#060608!important;color:#F5F5F7!important;min-height:100%;height:100%}body{overflow:hidden}#root{display:flex}',
+            __html:
+              'html,body,#root,#root>div{background-color:#060608!important;color:#F5F5F7!important;min-height:100%;height:100%}body{overflow:hidden;background:#060608}#root{display:flex}*{scrollbar-color:#14141a #060608}',
           }}
         />
       </head>

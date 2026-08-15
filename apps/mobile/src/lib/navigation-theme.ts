@@ -6,8 +6,8 @@
 
 export const SELFISH_NAV_COLORS = {
   primary: '#FFB457',
-  background: 'transparent',
-  card: 'transparent',
+  background: '#060608',
+  card: '#060608',
   text: '#F5F5F7',
   border: 'rgba(245,245,247,0.12)',
   notification: '#FF7847',

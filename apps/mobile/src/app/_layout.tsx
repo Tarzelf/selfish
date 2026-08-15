@@ -27,12 +27,12 @@ function ThemedStack() {
     <View style={{ flex: 1, backgroundColor: '#060608', overflow: 'hidden' }}>
       <AtmosphereSky />
       <StatusBar style={palette.status} />
-      <View style={{ flex: 1, zIndex: 1, backgroundColor: 'transparent' }}>
+      <View style={{ flex: 1, zIndex: 1, backgroundColor: '#060608' }}>
         <Stack
           screenOptions={{
             headerShown: false,
             animation: 'none',
-            contentStyle: { backgroundColor: 'transparent', flex: 1 },
+            contentStyle: { backgroundColor: '#060608', flex: 1 },
           }}
         >
           <Stack.Screen name="index" />

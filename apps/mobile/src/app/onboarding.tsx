@@ -37,10 +37,12 @@ function Landing({ onBegin }: { onBegin: () => void }) {
 
   return (
     <Screen>
-      <Text style={[styles.landingWordmark, { color: palette.text }]}>Selfish</Text>
+      <View style={styles.wordmarkChip}>
+        <Text style={[styles.landingWordmark, { color: palette.text }]}>Selfish</Text>
+      </View>
       <TextsReveal>
         <Text style={[styles.landingHero, { color: palette.text }]}>Time that&apos;s{'\n'}just for you.</Text>
-        <Body dim style={styles.landingLede}>
+        <Body style={styles.landingLede}>
           Intimate audio fiction and unhurried sleep stories — written with care, whispered up close,
           and tuned to exactly the mood you&apos;re in.
         </Body>
@@ -93,7 +95,7 @@ function Landing({ onBegin }: { onBegin: () => void }) {
             <LinearGradient colors={[p.rule[0], p.rule[1]]} style={styles.propRule} />
             <View style={styles.propText}>
               <Text style={[styles.propTitle, { color: palette.text }]}>{p.title}</Text>
-              <Text style={[styles.propBody, { color: palette.textDim }]}>{p.body}</Text>
+              <Text style={[styles.propBody, { color: palette.text }]}>{p.body}</Text>
             </View>
           </View>
         ))}
@@ -369,12 +371,21 @@ const styles = StyleSheet.create({
   },
 
   // Landing
+  wordmarkChip: {
+    alignSelf: 'flex-start',
+    marginTop: spacing.xl,
+    backgroundColor: '#121214',
+    borderColor: 'rgba(245,245,247,0.14)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
   landingWordmark: {
     fontFamily: fonts.body,
     fontSize: 15,
     letterSpacing: -0.2,
     fontWeight: '700',
-    marginTop: spacing.xl,
   },
   landingHero: {
     fontFamily: fonts.display,
@@ -383,9 +394,9 @@ const styles = StyleSheet.create({
     letterSpacing: -1.6,
     fontWeight: '700',
     marginTop: spacing.md,
-    textShadowColor: 'rgba(0,0,0,0.45)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 28,
+    textShadowColor: 'rgba(0,0,0,0.85)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
   },
   landingLede: { marginTop: spacing.md, fontSize: 17, lineHeight: 26, maxWidth: 560 },
   listenCard: {

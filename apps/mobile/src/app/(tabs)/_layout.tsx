@@ -10,7 +10,7 @@ export default function TabsLayout() {
   // Slot mounts only the active route.
   if (Platform.OS === 'web') {
     return (
-      <View style={{ flex: 1, overflow: 'hidden' }}>
+      <View style={{ flex: 1, overflow: 'hidden', backgroundColor: '#060608' }}>
         <Slot />
         <WebGlassTabBar />
       </View>
@@ -26,7 +26,7 @@ export default function TabsLayout() {
         animation: 'none',
         lazy: true,
         freezeOnBlur: true,
-        sceneStyle: { backgroundColor: 'transparent', flex: 1, overflow: 'hidden' },
+        sceneStyle: { backgroundColor: '#060608', flex: 1, overflow: 'hidden' },
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Today' }} />
