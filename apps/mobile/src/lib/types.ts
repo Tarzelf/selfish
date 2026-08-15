@@ -127,7 +127,12 @@ export interface Preferences {
   discreetMode: boolean;
   /** First Close session showed content notes. Later loops skip the literary gate. */
   closeNotesAcked: boolean;
+  /** Morning linen vs evening summer-night. Auto follows the clock. */
+  atmospherePref: AtmospherePref;
 }
+
+export type AtmospherePref = 'auto' | 'morning' | 'evening';
+export type AtmospherePart = 'morning' | 'evening';
 
 export const DEFAULT_PREFERENCES: Preferences = {
   onboarded: false,
@@ -140,6 +145,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   hardLimits: [],
   discreetMode: true,
   closeNotesAcked: false,
+  atmospherePref: 'auto',
 };
 
 /** Last Close loop — the ritual home cues this, and finished loops never vanish. */

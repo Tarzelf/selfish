@@ -3,11 +3,13 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { SessionCard } from '@/components/session-card';
 import { Body, Chip, Display, Heading, Screen } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { fonts, spacing } from '@/constants/theme';
 import { ALL_DYNAMICS, ALL_TAGS, VOICES } from '@/data/catalog';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { useAppState } from '@/lib/store';
 
 export default function Browse() {
+  const { palette } = useAtmosphere();
   const { visibleCatalog, prefs } = useAppState();
   const [dynamics, setDynamics] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
@@ -102,12 +104,14 @@ export default function Browse() {
       {results.map((f) => (
         <SessionCard key={f.id} family={f} />
       ))}
-      {results.length === 0 && <Text style={styles.empty}>No stories match that exact stack yet.</Text>}
+      {results.length === 0 && (
+        <Text style={[styles.empty, { color: palette.textFaint }]}>No stories match that exact stack yet.</Text>
+      )}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm },
-  empty: { fontFamily: fonts.body, color: palette.textFaint, fontSize: 14, marginTop: spacing.sm },
+  empty: { fontFamily: fonts.body, fontSize: 14, marginTop: spacing.sm },
 });

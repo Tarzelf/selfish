@@ -4,22 +4,25 @@ import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { AtmosphereChoice } from '@/components/atmosphere-choice';
 import { HeatChoice } from '@/components/heat-choice';
 import { Body, Button, Caption, Chip, Display, Screen } from '@/components/ui';
-import { fonts, palette, radius, spacing } from '@/constants/theme';
+import { fonts, radius, spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { useAppState } from '@/lib/store';
-import { type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
+import { type AtmospherePref, type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
 import { ErrorField } from '@/motion/error-field';
 import { IconSwap } from '@/motion/icon-swap';
 import { TextsReveal } from '@/motion/texts-reveal';
 
-type Step = 'welcome' | 'age' | 'honesty' | 'moods' | 'heat' | 'limits' | 'done';
+type Step = 'welcome' | 'age' | 'honesty' | 'moods' | 'heat' | 'limits' | 'atmosphere' | 'done';
 
-const STEPS: Step[] = ['welcome', 'age', 'honesty', 'moods', 'heat', 'limits', 'done'];
+const STEPS: Step[] = ['welcome', 'age', 'honesty', 'moods', 'heat', 'limits', 'atmosphere', 'done'];
 
 /** The landing: dramatize the value props, let them HEAR it, then begin. */
 function Landing({ onBegin }: { onBegin: () => void }) {
+  const { palette } = useAtmosphere();
   const player = useAudioPlayer(VOICE_PREVIEW_AUDIO['v-jasper'] ?? null);
   const status = useAudioPlayerStatus(player);
 
@@ -34,12 +37,12 @@ function Landing({ onBegin }: { onBegin: () => void }) {
 
   return (
     <Screen>
-      <Text style={styles.landingWordmark}>SELFISH</Text>
+      <Text style={[styles.landingWordmark, { color: palette.gold }]}>SELFISH</Text>
       <TextsReveal>
-        <Text style={styles.landingHero}>Time that&apos;s{'\n'}just for you.</Text>
+        <Text style={[styles.landingHero, { color: palette.text }]}>Time that&apos;s{'\n'}just for you.</Text>
         <Body dim style={styles.landingLede}>
           Intimate audio fiction and unhurried sleep stories — written with care, whispered up close,
-          and tuned to exactly the mood you&apos;re in tonight.
+          and tuned to exactly the mood you&apos;re in.
         </Body>
       </TextsReveal>
 
@@ -89,8 +92,8 @@ function Landing({ onBegin }: { onBegin: () => void }) {
           <View key={p.title} style={styles.prop}>
             <LinearGradient colors={[p.rule[0], p.rule[1]]} style={styles.propRule} />
             <View style={styles.propText}>
-              <Text style={styles.propTitle}>{p.title}</Text>
-              <Text style={styles.propBody}>{p.body}</Text>
+              <Text style={[styles.propTitle, { color: palette.text }]}>{p.title}</Text>
+              <Text style={[styles.propBody, { color: palette.textDim }]}>{p.body}</Text>
             </View>
           </View>
         ))}
@@ -104,6 +107,7 @@ function Landing({ onBegin }: { onBegin: () => void }) {
 
 export default function Onboarding() {
   const router = useRouter();
+  const { palette } = useAtmosphere();
   const { setPrefs } = useAppState();
 
   const [step, setStep] = useState<Step>('welcome');
@@ -111,6 +115,7 @@ export default function Onboarding() {
   const [moods, setMoods] = useState<Mood[]>([]);
   const [heatCap, setHeatCap] = useState<HeatLevel>('comfort');
   const [limits, setLimits] = useState<string[]>([]);
+  const [atmospherePref, setAtmospherePref] = useState<AtmospherePref>('auto');
   const [name, setName] = useState('');
   const [ageError, setAgeError] = useState(false);
 
@@ -137,6 +142,7 @@ export default function Onboarding() {
       moods,
       heatCap,
       hardLimits: limits,
+      atmospherePref,
       displayName: name.trim(),
     });
     router.replace('/(tabs)');
@@ -151,7 +157,7 @@ export default function Onboarding() {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
         <View style={styles.progressRow}>
           {STEPS.slice(0, -1).map((s, i) => (
-            <View key={s} style={[styles.progressDot, i <= stepIndex && { backgroundColor: palette.gold }]} />
+            <View key={s} style={[styles.progressDot, { backgroundColor: palette.border }, i <= stepIndex && { backgroundColor: palette.gold }]} />
           ))}
         </View>
 
@@ -169,7 +175,11 @@ export default function Onboarding() {
               style={{ marginTop: spacing.md }}
             >
               <TextInput
-                style={[styles.input, styles.inputFlush]}
+                style={[
+                  styles.input,
+                  styles.inputFlush,
+                  { backgroundColor: palette.surface, borderColor: 'transparent', color: palette.text },
+                ]}
                 value={birthYear}
                 onChangeText={(v) => {
                   setBirthYear(v);
@@ -229,7 +239,7 @@ export default function Onboarding() {
             <TextsReveal key="moods">
             <Display>How do you want to feel?</Display>
             <Body dim style={styles.lede}>
-              Pick any that ring true. This tunes your Tonight page — change it whenever you like.
+              Pick any that ring true. This tunes Today — change it whenever you like.
             </Body>
             </TextsReveal>
             <View style={styles.chipWrap}>
@@ -277,6 +287,27 @@ export default function Onboarding() {
           </View>
         )}
 
+        {step === 'atmosphere' && (
+          <View style={styles.stepBody}>
+            <TextsReveal key="atmosphere">
+              <Display>When do you listen?</Display>
+              <Body dim style={[styles.lede, { color: palette.textDim }]}>
+                Morning is linen and an open window. Evening is a summer night, in bed. Auto follows
+                the clock. You can change this anytime in You.
+              </Body>
+            </TextsReveal>
+            <AtmosphereChoice
+              value={atmospherePref}
+              onChange={(v) => {
+                setAtmospherePref(v);
+                setPrefs({ atmospherePref: v });
+              }}
+            />
+            <View style={styles.spacer} />
+            <Button label="Continue" onPress={next} />
+          </View>
+        )}
+
         {step === 'done' && (
           <View style={styles.stepBody}>
             <TextsReveal key="done">
@@ -287,7 +318,10 @@ export default function Onboarding() {
             </Body>
             </TextsReveal>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { backgroundColor: palette.surface, borderColor: palette.border, color: palette.text },
+              ]}
               value={name}
               onChangeText={setName}
               placeholder="Your name (optional)"
@@ -297,7 +331,7 @@ export default function Onboarding() {
             />
             <View style={styles.spacer} />
             <Button label="Take me in" onPress={finish} />
-            <Text style={styles.skip} onPress={finish}>
+            <Text style={[styles.skip, { color: palette.textFaint }]} onPress={finish}>
               Skip
             </Text>
           </View>
@@ -310,17 +344,14 @@ export default function Onboarding() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   progressRow: { flexDirection: 'row', gap: 6, marginTop: spacing.lg },
-  progressDot: { flex: 1, height: 3, borderRadius: 2, backgroundColor: palette.border },
+  progressDot: { flex: 1, height: 3, borderRadius: 2 },
   stepBody: { flex: 1, justifyContent: 'center' },
-  lede: { marginBottom: spacing.md, color: palette.textDim },
+  lede: { marginBottom: spacing.md },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.md },
-  inputFlush: { marginTop: 0, borderColor: 'transparent' },
+  inputFlush: { marginTop: 0 },
   input: {
-    backgroundColor: palette.surface,
-    borderWidth: 1,
-    borderColor: palette.border,
+    borderWidth: StyleSheet.hairlineWidth,
     borderRadius: radius.md,
-    color: palette.text,
     fontFamily: fonts.body,
     fontSize: 16,
     paddingHorizontal: spacing.md,
@@ -331,7 +362,6 @@ const styles = StyleSheet.create({
   spacer: { height: spacing.xl },
   skip: {
     fontFamily: fonts.body,
-    color: palette.textFaint,
     textAlign: 'center',
     marginTop: spacing.md,
     fontSize: 15,
@@ -344,14 +374,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 3.5,
     fontWeight: '700',
-    color: palette.gold,
     marginTop: spacing.xl,
   },
   landingHero: {
     fontFamily: fonts.display,
     fontSize: 52,
     lineHeight: 58,
-    color: palette.text,
+    letterSpacing: -1,
     marginTop: spacing.md,
   },
   landingLede: { marginTop: spacing.md, fontSize: 17, lineHeight: 26, maxWidth: 560 },
@@ -373,7 +402,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(224,138,120,0.32)',
   },
   listenKicker: { fontFamily: fonts.body, fontSize: 11, letterSpacing: 2.2, fontWeight: '700', color: '#E8B98A' },
-  listenTitle: { fontFamily: fonts.display, fontSize: 30, lineHeight: 36, color: palette.text, marginTop: spacing.sm },
+  listenTitle: { fontFamily: fonts.display, fontSize: 30, lineHeight: 36, color: '#F7F1E8', marginTop: spacing.sm, letterSpacing: -0.4 },
   listenRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.md },
   listenPlay: {
     width: 56,
@@ -385,18 +414,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  listenPlayGlyph: { color: palette.text, fontSize: 18, marginLeft: 2 },
-  listenMeta: { flex: 1, fontFamily: fonts.body, fontSize: 12.5, lineHeight: 18, color: 'rgba(243,237,247,0.75)' },
+  listenPlayGlyph: { color: '#F7F1E8', fontSize: 18, marginLeft: 2 },
+  listenMeta: { flex: 1, fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: 'rgba(243,237,247,0.75)' },
   props: { marginTop: spacing.xxl, gap: 44 },
   prop: { flexDirection: 'row', gap: spacing.md },
   propRule: { width: 2, borderRadius: 1, alignSelf: 'stretch' },
   propText: { flex: 1 },
-  propTitle: { fontFamily: fonts.display, fontSize: 23, lineHeight: 30, color: palette.text },
+  propTitle: { fontFamily: fonts.display, fontSize: 23, lineHeight: 30, letterSpacing: -0.3 },
   propBody: {
     fontFamily: fonts.body,
     fontSize: 15,
     lineHeight: 24,
-    color: 'rgba(240,229,238,0.72)',
     marginTop: spacing.sm,
     maxWidth: 540,
   },

@@ -4,12 +4,14 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Body, Caption, Card, Display, Heading, Screen } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { fonts, spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { VOICES } from '@/data/catalog';
+import { useAtmosphere } from '@/lib/atmosphere';
 import type { Voice } from '@/lib/types';
 
 function VoiceCard({ voice }: { voice: Voice }) {
+  const { palette } = useAtmosphere();
   const source = VOICE_PREVIEW_AUDIO[voice.id] ?? null;
   const player = useAudioPlayer(source);
   const status = useAudioPlayerStatus(player);
@@ -38,9 +40,13 @@ function VoiceCard({ voice }: { voice: Voice }) {
             onPress={toggle}
             accessibilityRole="button"
             accessibilityLabel={status.playing ? `Pause ${voice.name} sample` : `Play ${voice.name} sample`}
-            style={({ pressed }) => [styles.playButton, pressed && { opacity: 0.7 }]}
+            style={({ pressed }) => [
+              styles.playButton,
+              { backgroundColor: palette.goldSoft, borderColor: palette.gold },
+              pressed && { opacity: 0.7 },
+            ]}
           >
-            <Text style={styles.playGlyph}>{status.playing ? '❚❚' : '▶'}</Text>
+            <Text style={[styles.playGlyph, { color: palette.gold }]}>{status.playing ? '❚❚' : '▶'}</Text>
           </Pressable>
         )}
       </View>
@@ -53,10 +59,11 @@ function VoiceCard({ voice }: { voice: Voice }) {
 
 export default function Transparency() {
   const router = useRouter();
+  const { palette } = useAtmosphere();
   return (
     <Screen>
       <View style={styles.headerRow}>
-        <Text style={styles.close} onPress={() => router.back()}>
+        <Text style={[styles.close, { color: palette.textDim }]} onPress={() => router.back()}>
           Close
         </Text>
       </View>
@@ -110,7 +117,7 @@ export default function Transparency() {
 
 const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: spacing.md },
-  close: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, padding: spacing.xs },
+  close: { fontFamily: fonts.body, fontSize: 15, padding: spacing.xs },
   para: { marginBottom: spacing.sm },
   footer: { marginTop: spacing.lg, textAlign: 'center' },
   voiceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
@@ -119,12 +126,10 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: palette.goldSoft,
-    borderWidth: 1,
-    borderColor: palette.gold,
+    borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  playGlyph: { fontSize: 16, color: palette.gold },
+  playGlyph: { fontSize: 16 },
   sampleNote: { marginTop: spacing.sm },
 });

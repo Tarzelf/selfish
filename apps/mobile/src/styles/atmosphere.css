@@ -1,0 +1,125 @@
+/* Apple-crisp type + liquid glass. Display face is Newsreader (New York-adjacent). */
+
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&display=swap');
+
+html,
+body,
+#root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+html[data-part='evening'],
+html[data-part='evening'] body {
+  background: #070b18;
+  color: #f7f1e8;
+  --tabs-bar-bg: rgba(255, 255, 255, 0.08);
+  --tabs-pill-bg: #e8c48a;
+  --tabs-text-muted: rgba(247, 241, 232, 0.5);
+  --tabs-text-active: #1a140c;
+  --shimmer-base: #8f8274;
+  --shimmer-highlight: #f7f1e8;
+}
+
+html[data-part='morning'],
+html[data-part='morning'] body {
+  background: #f3e8d8;
+  color: #1c1612;
+  --tabs-bar-bg: rgba(255, 255, 255, 0.42);
+  --tabs-pill-bg: #a8742a;
+  --tabs-text-muted: rgba(28, 22, 18, 0.48);
+  --tabs-text-active: #fff8ee;
+  --shimmer-base: #9a8a7a;
+  --shimmer-highlight: #1c1612;
+}
+
+/* Liquid glass — saturate + blur, specular rim, not a muddy plate. */
+.t-liquid-glass {
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.34) 0%,
+      rgba(255, 255, 255, 0.1) 38%,
+      rgba(255, 255, 255, 0.04) 100%
+    ) !important;
+  -webkit-backdrop-filter: blur(44px) saturate(210%) brightness(1.08);
+  backdrop-filter: blur(44px) saturate(210%) brightness(1.08);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -0.5px 0 rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.12),
+    0 12px 40px rgba(0, 0, 0, 0.32);
+}
+
+.t-liquid-glass--island {
+  border-radius: 30px;
+}
+
+.t-liquid-glass[data-part='morning'] {
+  background:
+    linear-gradient(
+      165deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(255, 255, 255, 0.38) 46%,
+      rgba(255, 248, 238, 0.22) 100%
+    ) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(190%) brightness(1.04);
+  backdrop-filter: blur(32px) saturate(190%) brightness(1.04);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.95),
+    0 10px 28px rgba(80, 50, 30, 0.12);
+}
+
+.t-tab-pill {
+  background: rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+}
+
+.t-liquid-glass[data-part='morning'] .t-tab-pill {
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.9);
+}
+
+.t-glass-card {
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  backdrop-filter: blur(24px) saturate(170%);
+}
+
+.t-star {
+  animation: t-twinkle 3.8s ease-in-out infinite;
+}
+
+.t-firefly {
+  animation: t-twinkle 2.6s ease-in-out infinite;
+  border-radius: 999px;
+}
+
+@keyframes t-twinkle {
+  0%,
+  100% {
+    opacity: 0.22;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-liquid-glass,
+  .t-glass-card {
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+  .t-star,
+  .t-firefly {
+    animation: none;
+  }
+}

@@ -6,18 +6,31 @@ import { RitualHome } from '@/components/ritual-home';
 import { SessionCard } from '@/components/session-card';
 import { VoiceRail } from '@/components/voice-rail';
 import { Caption, Chip, Heading, Screen } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { fonts, spacing } from '@/constants/theme';
 import { getFamily } from '@/data/catalog';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { useAppState } from '@/lib/store';
 import { HEAT_LABEL, type HeatLevel, MOODS, type Mood } from '@/lib/types';
 
 type LengthPick = 'any' | 'short' | 'long';
 
-function eveningLine(hour: number): string {
-  if (hour < 5) return 'The house is quiet.';
-  if (hour < 12) return 'Take a slow morning.';
-  if (hour < 18) return 'Steal a moment.';
-  return 'The evening is yours.';
+function partCopy(part: 'morning' | 'evening') {
+  if (part === 'morning') {
+    return {
+      hello: 'Good morning',
+      line: 'Linen still warm. The window is open.',
+      kicker: "This morning",
+      who: "Who's talking this morning?",
+      more: 'More for this morning',
+    };
+  }
+  return {
+    hello: 'Good evening',
+    line: 'The house is quiet. A summer night, in bed.',
+    kicker: "Tonight's pick",
+    who: "Who's in your ear tonight?",
+    more: 'More for tonight',
+  };
 }
 
 export default function Tonight() {
@@ -33,6 +46,8 @@ export default function Tonight() {
 }
 
 function EditorialTonight() {
+  const { part, palette } = useAtmosphere();
+  const copy = partCopy(part);
   const { prefs, visibleCatalog, continueList, heatAllowed } = useAppState();
   const [mood, setMood] = useState<Mood | null>(null);
   const [voiceId, setVoiceId] = useState<string | null>(null);
@@ -69,18 +84,17 @@ function EditorialTonight() {
     .filter((x) => x.family && visibleCatalog.some((f) => f.id === x.family!.id));
 
   const firstName = prefs.displayName.split(' ')[0];
-  const hour = new Date().getHours();
 
   return (
     <Screen>
-      <Text style={styles.wordmark}>SELFISH</Text>
-      <Text style={styles.greeting}>
-        {hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'}
+      <Text style={[styles.wordmark, { color: palette.gold }]}>SELFISH</Text>
+      <Text style={[styles.greeting, { color: palette.text }]}>
+        {copy.hello}
         {firstName ? `, ${firstName}` : ''}.
       </Text>
-      <Text style={styles.subline}>{eveningLine(hour)} Tell us the feeling — we&apos;ll find the session.</Text>
+      <Text style={[styles.subline, { color: palette.textDim }]}>{copy.line} Tell us the feeling — we&apos;ll find the session.</Text>
 
-      {hero && <HeroCard family={hero} kicker={mood ? `For feeling ${MOODS.find((m) => m.id === mood)?.label.toLowerCase()}` : "Tonight's pick"} />}
+      {hero && <HeroCard family={hero} kicker={mood ? `For feeling ${MOODS.find((m) => m.id === mood)?.label.toLowerCase()}` : copy.kicker} />}
 
       {continueFamilies.length > 0 && (
         <>
@@ -89,8 +103,8 @@ function EditorialTonight() {
             {continueFamilies.map(({ entry, family }) => (
               <View key={entry.familyId}>
                 <SessionCard family={family!} compact />
-                <View style={styles.progressTrack}>
-                  <View style={[styles.progressFill, { width: `${Math.round(entry.progress * 100)}%` }]} />
+                <View style={[styles.progressTrack, { backgroundColor: palette.border }]}>
+                  <View style={[styles.progressFill, { width: `${Math.round(entry.progress * 100)}%`, backgroundColor: palette.gold }]} />
                 </View>
               </View>
             ))}
@@ -105,7 +119,7 @@ function EditorialTonight() {
         ))}
       </View>
 
-      <Heading>Who&apos;s talking tonight?</Heading>
+      <Heading>{copy.who}</Heading>
       <Caption>Tap ▶ to hear them up close. Every voice is synthetic, honestly made — and sounds anything but.</Caption>
       <VoiceRail selectedVoiceId={voiceId} onSelect={setVoiceId} />
 
@@ -123,7 +137,7 @@ function EditorialTonight() {
         <Chip label="Take your time" selected={length === 'long'} onPress={() => setLength(length === 'long' ? 'any' : 'long')} />
       </View>
 
-      <Heading>{matches.length === 0 ? 'Nothing matches that exact feeling' : 'More for tonight'}</Heading>
+      <Heading>{matches.length === 0 ? 'Nothing matches that exact feeling' : copy.more}</Heading>
       {matches.length === 0 && (
         <Caption style={{ marginBottom: spacing.md }}>Loosen a filter — or let the pick above surprise you.</Caption>
       )}
@@ -144,29 +158,27 @@ const styles = StyleSheet.create({
   wordmark: {
     fontFamily: fonts.body,
     fontSize: 11,
-    letterSpacing: 3,
+    letterSpacing: 3.2,
     fontWeight: '700',
-    color: palette.gold,
     marginTop: spacing.lg,
   },
   greeting: {
     fontFamily: fonts.display,
-    fontSize: 36,
+    fontSize: 38,
     lineHeight: 44,
-    color: palette.text,
+    letterSpacing: -0.8,
     marginTop: spacing.sm,
   },
-  subline: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: palette.textDim, marginTop: spacing.xs },
+  subline: { fontFamily: fonts.body, fontSize: 16, lineHeight: 22, letterSpacing: -0.2, marginTop: spacing.xs },
   rail: { marginTop: spacing.sm, marginHorizontal: -spacing.md, paddingHorizontal: spacing.md },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm },
   progressTrack: {
-    height: 3,
-    backgroundColor: palette.border,
+    height: 2,
     borderRadius: 2,
     marginRight: spacing.md,
     marginTop: -spacing.sm,
     marginBottom: spacing.sm,
   },
-  progressFill: { height: 3, backgroundColor: palette.gold, borderRadius: 2 },
+  progressFill: { height: 2, borderRadius: 2 },
   foot: { marginTop: spacing.xl, textAlign: 'center' },
 });

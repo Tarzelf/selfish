@@ -3,10 +3,11 @@ import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { fonts, palette, radius, spacing } from '@/constants/theme';
+import { fonts, radius, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { closeForVoice, getFamily, getVoice, VOICES } from '@/data/catalog';
 import { recycleVariant } from '@/data/close-catalog';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { useAppState } from '@/lib/store';
 import type { RecycleKey, SessionFamily } from '@/lib/types';
 import { AvatarGroup } from '@/motion/avatar-group';
@@ -38,6 +39,7 @@ const RECYCLES: { id: RecycleKey; label: string }[] = [
 
 export function RitualHome() {
   const router = useRouter();
+  const { palette } = useAtmosphere();
   const { visibleCatalog, ritual, prefs } = useAppState();
   const closeLoops = useMemo(() => visibleCatalog.filter((f) => f.format === 'close'), [visibleCatalog]);
 
@@ -56,9 +58,9 @@ export function RitualHome() {
   if (!cued) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.wordmark}>SELFISH</Text>
+        <Text style={[styles.wordmark, { color: palette.gold }]}>SELFISH</Text>
         <TextsReveal>
-          <Text style={styles.line}>Raise heat to Close in You — then this room opens.</Text>
+          <Text style={[styles.line, { color: palette.text }]}>Raise heat to Close in You — then this room opens.</Text>
         </TextsReveal>
       </View>
     );
@@ -92,10 +94,10 @@ export function RitualHome() {
 
   return (
     <View style={styles.wrap}>
-      <Text style={styles.wordmark}>SELFISH</Text>
+      <Text style={[styles.wordmark, { color: palette.gold }]}>SELFISH</Text>
       <TextsReveal>
-        <Text style={styles.line}>{alreadyHere(voice?.gender)}</Text>
-        {firstName ? <Text style={styles.aside}>{firstName}.</Text> : <Text style={styles.aside}> </Text>}
+        <Text style={[styles.line, { color: palette.text }]}>{alreadyHere(voice?.gender)}</Text>
+        {firstName ? <Text style={[styles.aside, { color: palette.textDim }]}>{firstName}.</Text> : <Text style={[styles.aside, { color: palette.textDim }]}> </Text>}
       </TextsReveal>
 
       <LinearGradient colors={['#2B1631', '#1A121F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.stage}>
@@ -111,9 +113,9 @@ export function RitualHome() {
           accessibilityRole="button"
           accessibilityLabel={`Play ${cued.title}`}
           onPress={() => router.push(openLoop(cued, defaultVariant.id, true))}
-          style={({ pressed }) => [styles.play, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}
+          style={({ pressed }) => [styles.play, { backgroundColor: palette.gold }, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}
         >
-          <Text style={styles.playGlyph}>▶</Text>
+          <Text style={[styles.playGlyph, { color: palette.onAccent }]}>▶</Text>
         </Pressable>
       </LinearGradient>
 
@@ -121,7 +123,7 @@ export function RitualHome() {
         <SlidingTabs tabs={RECYCLES} selected={cuedRecycle} onSelect={(id) => go(id as RecycleKey)} />
       </View>
 
-      <Text style={styles.mouthsKicker}>other mouths</Text>
+      <Text style={[styles.mouthsKicker, { color: palette.textFaint }]}>other mouths</Text>
       <AvatarGroup style={styles.mouths}>
         {VOICES.map((v) => {
           const hasLoop = closeForVoice(v.id, closeLoops);
@@ -134,9 +136,14 @@ export function RitualHome() {
               accessibilityLabel={v.name}
               accessibilityState={{ selected }}
               onPress={() => setVoiceId(v.id)}
-              style={({ pressed }) => [styles.mouth, selected && styles.mouthOn, pressed && { opacity: 0.8 }]}
+              style={({ pressed }) => [
+                styles.mouth,
+                { borderColor: palette.border, backgroundColor: palette.surface },
+                selected && { borderColor: palette.gold, backgroundColor: palette.goldSoft },
+                pressed && { opacity: 0.8 },
+              ]}
             >
-              <Text style={[styles.mouthGlyph, selected && { color: palette.gold }]}>{v.name.charAt(0)}</Text>
+              <Text style={[styles.mouthGlyph, { color: palette.textDim }, selected && { color: palette.gold }]}>{v.name.charAt(0)}</Text>
             </Pressable>
           );
         })}
@@ -155,20 +162,18 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 3,
     fontWeight: '700',
-    color: palette.gold,
   },
   line: {
     fontFamily: fonts.display,
     fontSize: 36,
     lineHeight: 44,
-    color: palette.text,
     marginTop: spacing.md,
+    letterSpacing: -0.7,
   },
   aside: {
     fontFamily: fonts.display,
     fontStyle: 'italic',
     fontSize: 22,
-    color: palette.textDim,
     marginTop: spacing.xs,
   },
   stage: {
@@ -203,9 +208,10 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display,
     fontSize: 44,
     lineHeight: 50,
-    color: palette.text,
+    color: '#F7F1E8',
     marginTop: spacing.sm,
     textAlign: 'center',
+    letterSpacing: -0.6,
   },
   meta: {
     fontFamily: fonts.body,
@@ -218,18 +224,16 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 44,
-    backgroundColor: palette.gold,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: spacing.lg,
   },
-  playGlyph: { fontSize: 28, color: palette.onAccent, marginLeft: 4 },
+  playGlyph: { fontSize: 28, marginLeft: 4 },
   recycles: { marginTop: spacing.lg },
   mouthsKicker: {
     fontFamily: fonts.body,
     fontSize: 11,
     letterSpacing: 1.8,
-    color: palette.textFaint,
     textAlign: 'center',
     marginTop: spacing.xl,
     textTransform: 'lowercase',
@@ -240,11 +244,8 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: palette.border,
-    backgroundColor: palette.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  mouthOn: { borderColor: palette.gold, backgroundColor: palette.goldSoft },
-  mouthGlyph: { fontFamily: fonts.display, fontSize: 18, color: palette.textDim },
+  mouthGlyph: { fontFamily: fonts.display, fontSize: 18 },
 });

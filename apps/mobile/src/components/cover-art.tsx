@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { fonts, palette } from '@/constants/theme';
+import { fonts } from '@/constants/theme';
 import type { SessionFamily } from '@/lib/types';
 
 /**
@@ -117,9 +117,9 @@ export function CoverArt({
 const styles = StyleSheet.create({
   cover: {
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    backgroundColor: palette.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: 'transparent',
   },
   orb: { position: 'absolute', opacity: 0.9 },
   ruleH: { position: 'absolute', left: 0, right: 0, height: StyleSheet.hairlineWidth },

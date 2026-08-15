@@ -4,7 +4,7 @@ import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { coverPalette } from '@/components/cover-art';
-import { fonts, palette, radius, spacing } from '@/constants/theme';
+import { fonts, radius, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getVoice } from '@/data/catalog';
 import type { SessionFamily } from '@/lib/types';
@@ -50,8 +50,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg + 6,
     padding: spacing.lg,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.09)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'rgba(255,255,255,0.22)',
     minHeight: 210,
     justifyContent: 'flex-end',
   },
@@ -74,11 +74,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.display,
     fontSize: 34,
     lineHeight: 40,
-    color: palette.text,
+    color: '#F7F1E8',
+    letterSpacing: -0.55,
   },
   blurb: {
     fontFamily: fonts.body,
-    fontSize: 14.5,
+    fontSize: 15,
     lineHeight: 21,
     color: 'rgba(243,237,247,0.78)',
     marginTop: spacing.sm,
@@ -95,6 +96,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  playGlyph: { color: palette.text, fontSize: 15, marginLeft: 2 },
+  playGlyph: { color: '#F7F1E8', fontSize: 15, marginLeft: 2 },
   meta: { fontFamily: fonts.body, fontSize: 13, fontWeight: '600', flex: 1 },
 });

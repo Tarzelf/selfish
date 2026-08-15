@@ -1,12 +1,15 @@
 import React from 'react';
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useAtmosphere } from '@/lib/atmosphere';
+
 /** 24 — learn more hover. Chevron slides and opens into an arrow. */
 export function LearnMore({ label, onPress }: { label: string; onPress: () => void }) {
+  const { palette } = useAtmosphere();
   if (Platform.OS === 'web') {
     return (
       <Pressable accessibilityRole="button" onPress={onPress} className="t-learn" style={styles.row}>
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, { color: palette.textFaint }]}>{label}</Text>
         <View className="t-learn-chevron">
           {React.createElement(
             'svg',
@@ -31,7 +34,7 @@ export function LearnMore({ label, onPress }: { label: string; onPress: () => vo
 
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={styles.row}>
-      <Text style={styles.label}>{label} →</Text>
+      <Text style={[styles.label, { color: palette.textFaint }]}>{label} →</Text>
     </Pressable>
   );
 }
@@ -43,7 +46,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     padding: 8,
-    color: '#6E5E85',
   },
-  label: { fontSize: 14, color: '#6E5E85' },
+  label: { fontSize: 14, letterSpacing: -0.1 },
 });

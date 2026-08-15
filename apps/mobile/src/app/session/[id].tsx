@@ -4,10 +4,11 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CoverArt } from '@/components/cover-art';
 import { Body, Button, Caption, Card, Chip, Display, HeatBadge, Heading, Screen } from '@/components/ui';
-import { fonts, palette, radius, spacing } from '@/constants/theme';
+import { fonts, radius, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getFamily, getSeries, getVoice } from '@/data/catalog';
 import { recycleVariant } from '@/data/close-catalog';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { formatClock, usePlayback } from '@/lib/player';
 import { useAppState } from '@/lib/store';
 import type { RecycleKey, SessionVariant } from '@/lib/types';
@@ -30,6 +31,7 @@ function PlayerCore({
   autoPlay?: boolean;
   isClose?: boolean;
 }) {
+  const { palette } = useAtmosphere();
   const playback = usePlayback(variant.durationMin, source, onProgress);
   const seeded = useRef(false);
   const autoPlayed = useRef(false);
@@ -50,9 +52,15 @@ function PlayerCore({
   const finished = playback.progress >= 0.97 && !playback.playing;
 
   return (
-    <View style={styles.player}>
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${playback.progress * 100}%` }]} />
+    <View
+      className="t-glass-card"
+      style={[
+        styles.player,
+        { backgroundColor: palette.surface, borderColor: palette.borderSoft },
+      ]}
+    >
+      <View style={[styles.progressTrack, { backgroundColor: palette.border }]}>
+        <View style={[styles.progressFill, { width: `${playback.progress * 100}%`, backgroundColor: palette.gold }]} />
       </View>
       <View style={styles.clockRow}>
         <Caption>{formatClock(playback.elapsedSec)}</Caption>
@@ -60,11 +68,11 @@ function PlayerCore({
       </View>
       <View style={styles.controls}>
         <Pressable onPress={() => playback.seekBy(-15)} style={styles.skipButton} accessibilityRole="button" accessibilityLabel="Back 15 seconds">
-          <Text style={styles.skipLabel}>−15</Text>
+          <Text style={[styles.skipLabel, { color: palette.textDim }]}>−15</Text>
         </Pressable>
         <Pressable
           onPress={finished ? playback.restart : playback.toggle}
-          style={styles.playButton}
+          style={[styles.playButton, { backgroundColor: palette.gold }]}
           accessibilityRole="button"
           accessibilityLabel={finished ? 'Again' : playback.playing ? 'Pause' : 'Play'}
         >
@@ -73,15 +81,15 @@ function PlayerCore({
             a={finished ? '↺' : '▶'}
             b="❚❚"
             style={{ width: 28, height: 28 }}
-            glyphStyle={styles.playGlyph}
+            glyphStyle={[styles.playGlyph, { color: palette.onAccent }]}
           />
         </Pressable>
         <Pressable onPress={() => playback.seekBy(15)} style={styles.skipButton} accessibilityRole="button" accessibilityLabel="Forward 15 seconds">
-          <Text style={styles.skipLabel}>+15</Text>
+          <Text style={[styles.skipLabel, { color: palette.textDim }]}>+15</Text>
         </Pressable>
       </View>
       {finished && isClose ? (
-        <Text style={styles.againHint} onPress={playback.restart}>
+        <Text style={[styles.againHint, { color: palette.gold }]} onPress={playback.restart}>
           Again. Same mouth. Same room.
         </Text>
       ) : null}
@@ -97,6 +105,7 @@ function PlayerCore({
 export default function SessionScreen() {
   const { id, variant: variantParam, play } = useLocalSearchParams<{ id: string; variant?: string; play?: string }>();
   const router = useRouter();
+  const { palette } = useAtmosphere();
   const { prefs, heatAllowed, recordProgress, setPrefs } = useAppState();
 
   const family = getFamily(id);
@@ -210,7 +219,7 @@ export default function SessionScreen() {
             </Caption>
           </Card>
           <Button label="I'm in" onPress={ack} />
-          <Text style={styles.leave} onPress={() => router.back()}>
+          <Text style={[styles.leave, { color: palette.textFaint }]} onPress={() => router.back()}>
             Not tonight
           </Text>
         </View>
@@ -221,7 +230,7 @@ export default function SessionScreen() {
   return (
     <Screen>
       <View style={styles.headerRow}>
-        <Text style={styles.close} onPress={() => router.back()}>
+        <Text style={[styles.close, { color: palette.textDim }]} onPress={() => router.back()}>
           Close
         </Text>
         <HeatBadge heat={variant.heat} />
@@ -230,10 +239,10 @@ export default function SessionScreen() {
       <View style={styles.hero}>
         <CoverArt family={family} size={isClose ? 120 : 168} radius={24} />
         <Caption style={styles.gateKicker}>{(isClose ? 'Close loop' : family.dynamic).toUpperCase()}</Caption>
-        <TextSwap text={family.title} style={styles.heroTitleSwap} />
+        <TextSwap text={family.title} style={[styles.heroTitleSwap, { color: palette.text }]} />
         <TextSwap
           text={`${voice.name} · ${variant.durationMin} min${isClose ? ` · ${variant.label}` : ` · ${variant.pace === 'slow' ? 'slow pace' : 'measured pace'}`}${variant.extendedBuildup ? ' · extended buildup' : ''}`}
-          style={styles.heroMetaSwap}
+          style={[styles.heroMetaSwap, { color: palette.textDim }]}
         />
       </View>
 
@@ -320,52 +329,48 @@ export default function SessionScreen() {
 
 const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
-  close: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, padding: spacing.xs },
+  close: { fontFamily: fonts.body, fontSize: 15, padding: spacing.xs },
   gateBody: { flex: 1, justifyContent: 'center' },
   gateCover: { alignItems: 'flex-start', marginBottom: spacing.sm },
   gateKicker: { letterSpacing: 1.2, marginTop: spacing.lg },
   gateBlurb: { marginTop: spacing.sm, marginBottom: spacing.lg },
-  leave: { fontFamily: fonts.body, color: palette.textFaint, textAlign: 'center', marginTop: spacing.md, fontSize: 15, padding: spacing.sm },
+  leave: { fontFamily: fonts.body, textAlign: 'center', marginTop: spacing.md, fontSize: 15, padding: spacing.sm },
   hero: { alignItems: 'center', marginTop: spacing.md },
   heroTitle: { textAlign: 'center', marginTop: spacing.xs },
   heroTitleSwap: {
     fontFamily: fonts.display,
     fontSize: 32,
     lineHeight: 40,
-    color: palette.text,
+    letterSpacing: -0.5,
     textAlign: 'center',
     marginTop: spacing.xs,
   },
   heroMeta: { textAlign: 'center' },
-  heroMetaSwap: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: palette.textDim, textAlign: 'center' },
+  heroMetaSwap: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, textAlign: 'center', letterSpacing: -0.2 },
   player: {
-    backgroundColor: palette.surface,
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: palette.borderSoft,
+    borderWidth: StyleSheet.hairlineWidth,
     padding: spacing.lg,
     marginTop: spacing.lg,
   },
-  progressTrack: { height: 4, backgroundColor: palette.border, borderRadius: 2 },
-  progressFill: { height: 4, backgroundColor: palette.gold, borderRadius: 2 },
+  progressTrack: { height: 4, borderRadius: 2 },
+  progressFill: { height: 4, borderRadius: 2 },
   clockRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.sm },
   controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xl, marginTop: spacing.md },
   playButton: {
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: palette.gold,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  playGlyph: { fontSize: 24, color: palette.onAccent },
+  playGlyph: { fontSize: 24 },
   skipButton: { padding: spacing.sm },
-  skipLabel: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, fontWeight: '600' },
+  skipLabel: { fontFamily: fonts.body, fontSize: 15, fontWeight: '600' },
   againHint: {
     fontFamily: fonts.display,
     fontStyle: 'italic',
     fontSize: 16,
-    color: palette.gold,
     textAlign: 'center',
     marginTop: spacing.md,
   },

@@ -2,14 +2,17 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 
+import { AtmosphereChoice } from '@/components/atmosphere-choice';
 import { HeatChoice } from '@/components/heat-choice';
 import { Body, Button, Caption, Card, Chip, Display, Divider, Heading, Screen } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { fonts, spacing } from '@/constants/theme';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { useAppState } from '@/lib/store';
 import { LIMIT_TAGS } from '@/lib/types';
 
 export default function You() {
   const router = useRouter();
+  const { palette, part, pref } = useAtmosphere();
   const { prefs, setPrefs, resetAll } = useAppState();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
@@ -24,6 +27,13 @@ export default function You() {
     <Screen>
       <Display>{prefs.displayName ? prefs.displayName : 'You'}</Display>
       <Body dim>Your settings, your limits, your business.</Body>
+
+      <Heading>When you listen</Heading>
+      <Caption>
+        Morning is linen and an open window. Evening is a summer night, in bed.
+        {pref === 'auto' ? ` Auto is showing ${part} right now.` : ` Locked to ${part}.`}
+      </Caption>
+      <AtmosphereChoice value={prefs.atmospherePref} onChange={(atmospherePref) => setPrefs({ atmospherePref })} />
 
       <Heading>Heat cap</Heading>
       <Caption>Nothing above this ever appears, anywhere in the app. Close opens the other room.</Caption>
@@ -86,7 +96,7 @@ export default function You() {
           </Caption>
           <View style={styles.deleteRow}>
             <Button kind="danger" label="Yes, delete it all" onPress={() => { resetAll(); router.replace('/onboarding'); }} style={styles.deleteButton} />
-            <Text style={styles.cancel} onPress={() => setConfirmingDelete(false)}>
+            <Text style={[styles.cancel, { color: palette.textDim }]} onPress={() => setConfirmingDelete(false)}>
               Cancel
             </Text>
           </View>
@@ -104,5 +114,5 @@ const styles = StyleSheet.create({
   switchText: { flex: 1 },
   deleteRow: { flexDirection: 'row', alignItems: 'center', marginTop: spacing.md, gap: spacing.md },
   deleteButton: { flex: 1 },
-  cancel: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, padding: spacing.sm },
+  cancel: { fontFamily: fonts.body, fontSize: 15, padding: spacing.sm },
 });

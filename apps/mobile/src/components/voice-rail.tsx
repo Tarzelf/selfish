@@ -3,9 +3,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { fonts, palette, radius, spacing } from '@/constants/theme';
+import { fonts, radius, spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { VOICES } from '@/data/catalog';
+import { useAtmosphere } from '@/lib/atmosphere';
 import type { Voice } from '@/lib/types';
 
 /**
@@ -46,6 +47,7 @@ function VoiceCard({
     player.play();
   };
 
+  const { palette } = useAtmosphere();
   const tint = VOICE_TINTS[voice.id] ?? ['#1D1626', '#1D1626'];
 
   return (
@@ -53,7 +55,11 @@ function VoiceCard({
       accessibilityRole="button"
       accessibilityState={{ selected }}
       onPress={onSelect}
-      style={({ pressed }) => [styles.cardWrap, selected && styles.cardSelected, pressed && { opacity: 0.85 }]}
+      style={({ pressed }) => [
+        styles.cardWrap,
+        { borderColor: selected ? palette.gold : palette.borderSoft },
+        pressed && { opacity: 0.85 },
+      ]}
     >
       <LinearGradient colors={[tint[0], tint[1]]} start={{ x: 0.1, y: 0 }} end={{ x: 0.8, y: 1 }} style={styles.card}>
         <View style={styles.topRow}>
@@ -64,9 +70,14 @@ function VoiceCard({
               accessibilityRole="button"
               accessibilityLabel={`Hear ${voice.name}`}
               hitSlop={8}
-              style={({ pressed }) => [styles.sampleButton, status.playing && styles.samplePlaying, pressed && { opacity: 0.7 }]}
+              style={({ pressed }) => [
+                styles.sampleButton,
+                { borderColor: palette.gold },
+                status.playing && { backgroundColor: palette.goldSoft },
+                pressed && { opacity: 0.7 },
+              ]}
             >
-              <Text style={styles.sampleGlyph}>{status.playing ? '❚❚' : '▶'}</Text>
+              <Text style={[styles.sampleGlyph, { color: palette.gold }]}>{status.playing ? '❚❚' : '▶'}</Text>
             </Pressable>
           )}
         </View>
@@ -110,25 +121,21 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
     borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: palette.borderSoft,
     overflow: 'hidden',
   },
   card: { padding: spacing.md, flex: 1 },
-  cardSelected: { borderColor: palette.gold },
   topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  initial: { fontFamily: fonts.display, fontStyle: 'italic', fontSize: 34, color: palette.textDim, lineHeight: 40 },
+  initial: { fontFamily: fonts.display, fontStyle: 'italic', fontSize: 34, color: 'rgba(247,241,232,0.55)', lineHeight: 40 },
   sampleButton: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    borderWidth: 1,
-    borderColor: palette.gold,
+    borderWidth: StyleSheet.hairlineWidth,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  samplePlaying: { backgroundColor: palette.goldSoft },
-  sampleGlyph: { color: palette.gold, fontSize: 11 },
-  name: { fontFamily: fonts.display, fontSize: 19, color: palette.text, marginTop: spacing.xs },
-  pronouns: { fontFamily: fonts.body, fontSize: 11.5, color: palette.textFaint, marginTop: 2 },
-  descriptor: { fontFamily: fonts.body, fontSize: 12.5, lineHeight: 18, color: palette.textDim, marginTop: spacing.sm },
+  sampleGlyph: { fontSize: 11 },
+  name: { fontFamily: fonts.display, fontSize: 19, color: '#F7F1E8', marginTop: spacing.xs, letterSpacing: -0.3 },
+  pronouns: { fontFamily: fonts.body, fontSize: 12, color: 'rgba(247,241,232,0.5)', marginTop: 2 },
+  descriptor: { fontFamily: fonts.body, fontSize: 13, lineHeight: 18, color: 'rgba(247,241,232,0.68)', marginTop: spacing.sm },
 });

@@ -4,14 +4,16 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { CoverArt } from '@/components/cover-art';
 import { Card, HeatBadge } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { fonts, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getSeries, getVoice } from '@/data/catalog';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { useAppState } from '@/lib/store';
 import type { SessionFamily } from '@/lib/types';
 
 export function SessionCard({ family, compact }: { family: SessionFamily; compact?: boolean }) {
   const router = useRouter();
+  const { palette } = useAtmosphere();
   const { heatAllowed } = useAppState();
   const voice = getVoice(family.voiceId);
   const series = getSeries(family.seriesId);
@@ -32,16 +34,16 @@ export function SessionCard({ family, compact }: { family: SessionFamily; compac
         <CoverArt family={family} size={compact ? 56 : 76} />
         <View style={styles.content}>
           <View style={styles.topRow}>
-            <Text style={styles.dynamic} numberOfLines={1}>
+            <Text style={[styles.dynamic, { color: palette.textFaint }]} numberOfLines={1}>
               {family.format === 'close' ? 'LOOP' : family.dynamic.toUpperCase()}
               {family.format !== 'close' && series ? `  ·  ${series.title.toUpperCase()} E${family.episode}` : ''}
             </Text>
             <HeatBadge heat={maxHeat} locked={!heatAllowed(maxHeat)} />
           </View>
-          <Text style={styles.title} numberOfLines={compact ? 1 : 2}>
+          <Text style={[styles.title, { color: palette.text }]} numberOfLines={compact ? 1 : 2}>
             {family.title}
           </Text>
-          <Text style={styles.meta} numberOfLines={1}>
+          <Text style={[styles.meta, { color: palette.textDim }]} numberOfLines={1}>
             {voice?.name} · {durationLabel} ·{' '}
             {family.format === 'close'
               ? `${family.variants.length} recycles`
@@ -52,16 +54,16 @@ export function SessionCard({ family, compact }: { family: SessionFamily; compac
       </View>
       {!compact && (
         <>
-          <Text style={styles.blurb}>{family.blurb}</Text>
+          <Text style={[styles.blurb, { color: palette.textDim }]}>{family.blurb}</Text>
           <View style={styles.footRow}>
-            <Text style={styles.notes} numberOfLines={1}>
+            <Text style={[styles.notes, { color: palette.textFaint }]} numberOfLines={1}>
               {family.contentNotes.join(' · ')}
               {minHeat !== maxHeat ? '  ·  softer versions available' : ''}
             </Text>
-            <Text style={styles.rating}>★ {family.rating.toFixed(1)}</Text>
+            <Text style={[styles.rating, { color: palette.gold }]}>★ {family.rating.toFixed(1)}</Text>
           </View>
           {family.lovedFor.length > 0 && (
-            <Text style={styles.lovedFor}>loved for: {family.lovedFor.join(' · ')}</Text>
+            <Text style={[styles.lovedFor, { color: palette.rose }]}>loved for: {family.lovedFor.join(' · ')}</Text>
           )}
         </>
       )}
@@ -83,14 +85,13 @@ const styles = StyleSheet.create({
   dynamic: {
     flex: 1,
     fontFamily: fonts.body,
-    fontSize: 10.5,
+    fontSize: 11,
     letterSpacing: 1.1,
-    color: palette.textFaint,
     fontWeight: '600',
   },
-  title: { fontFamily: fonts.display, fontSize: 19, lineHeight: 25, color: palette.text },
-  meta: { fontFamily: fonts.body, fontSize: 12.5, color: palette.textDim, marginTop: 3 },
-  blurb: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: palette.textDim, marginTop: spacing.sm },
+  title: { fontFamily: fonts.display, fontSize: 20, lineHeight: 25, letterSpacing: -0.35 },
+  meta: { fontFamily: fonts.body, fontSize: 13, marginTop: 3, letterSpacing: -0.1 },
+  blurb: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, marginTop: spacing.sm, letterSpacing: -0.1 },
   footRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.sm,
   },
-  notes: { flex: 1, fontFamily: fonts.body, fontSize: 12, color: palette.textFaint },
-  rating: { fontFamily: fonts.body, fontSize: 13, color: palette.gold, fontWeight: '600' },
-  lovedFor: { fontFamily: fonts.body, fontSize: 12, color: palette.rose, marginTop: spacing.xs },
+  notes: { flex: 1, fontFamily: fonts.body, fontSize: 12 },
+  rating: { fontFamily: fonts.body, fontSize: 13, fontWeight: '600' },
+  lovedFor: { fontFamily: fonts.body, fontSize: 12, marginTop: spacing.xs },
 });

@@ -1,7 +1,8 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { fonts, heatColor, palette, radius, spacing } from '@/constants/theme';
+import { fonts, radius, spacing } from '@/constants/theme';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { HEAT_HINT, HEAT_LABEL, type HeatLevel } from '@/lib/types';
 
 const ORDER: HeatLevel[] = ['comfort', 'slow-burn', 'spicy'];
@@ -13,6 +14,7 @@ export function HeatChoice({
   value: HeatLevel;
   onChange: (h: HeatLevel) => void;
 }) {
+  const { palette, heatColor } = useAtmosphere();
   return (
     <View style={styles.stack}>
       {ORDER.map((h) => {
@@ -26,12 +28,12 @@ export function HeatChoice({
             onPress={() => onChange(h)}
             style={({ pressed }) => [
               styles.card,
-              selected && { borderColor: color, backgroundColor: `${color}14` },
+              { borderColor: selected ? color : palette.border, backgroundColor: selected ? `${color}14` : palette.surface },
               pressed && { opacity: 0.85 },
             ]}
           >
-            <Text style={[styles.label, selected && { color }]}>{HEAT_LABEL[h]}</Text>
-            <Text style={styles.hint}>{HEAT_HINT[h]}</Text>
+            <Text style={[styles.label, { color: selected ? color : palette.text }]}>{HEAT_LABEL[h]}</Text>
+            <Text style={[styles.hint, { color: palette.textDim }]}>{HEAT_HINT[h]}</Text>
           </Pressable>
         );
       })}
@@ -43,9 +45,7 @@ const styles = StyleSheet.create({
   stack: { gap: spacing.sm, marginTop: spacing.md },
   card: {
     borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: palette.border,
-    backgroundColor: palette.surface,
+    borderWidth: StyleSheet.hairlineWidth,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
   },
@@ -54,13 +54,13 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     fontSize: 22,
     lineHeight: 28,
-    color: palette.text,
+    letterSpacing: -0.3,
   },
   hint: {
     fontFamily: fonts.body,
     fontSize: 14,
     lineHeight: 20,
-    color: palette.textDim,
     marginTop: spacing.xs,
+    letterSpacing: -0.1,
   },
 });

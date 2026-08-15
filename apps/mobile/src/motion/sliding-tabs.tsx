@@ -3,6 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 import { fonts } from '@/constants/theme';
+import { useAtmosphere } from '@/lib/atmosphere';
 import { duration, ease } from '@/motion/tokens';
 
 const bezier = Easing.bezier(ease.smoothOut[0], ease.smoothOut[1], ease.smoothOut[2], ease.smoothOut[3]);
@@ -16,6 +17,7 @@ export function SlidingTabs({
   selected: string;
   onSelect: (id: string) => void;
 }) {
+  const { palette } = useAtmosphere();
   const barRef = useRef<View>(null);
   const tabRefs = useRef<Record<string, { offsetLeft: number; offsetWidth: number } | null>>({});
   const x = useSharedValue(0);
@@ -87,8 +89,8 @@ export function SlidingTabs({
   }
 
   return (
-    <View style={styles.nativeBar} accessibilityRole="tablist">
-      <Animated.View style={[styles.nativePill, pillStyle]} />
+    <View style={[styles.nativeBar, { backgroundColor: palette.surface }]} accessibilityRole="tablist">
+      <Animated.View style={[styles.nativePill, { backgroundColor: palette.gold }, pillStyle]} />
       {tabs.map((tab) => (
         <Pressable
           key={tab.id}
@@ -110,7 +112,7 @@ export function SlidingTabs({
           onPress={() => onSelect(tab.id)}
           style={styles.nativeTab}
         >
-          <Text style={[styles.nativeLabel, selected === tab.id && styles.nativeLabelOn]}>{tab.label}</Text>
+          <Text style={[styles.nativeLabel, { color: palette.textFaint }, selected === tab.id && { color: palette.onAccent }]}>{tab.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -123,7 +125,6 @@ const styles = StyleSheet.create({
   nativeBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1d1626',
     borderRadius: 48,
     padding: 3,
     gap: 3,
@@ -133,10 +134,8 @@ const styles = StyleSheet.create({
     top: 3,
     left: 0,
     height: 30,
-    backgroundColor: '#dfae72',
     borderRadius: 48,
   },
   nativeTab: { flex: 1, height: 30, alignItems: 'center', justifyContent: 'center', zIndex: 1 },
-  nativeLabel: { fontFamily: fonts.body, fontSize: 13, fontWeight: '600', color: 'rgba(243,237,247,0.55)' },
-  nativeLabelOn: { color: '#1e1526' },
+  nativeLabel: { fontFamily: fonts.body, fontSize: 13, fontWeight: '600' },
 });
