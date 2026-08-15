@@ -1,10 +1,10 @@
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Body, Caption, Card, Display, Heading, Screen } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { Body, Caption, Card, Display, Heading, PlayControl, Screen, TextLink } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { VOICES } from '@/data/catalog';
 import type { Voice } from '@/lib/types';
@@ -30,18 +30,16 @@ function VoiceCard({ voice }: { voice: Voice }) {
           <Body>
             {voice.name} · {voice.gender === 'M' ? 'he/him' : voice.gender === 'F' ? 'she/her' : 'they/them'}
           </Body>
-          <Caption style={{ marginTop: spacing.xs }}>{voice.descriptor}</Caption>
-          <Caption style={{ marginTop: spacing.xs }}>{voice.narratorCredit}</Caption>
+          <Caption style={styles.note}>{voice.descriptor}</Caption>
+          <Caption style={styles.note}>{voice.narratorCredit}</Caption>
         </View>
         {source != null && (
-          <Pressable
+          <PlayControl
+            playing={status.playing}
             onPress={toggle}
-            accessibilityRole="button"
-            accessibilityLabel={status.playing ? `Pause ${voice.name} sample` : `Play ${voice.name} sample`}
-            style={({ pressed }) => [styles.playButton, pressed && { opacity: 0.7 }]}
-          >
-            <Text style={styles.playGlyph}>{status.playing ? '❚❚' : '▶'}</Text>
-          </Pressable>
+            size="sm"
+            label={status.playing ? `Pause ${voice.name} sample` : `Play ${voice.name} sample`}
+          />
         )}
       </View>
       {source != null && (
@@ -56,14 +54,10 @@ export default function Transparency() {
   return (
     <Screen>
       <View style={styles.headerRow}>
-        <Text style={styles.close} onPress={() => router.back()}>
-          Close
-        </Text>
+        <TextLink label="Close" onPress={() => router.back()} />
       </View>
       <Display>How Selfish is made</Display>
-      <Body dim>
-        We think you deserve the whole story, told plainly, before anyone else tells it for us.
-      </Body>
+      <Body dim>We think you deserve the whole story, told plainly, before anyone else tells it for us.</Body>
 
       <Heading>The voices are synthetic — and humans get paid</Heading>
       <Body dim style={styles.para}>
@@ -94,9 +88,7 @@ export default function Transparency() {
       </Body>
 
       <Heading>The roster</Heading>
-      <Caption style={{ marginBottom: spacing.sm }}>
-        Tap ▶ to hear a whisper-register engine preview of each voice.
-      </Caption>
+      <Caption style={styles.rosterHint}>Tap play to hear a whisper-register engine preview of each voice.</Caption>
       {VOICES.map((v) => (
         <VoiceCard key={v.id} voice={v} />
       ))}
@@ -110,21 +102,11 @@ export default function Transparency() {
 
 const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: spacing.md },
-  close: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, padding: spacing.xs },
   para: { marginBottom: spacing.sm },
   footer: { marginTop: spacing.lg, textAlign: 'center' },
   voiceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   voiceText: { flex: 1 },
-  playButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: palette.goldSoft,
-    borderWidth: 1,
-    borderColor: palette.gold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  playGlyph: { fontSize: 16, color: palette.gold },
+  note: { marginTop: spacing.xs },
   sampleNote: { marginTop: spacing.sm },
+  rosterHint: { marginBottom: spacing.sm },
 });

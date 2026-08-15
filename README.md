@@ -52,18 +52,16 @@ Selfish+ is **not** published to the Whop marketplace (adult catalog). Dashboard
 
 ### Brand
 
-The preview used Expo’s default blue chevron as the app icon. The real system is already in `apps/mobile/src/constants/theme.ts` and the cover-art language: wine-and-candlelight (`#141019`), champagne gold (`#DFAE72`), italic display serif, letter-spaced `SELFISH` mark.
+The name is the mark. Sentence-case italic *Selfish* on ink (`#0F0D10`), paper bone (`#F0E8DF`), one metal (ember) used rarely. No tracked `SELFISH`, no hotel monogram, no gold jewel play button. Tokens live in `apps/mobile/src/constants/theme.ts`; primitives in `src/components/ui.tsx` are the only place screens should get color, type, space, or radius.
 
 Rendered assets (regenerate with `python3 apps/mobile/scripts/render-brand.py`):
 
 | Asset | Path |
 |---|---|
 | Logo / app icon | `apps/mobile/assets/brand/logo-1024.png` |
-| Selfish+ banner | `apps/mobile/assets/brand/banner-1920x720.png` |
+| Banner | `apps/mobile/assets/brand/banner-1920x720.png` |
 | Store banner | `apps/mobile/assets/brand/store-banner-1500x500.png` |
 | Open Graph | `apps/mobile/assets/brand/og-1200x630.png` |
-
-Those are live on the Whop company (logo, banner, OG). Store accent is gold.
 
 ### Web deploy (for user testing)
 

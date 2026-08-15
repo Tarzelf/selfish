@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { CoverArt } from '@/components/cover-art';
-import { Card, HeatBadge } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { Body, Caption, Card, HeatBadge, Title } from '@/components/ui';
+import { spacing, type } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getSeries, getVoice } from '@/data/catalog';
 import { isFreeFamily } from '@/lib/catalog-access';
@@ -31,38 +31,36 @@ export function SessionCard({ family, compact }: { family: SessionFamily; compac
       style={compact ? styles.compact : undefined}
     >
       <View style={styles.row}>
-        <CoverArt family={family} size={compact ? 56 : 76} />
+        <CoverArt family={family} size={compact ? 52 : 68} />
         <View style={styles.content}>
           <View style={styles.topRow}>
-            <Text style={styles.dynamic} numberOfLines={1}>
-              {family.dynamic.toUpperCase()}
-              {series ? `  ·  ${series.title.toUpperCase()} E${family.episode}` : ''}
-            </Text>
+            <Caption style={styles.dynamic} numberOfLines={1}>
+              {family.dynamic}
+              {series ? ` · ${series.title}` : ''}
+            </Caption>
             <HeatBadge heat={maxHeat} locked={!heatAllowed(maxHeat)} />
           </View>
-          <Text style={styles.title} numberOfLines={compact ? 1 : 2}>
+          <Title style={styles.title} numberOfLines={compact ? 1 : 2}>
             {family.title}
-          </Text>
-          <Text style={styles.meta} numberOfLines={1}>
-            {voice?.name} · {durationLabel} · {family.variants.length}{' '}
-            {family.variants.length === 1 ? 'version' : 'versions'}
-            {hasAudio ? '  ·  ▶ preview' : ''}
-            {isFreeFamily(family) ? '  ·  free' : playable ? '' : '  ·  Selfish+'}
-          </Text>
+          </Title>
+          <Caption numberOfLines={1}>
+            {voice?.name} · {durationLabel}
+            {hasAudio ? ' · preview' : ''}
+            {isFreeFamily(family) ? ' · free' : playable ? '' : ' · the rest of the catalog'}
+          </Caption>
         </View>
       </View>
       {!compact && (
         <>
-          <Text style={styles.blurb}>{family.blurb}</Text>
-          <View style={styles.footRow}>
-            <Text style={styles.notes} numberOfLines={1}>
-              {family.contentNotes.join(' · ')}
-              {minHeat !== maxHeat ? '  ·  softer versions available' : ''}
-            </Text>
-            <Text style={styles.rating}>★ {family.rating.toFixed(1)}</Text>
-          </View>
+          <Body dim style={styles.blurb}>
+            {family.blurb}
+          </Body>
+          <Caption style={styles.notes} numberOfLines={1}>
+            {family.contentNotes.join(' · ')}
+            {minHeat !== maxHeat ? ' · softer versions' : ''}
+          </Caption>
           {family.lovedFor.length > 0 && (
-            <Text style={styles.lovedFor}>loved for: {family.lovedFor.join(' · ')}</Text>
+            <Caption style={styles.loved}>loved for: {family.lovedFor.join(' · ')}</Caption>
           )}
         </>
       )}
@@ -79,27 +77,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     gap: spacing.sm,
-    marginBottom: 4,
+    marginBottom: 2,
   },
-  dynamic: {
-    flex: 1,
-    fontFamily: fonts.body,
-    fontSize: 10.5,
-    letterSpacing: 1.1,
-    color: palette.textFaint,
-    fontWeight: '600',
-  },
-  title: { fontFamily: fonts.display, fontSize: 19, lineHeight: 25, color: palette.text },
-  meta: { fontFamily: fonts.body, fontSize: 12.5, color: palette.textDim, marginTop: 3 },
-  blurb: { fontFamily: fonts.body, fontSize: 14, lineHeight: 21, color: palette.textDim, marginTop: spacing.sm },
-  footRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  notes: { flex: 1, fontFamily: fonts.body, fontSize: 12, color: palette.textFaint },
-  rating: { fontFamily: fonts.body, fontSize: 13, color: palette.gold, fontWeight: '600' },
-  lovedFor: { fontFamily: fonts.body, fontSize: 12, color: palette.rose, marginTop: spacing.xs },
+  dynamic: { flex: 1, textTransform: 'lowercase' },
+  title: { ...type.cardTitle, marginBottom: 2 },
+  blurb: { marginTop: spacing.sm },
+  notes: { marginTop: spacing.sm },
+  loved: { marginTop: spacing.xs },
 });

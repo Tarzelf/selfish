@@ -1,6 +1,12 @@
+import {
+  Newsreader_400Regular,
+  Newsreader_400Regular_Italic,
+  useFonts,
+} from '@expo-google-fonts/newsreader';
 import { Stack, useGlobalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useEffect } from 'react';
+import { View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { palette } from '@/constants/theme';
@@ -20,6 +26,15 @@ function WhopReturnUnlock() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Newsreader: Newsreader_400Regular,
+    NewsreaderItalic: Newsreader_400Regular_Italic,
+  });
+
+  if (!fontsLoaded) {
+    return <View style={{ flex: 1, backgroundColor: palette.ink }} />;
+  }
+
   return (
     <SafeAreaProvider>
       <AppStateProvider>
@@ -28,7 +43,7 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: palette.bg },
+            contentStyle: { backgroundColor: palette.ink },
           }}
         >
           <Stack.Screen name="index" />

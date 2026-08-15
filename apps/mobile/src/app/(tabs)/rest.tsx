@@ -10,14 +10,12 @@ export default function Rest() {
   const rest = useMemo(() => visibleCatalog.filter((f) => f.shelf === 'rest'), [visibleCatalog]);
 
   return (
-    <Screen>
+    <Screen tone="rest">
       <Display>Rest</Display>
       <Body dim style={{ marginBottom: spacing.md }}>
-        Nothing to follow, nowhere to be. Voices that read you down slowly, and stay until you drift.
+        Nothing to follow, nowhere to be.
       </Body>
-      <Caption style={{ marginBottom: spacing.lg }}>
-        Best with headphones and the lights low. Sessions fade out on their own.
-      </Caption>
+      <Caption style={{ marginBottom: spacing.lg }}>Headphones. Lights low. They stay until you drift.</Caption>
       {rest.map((f) => (
         <SessionCard key={f.id} family={f} />
       ))}

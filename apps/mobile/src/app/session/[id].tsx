@@ -1,11 +1,26 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { CoverArt } from '@/components/cover-art';
 import { MembershipCtas } from '@/components/membership-ctas';
-import { Body, Button, Caption, Card, Chip, Display, HeatBadge, Heading, Screen } from '@/components/ui';
-import { fonts, palette, radius, spacing } from '@/constants/theme';
+import {
+  Body,
+  Button,
+  Caption,
+  Card,
+  Chip,
+  ChipRow,
+  Display,
+  HeatBadge,
+  Heading,
+  HitLabel,
+  PlayControl,
+  Progress,
+  Screen,
+  TextLink,
+} from '@/components/ui';
+import { radius, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getFamily, getSeries, getVoice } from '@/data/catalog';
 import { allowedVariants as variantsForCap, lockedVariants as lockedForCap } from '@/lib/catalog-access';
@@ -33,27 +48,24 @@ function PlayerCore({
 
   return (
     <View style={styles.player}>
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${playback.progress * 100}%` }]} />
-      </View>
+      <Progress value={playback.progress} />
       <View style={styles.clockRow}>
         <Caption>{formatClock(playback.elapsedSec)}</Caption>
         <Caption>{playback.isReal ? formatClock(playback.durationSec) : `${variant.durationMin}:00`}</Caption>
       </View>
       <View style={styles.controls}>
-        <Pressable onPress={() => playback.seekBy(-30)} style={styles.skipButton} accessibilityRole="button" accessibilityLabel="Back 30 seconds">
-          <Text style={styles.skipLabel}>−30</Text>
-        </Pressable>
-        <Pressable onPress={playback.toggle} style={styles.playButton} accessibilityRole="button" accessibilityLabel={playback.playing ? 'Pause' : 'Play'}>
-          <Text style={styles.playGlyph}>{playback.playing ? '❚❚' : '▶'}</Text>
-        </Pressable>
-        <Pressable onPress={() => playback.seekBy(30)} style={styles.skipButton} accessibilityRole="button" accessibilityLabel="Forward 30 seconds">
-          <Text style={styles.skipLabel}>+30</Text>
-        </Pressable>
+        <HitLabel label="−30" onPress={() => playback.seekBy(-30)} accessibilityLabel="Back 30 seconds" />
+        <PlayControl
+          playing={playback.playing}
+          onPress={playback.toggle}
+          size="lg"
+          label={playback.playing ? 'Pause' : 'Play'}
+        />
+        <HitLabel label="+30" onPress={() => playback.seekBy(30)} accessibilityLabel="Forward 30 seconds" />
       </View>
       <Caption style={styles.previewNote}>
         {playback.isReal
-          ? '▶ Engine preview — a real excerpt rendered by the Selfish pipeline. Full sessions stream in production.'
+          ? 'Engine preview — a real excerpt rendered by the Selfish pipeline. Full sessions stream in production.'
           : 'Preview build: playback is simulated for this session. Production streams pre-rendered, watermarked audio.'}
       </Caption>
     </View>
@@ -93,7 +105,7 @@ export default function SessionScreen() {
     return (
       <Screen scroll={false}>
         <Display>{blocked ? 'Outside your limits' : 'Not found'}</Display>
-        <Body dim style={{ marginTop: spacing.sm }}>
+        <Body dim style={styles.lede}>
           {blocked
             ? 'This session is filtered by a hard limit or heat cap you set. Nothing here will play.'
             : 'That session is not in the catalog.'}
@@ -114,15 +126,14 @@ export default function SessionScreen() {
 
   const lockedVariants = lockedForCap(family, prefs.heatCap);
 
-  // Content notes gate: never surprise a listener. One acknowledgment per open.
   if (!acknowledged) {
     return (
       <Screen scroll={false}>
         <View style={styles.gateBody}>
           <View style={styles.gateCover}>
-            <CoverArt family={family} size={120} radius={20} />
+            <CoverArt family={family} size={120} radius={radius.lg} />
           </View>
-          <Caption style={styles.gateKicker}>{family.dynamic.toUpperCase()}</Caption>
+          <Caption style={styles.dynamic}>{family.dynamic}</Caption>
           <Display>{family.title}</Display>
           {series ? (
             <Body dim>
@@ -134,27 +145,25 @@ export default function SessionScreen() {
           </Body>
           <Card>
             <Body>Before you press play</Body>
-            <Caption style={{ marginTop: spacing.xs }}>
-              This session includes: {family.contentNotes.join(', ')}.
-            </Caption>
-            <Caption style={{ marginTop: spacing.xs }}>
+            <Caption style={styles.note}>This session includes: {family.contentNotes.join(', ')}.</Caption>
+            <Caption style={styles.note}>
               Performed by {voice.name} — a studio-crafted synthetic voice. {voice.narratorCredit}
             </Caption>
-            <Caption style={{ marginTop: spacing.xs }}>
-              🎧 Headphones recommended: this session is mixed binaurally and loses its closeness on
+            <Caption style={styles.note}>
+              Headphones recommended: this session is mixed binaurally and loses its closeness on
               speakers.
             </Caption>
           </Card>
           {locked ? (
-            <View style={{ marginTop: spacing.md }}>
+            <View style={styles.lockedCta}>
               <MembershipCtas />
             </View>
           ) : (
             <Button label="I'm in" onPress={() => setAcknowledged(true)} />
           )}
-          <Text style={styles.leave} onPress={() => router.back()}>
-            Not tonight
-          </Text>
+          <View style={styles.leave}>
+            <TextLink label="Not tonight" onPress={() => router.back()} />
+          </View>
         </View>
       </Screen>
     );
@@ -163,15 +172,13 @@ export default function SessionScreen() {
   return (
     <Screen>
       <View style={styles.headerRow}>
-        <Text style={styles.close} onPress={() => router.back()}>
-          Close
-        </Text>
+        <TextLink label="Close" onPress={() => router.back()} />
         <HeatBadge heat={variant.heat} />
       </View>
 
       <View style={styles.hero}>
-        <CoverArt family={family} size={168} radius={24} />
-        <Caption style={styles.gateKicker}>{family.dynamic.toUpperCase()}</Caption>
+        <CoverArt family={family} size={168} radius={radius.lg} />
+        <Caption style={styles.dynamic}>{family.dynamic}</Caption>
         <Display style={styles.heroTitle}>{family.title}</Display>
         <Body dim style={styles.heroMeta}>
           {voice.name} · {variant.durationMin} min · {variant.pace === 'slow' ? 'slow pace' : 'measured pace'}
@@ -189,18 +196,18 @@ export default function SessionScreen() {
 
       <Heading>More like this, but…</Heading>
       <Caption>Same story, different temperature.</Caption>
-      <View style={styles.chipWrap}>
+      <ChipRow>
         {allowedVariants.map((v) => (
           <Chip
             key={v.id}
-            label={`${v.label} · ${v.durationMin} min${VARIANT_AUDIO[v.id] ? ' · ▶' : ''}`}
+            label={`${v.label} · ${v.durationMin} min${VARIANT_AUDIO[v.id] ? ' · preview' : ''}`}
             selected={v.id === variant.id}
             onPress={() => setVariantId(v.id)}
           />
         ))}
-      </View>
+      </ChipRow>
       {lockedVariants.length > 0 && (
-        <Caption style={{ marginTop: spacing.xs }}>
+        <Caption style={styles.note}>
           {lockedVariants.length} {lockedVariants.length === 1 ? 'version goes' : 'versions go'} further
           than your current heat cap. Raise it in You → Heat cap if you&apos;re curious.
         </Caption>
@@ -220,49 +227,39 @@ export default function SessionScreen() {
       <Heading>About this voice</Heading>
       <Card>
         <Body>{voice.name}</Body>
-        <Caption style={{ marginTop: spacing.xs }}>{voice.descriptor}</Caption>
-        <Caption style={{ marginTop: spacing.xs }}>
-          Studio-crafted synthetic voice. {voice.narratorCredit}
-        </Caption>
+        <Caption style={styles.note}>{voice.descriptor}</Caption>
+        <Caption style={styles.note}>Studio-crafted synthetic voice. {voice.narratorCredit}</Caption>
       </Card>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md },
-  close: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, padding: spacing.xs },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: spacing.md,
+  },
   gateBody: { flex: 1, justifyContent: 'center' },
   gateCover: { alignItems: 'flex-start', marginBottom: spacing.sm },
-  gateKicker: { letterSpacing: 1.2, marginTop: spacing.lg },
+  dynamic: { textTransform: 'lowercase', marginTop: spacing.lg },
   gateBlurb: { marginTop: spacing.sm, marginBottom: spacing.lg },
-  leave: { fontFamily: fonts.body, color: palette.textFaint, textAlign: 'center', marginTop: spacing.md, fontSize: 15, padding: spacing.sm },
+  lede: { marginTop: spacing.sm, marginBottom: spacing.lg },
+  note: { marginTop: spacing.xs },
+  lockedCta: { marginTop: spacing.md },
+  leave: { alignItems: 'center' },
   hero: { alignItems: 'center', marginTop: spacing.md },
   heroTitle: { textAlign: 'center', marginTop: spacing.xs },
   heroMeta: { textAlign: 'center' },
-  player: {
-    backgroundColor: palette.surface,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    borderColor: palette.borderSoft,
-    padding: spacing.lg,
-    marginTop: spacing.lg,
-  },
-  progressTrack: { height: 4, backgroundColor: palette.border, borderRadius: 2 },
-  progressFill: { height: 4, backgroundColor: palette.gold, borderRadius: 2 },
+  player: { marginTop: spacing.xl },
   clockRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.sm },
-  controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xl, marginTop: spacing.md },
-  playButton: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: palette.gold,
+  controls: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.xl,
+    marginTop: spacing.md,
   },
-  playGlyph: { fontSize: 24, color: palette.onAccent },
-  skipButton: { padding: spacing.sm },
-  skipLabel: { fontFamily: fonts.body, color: palette.textDim, fontSize: 15, fontWeight: '600' },
   previewNote: { textAlign: 'center', marginTop: spacing.md },
-  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm },
 });

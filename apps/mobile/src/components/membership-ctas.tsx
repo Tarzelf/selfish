@@ -12,19 +12,19 @@ import { WHOP_MANAGE_URL, WHOP_TEST_PROMO } from '@/lib/whop';
 function membershipCopy(prefs: Preferences): { title: string; body: string } {
   if (isWhopMember(prefs)) {
     return {
-      title: 'Selfish+ · billed on Whop',
-      body: 'Full catalog is unlocked on this device. Cancel or update the card on Whop.',
+      title: 'The rest of the catalog is yours',
+      body: 'Billed on Whop. Cancel or update the card there.',
     };
   }
   if (hasCatalogAccess(prefs)) {
     const days = previewDaysLeft(prefs);
     return {
-      title: `Selfish+ preview · ${days} ${days === 1 ? 'day' : 'days'} left`,
-      body: 'Full catalog is unlocked on this device until the preview ends. Subscribe on Whop to keep it.',
+      title: `Full catalog · ${days} ${days === 1 ? 'day' : 'days'} left`,
+      body: 'Unlocked on this device until the preview ends. Subscribe on Whop to keep it.',
     };
   }
   return {
-    title: 'Selfish+',
+    title: 'The rest of the catalog',
     body: `Three Desire and three Rest sessions stay free. Unlock the rest on Whop — $6.99/month (14-day trial) or $49.99/year. To test without paying, apply ${WHOP_TEST_PROMO} at checkout.`,
   };
 }
