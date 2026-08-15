@@ -42,7 +42,7 @@ export function LiquidGlass({
         island && styles.island,
         {
           borderColor: palette.glassBorder,
-          backgroundColor: Platform.OS === 'web' ? 'transparent' : palette.glassTint,
+          backgroundColor: palette.glassTint,
         },
         style,
       ]}

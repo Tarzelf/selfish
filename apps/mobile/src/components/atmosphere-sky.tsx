@@ -1,7 +1,7 @@
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 import { useAtmosphere } from '@/lib/atmosphere';
 import { skyWash } from '@/lib/sky-wash';
@@ -13,12 +13,16 @@ const PHOTOS = {
 
 /**
  * Photograph as the world — but the page is always near-black first.
- * Morning is a bright sunrise; without a floor wash, white ink vanishes.
+ * Web paints the sky in CSS so expo-image / LinearGradient cannot bleach the type.
  */
 export function AtmosphereSky() {
   const { part } = useAtmosphere();
-  const wash = skyWash(part);
 
+  if (Platform.OS === 'web') {
+    return <View pointerEvents="none" className="t-sky" style={styles.root} {...{ 'data-part': part }} />;
+  }
+
+  const wash = skyWash(part);
   return (
     <View pointerEvents="none" style={styles.root}>
       <Image
@@ -38,7 +42,7 @@ export function AtmosphereSky() {
 const FILL = { position: 'absolute' as const, top: 0, right: 0, bottom: 0, left: 0 };
 
 const styles = StyleSheet.create({
-  root: { ...FILL, backgroundColor: '#060608' },
+  root: { ...FILL, backgroundColor: '#060608', zIndex: 0 },
   photo: FILL,
   grain: FILL,
 });

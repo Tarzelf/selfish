@@ -49,7 +49,7 @@ const INK = {
   heatSpicy: '#FF7847',
   success: '#8FBF9F',
   danger: '#E07A86',
-  glassTint: 'rgba(12, 12, 16, 0.55)',
+  glassTint: 'rgba(12, 12, 16, 0.88)',
   glassBorder: 'rgba(245,245,247,0.12)',
   lamp: 'rgba(255, 180, 87, 0.28)',
   status: 'light' as const,

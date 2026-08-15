@@ -9,12 +9,18 @@
   --bg: #060608;
   --amber: #ffb457;
   --ember: #ff7847;
-  --tabs-bar-bg: #0c0c108c;
+  --tabs-bar-bg: #14141ae6;
   --tabs-pill-bg: #ffb457;
   --tabs-text-muted: #f5f5f7a3;
   --tabs-text-active: #1a1006;
   --shimmer-base: #f5f5f766;
   --shimmer-highlight: #f5f5f7;
+  --sky-evening:
+    linear-gradient(180deg, rgba(6, 6, 8, 0.78) 0%, rgba(6, 6, 8, 0.58) 28%, rgba(6, 6, 8, 0.86) 70%, #060608 100%),
+    url('/atmosphere/evening.jpg');
+  --sky-morning:
+    linear-gradient(180deg, rgba(6, 6, 8, 0.90) 0%, rgba(6, 6, 8, 0.82) 34%, rgba(6, 6, 8, 0.94) 72%, #060608 100%),
+    url('/atmosphere/morning.jpg');
 }
 
 html {
@@ -30,23 +36,62 @@ body,
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', system-ui, sans-serif;
   letter-spacing: -0.011em;
-  background: #060608 !important;
+  min-height: 100%;
+  height: 100%;
+  background-color: #060608 !important;
   color: #f5f5f7 !important;
 }
 
-html[data-part='evening'],
-html[data-part='evening'] body,
-html[data-part='morning'],
-html[data-part='morning'] body {
-  background: #060608;
-  color: #f5f5f7;
+html {
+  background-image: var(--sky-evening);
+  background-size: cover;
+  background-position: 50% 28%;
+  background-repeat: no-repeat;
+}
+
+html[data-part='morning'] {
+  background-image: var(--sky-morning);
+  background-position: 50% 55%;
+}
+
+html[data-part='evening'] {
+  background-image: var(--sky-evening);
+  background-position: 50% 28%;
+}
+
+/* Fixed sky layer — does not depend on expo-image or LinearGradient. */
+.t-sky {
+  position: absolute !important;
+  inset: 0;
+  z-index: 0;
+  background-color: #060608;
+  background-image: var(--sky-evening);
+  background-size: cover;
+  background-position: 50% 28%;
+  background-repeat: no-repeat;
+}
+
+.t-sky[data-part='morning'] {
+  background-image: var(--sky-morning);
+  background-position: 50% 55%;
+}
+
+.t-sky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.11;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.55'/></svg>");
+  background-size: 160px 160px;
 }
 
 /* Dark glass — the photo must read through. No milky white plate. */
 .t-liquid-glass {
   position: relative;
   isolation: isolate;
-  background: #0c0c108c !important;
+  background: #0c0c10e8 !important;
   border: 1px solid #f5f5f71f !important;
   backdrop-filter: blur(24px) saturate(1.4);
   box-shadow: 0 12px 40px #00000059;
@@ -66,8 +111,7 @@ html[data-part='morning'] body {
 }
 
 .t-tab-pill {
-  background: #ff965024;
-  box-shadow: inset 0 0.5px 0 rgba(255, 180, 87, 0.35);
+  background: #ffb457 !important;
 }
 
 .t-glass-card {
@@ -77,6 +121,24 @@ html[data-part='morning'] body {
 .t-btn-primary {
   background: linear-gradient(180deg, #ffb457, #ff7847) !important;
   color: #1a1006 !important;
+}
+
+/* Recycle tabs: the skill snippet is inline-flex and collapses on web. */
+div.t-tabs,
+.t-tabs {
+  display: flex !important;
+  width: 100% !important;
+  align-self: stretch;
+  box-sizing: border-box;
+  background: #14141ae6 !important;
+}
+
+.t-tabs .t-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .t-grain {

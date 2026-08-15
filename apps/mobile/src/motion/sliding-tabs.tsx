@@ -134,6 +134,7 @@ export function SlidingTabs({
 const styles = StyleSheet.create({
   bar: {
     alignSelf: 'stretch',
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

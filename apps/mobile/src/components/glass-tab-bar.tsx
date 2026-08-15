@@ -23,7 +23,7 @@ function Dock({
       <LiquidGlass island style={styles.island}>
         <View style={styles.row}>
           {items.map((item) => {
-            const color = item.focused ? palette.text : palette.textFaint;
+            const color = item.focused ? palette.onAccent : palette.textDim;
             return (
               <Pressable
                 key={item.name}
@@ -33,9 +33,9 @@ function Dock({
                 onPress={item.onPress}
                 style={({ pressed }) => [styles.item, pressed && { opacity: 0.7 }]}
               >
-                {item.focused ? <View className="t-tab-pill" style={styles.pill} /> : null}
-                <TabIcon name={item.name} color={item.focused ? palette.gold : color} focused={item.focused} part={part} />
-                <Text style={[styles.label, { color: item.focused ? palette.text : palette.textFaint }]}>{item.label}</Text>
+                {item.focused ? <View className="t-tab-pill" style={[styles.pill, { backgroundColor: palette.gold }]} /> : null}
+                <TabIcon name={item.name} color={color} focused={item.focused} part={part} />
+                <Text style={[styles.label, { color }]}>{item.label}</Text>
               </Pressable>
             );
           })}
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     bottom: 3,
     left: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(255, 150, 80, 0.14)',
+    backgroundColor: '#FFB457',
   },
   label: {
     fontFamily: fonts.body,

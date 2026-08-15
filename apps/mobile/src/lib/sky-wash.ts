@@ -8,14 +8,14 @@ export function skyWash(part: AtmospherePart): {
 } {
   if (part === 'morning') {
     return {
-      photoOpacity: 0.34,
-      colors: ['rgba(6,6,8,0.68)', 'rgba(6,6,8,0.52)', 'rgba(6,6,8,0.76)', '#060608'],
-      locations: [0, 0.3, 0.66, 1],
+      photoOpacity: 0.18,
+      colors: ['rgba(6,6,8,0.88)', 'rgba(6,6,8,0.80)', 'rgba(6,6,8,0.90)', '#060608'],
+      locations: [0, 0.32, 0.68, 1],
     };
   }
   return {
-    photoOpacity: 0.58,
-    colors: ['rgba(6,6,8,0.52)', 'rgba(6,6,8,0.3)', 'rgba(6,6,8,0.64)', '#060608'],
+    photoOpacity: 0.42,
+    colors: ['rgba(6,6,8,0.72)', 'rgba(6,6,8,0.48)', 'rgba(6,6,8,0.78)', '#060608'],
     locations: [0, 0.28, 0.68, 1],
   };
 }
