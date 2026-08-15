@@ -1,3 +1,4 @@
+import { useIsFocused } from 'expo-router';
 import React from 'react';
 import {
   Pressable,
@@ -31,6 +32,10 @@ export function Screen({
   padded?: boolean;
 }) {
   const insets = useSafeAreaInsets();
+  const focused = useIsFocused();
+  if (!focused) {
+    return <View style={styles.screen} />;
+  }
   const inner = (
     <View style={[styles.shell, padded && { paddingHorizontal: spacing.md }]}>{children}</View>
   );

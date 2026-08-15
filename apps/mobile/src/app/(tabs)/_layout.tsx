@@ -7,9 +7,13 @@ export default function TabsLayout() {
   return (
     <Tabs
       tabBar={(props) => <GlassTabBar {...props} />}
+      detachInactiveScreens
       screenOptions={{
         headerShown: false,
-        sceneStyle: { backgroundColor: 'transparent' },
+        animation: 'none',
+        lazy: true,
+        freezeOnBlur: true,
+        sceneStyle: { backgroundColor: 'transparent', flex: 1, overflow: 'hidden' },
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Today' }} />

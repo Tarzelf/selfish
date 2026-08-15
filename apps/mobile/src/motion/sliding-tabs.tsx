@@ -120,7 +120,12 @@ export function SlidingTabs({
 }
 
 const styles = StyleSheet.create({
-  bar: { alignSelf: 'stretch', justifyContent: 'space-between' },
+  bar: {
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   webLabel: { fontFamily: fonts.body, fontSize: 13, fontWeight: '600', color: 'inherit' as unknown as string },
   nativeBar: {
     flexDirection: 'row',

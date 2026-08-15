@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { View } from 'react-native';
+import { enableScreens } from 'react-native-screens';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AtmosphereSky } from '@/components/atmosphere-sky';
@@ -12,16 +13,21 @@ import '@/styles/atmosphere.css';
 import '@/styles/transitions-root.css';
 import '@/styles/transitions.css';
 
+// Web defaults this off. Without it, every tab/stack scene is position:absolute
+// and stays painted — Today, Browse, and Rest ghost through each other.
+enableScreens(true);
+
 function ThemedStack() {
   const { palette } = useAtmosphere();
   return (
-    <View style={{ flex: 1, backgroundColor: '#060608' }}>
+    <View style={{ flex: 1, backgroundColor: '#060608', overflow: 'hidden' }}>
       <AtmosphereSky />
       <StatusBar style={palette.status} />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' },
+          animation: 'none',
+          contentStyle: { backgroundColor: 'transparent', flex: 1 },
         }}
       >
         <Stack.Screen name="index" />
