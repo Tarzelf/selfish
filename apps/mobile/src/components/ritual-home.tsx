@@ -9,6 +9,12 @@ import { closeForVoice, getFamily, getVoice, VOICES } from '@/data/catalog';
 import { recycleVariant } from '@/data/close-catalog';
 import { useAppState } from '@/lib/store';
 import type { RecycleKey, SessionFamily } from '@/lib/types';
+import { AvatarGroup } from '@/motion/avatar-group';
+import { LearnMore } from '@/motion/learn-more';
+import { ShimmerText } from '@/motion/shimmer-text';
+import { SlidingTabs } from '@/motion/sliding-tabs';
+import { TextsReveal } from '@/motion/texts-reveal';
+import { TextSwap } from '@/motion/text-swap';
 
 function alreadyHere(gender: string | undefined): string {
   if (gender === 'F') return "She's already here.";
@@ -22,6 +28,13 @@ function openLoop(family: SessionFamily, variantId: string, play: boolean) {
     params: { id: family.id, variant: variantId, ...(play ? { play: '1' } : {}) },
   };
 }
+
+const RECYCLES: { id: RecycleKey; label: string }[] = [
+  { id: 'again', label: 'Again' },
+  { id: 'slower', label: 'Slower' },
+  { id: 'closer', label: 'Closer' },
+  { id: 'after', label: 'After' },
+];
 
 export function RitualHome() {
   const router = useRouter();
@@ -44,7 +57,9 @@ export function RitualHome() {
     return (
       <View style={styles.empty}>
         <Text style={styles.wordmark}>SELFISH</Text>
-        <Text style={styles.line}>Raise heat to Close in You — then this room opens.</Text>
+        <TextsReveal>
+          <Text style={styles.line}>Raise heat to Close in You — then this room opens.</Text>
+        </TextsReveal>
       </View>
     );
   }
@@ -59,6 +74,12 @@ export function RitualHome() {
     cued.variants[0];
   const minutes = defaultVariant.durationMin;
   const firstName = prefs.displayName.split(' ')[0];
+  const cuedRecycle =
+    (defaultVariant.label.toLowerCase() as RecycleKey) === 'slower' ||
+    defaultVariant.label.toLowerCase() === 'closer' ||
+    defaultVariant.label.toLowerCase() === 'after'
+      ? (defaultVariant.label.toLowerCase() as RecycleKey)
+      : 'again';
 
   const go = (key: RecycleKey) => {
     if (key === 'again') {
@@ -72,17 +93,19 @@ export function RitualHome() {
   return (
     <View style={styles.wrap}>
       <Text style={styles.wordmark}>SELFISH</Text>
-      <Text style={styles.line}>{alreadyHere(voice?.gender)}</Text>
-      {firstName ? <Text style={styles.aside}>{firstName}.</Text> : null}
+      <TextsReveal>
+        <Text style={styles.line}>{alreadyHere(voice?.gender)}</Text>
+        {firstName ? <Text style={styles.aside}>{firstName}.</Text> : <Text style={styles.aside}> </Text>}
+      </TextsReveal>
 
       <LinearGradient colors={['#2B1631', '#1A121F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.stage}>
         <View style={styles.orb} />
-        <Text style={styles.kicker}>HEADPHONES ON</Text>
-        <Text style={styles.title}>{cued.title}</Text>
-        <Text style={styles.meta}>
-          {voice?.name} · {minutes} min
-          {VARIANT_AUDIO[defaultVariant.id] ? '  ·  ▶' : ''}
-        </Text>
+        <ShimmerText text="HEADPHONES ON" style={styles.kicker} />
+        <TextSwap text={cued.title} style={styles.title} />
+        <TextSwap
+          text={`${voice?.name ?? ''} · ${minutes} min${VARIANT_AUDIO[defaultVariant.id] ? '  ·  ▶' : ''}`}
+          style={styles.meta}
+        />
 
         <Pressable
           accessibilityRole="button"
@@ -95,21 +118,11 @@ export function RitualHome() {
       </LinearGradient>
 
       <View style={styles.recycles}>
-        {(['again', 'slower', 'closer', 'after'] as RecycleKey[]).map((key) => (
-          <Pressable
-            key={key}
-            accessibilityRole="button"
-            accessibilityLabel={key}
-            onPress={() => go(key)}
-            style={({ pressed }) => [styles.recycle, pressed && { opacity: 0.7 }]}
-          >
-            <Text style={styles.recycleLabel}>{key === 'again' ? 'Again' : key === 'slower' ? 'Slower' : key === 'closer' ? 'Closer' : 'After'}</Text>
-          </Pressable>
-        ))}
+        <SlidingTabs tabs={RECYCLES} selected={cuedRecycle} onSelect={(id) => go(id as RecycleKey)} />
       </View>
 
       <Text style={styles.mouthsKicker}>other mouths</Text>
-      <View style={styles.mouths}>
+      <AvatarGroup style={styles.mouths}>
         {VOICES.map((v) => {
           const hasLoop = closeForVoice(v.id, closeLoops);
           if (!hasLoop) return null;
@@ -127,11 +140,9 @@ export function RitualHome() {
             </Pressable>
           );
         })}
-      </View>
+      </AvatarGroup>
 
-      <Text style={styles.stories} onPress={() => router.push('/browse')}>
-        Stories, if you have time →
-      </Text>
+      <LearnMore label="Stories, if you have time" onPress={() => router.push('/browse')} />
     </View>
   );
 }
@@ -194,12 +205,14 @@ const styles = StyleSheet.create({
     lineHeight: 50,
     color: palette.text,
     marginTop: spacing.sm,
+    textAlign: 'center',
   },
   meta: {
     fontFamily: fonts.body,
     fontSize: 14,
     color: 'rgba(243,237,247,0.72)',
     marginTop: spacing.xs,
+    textAlign: 'center',
   },
   play: {
     width: 88,
@@ -211,22 +224,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.lg,
   },
   playGlyph: { fontSize: 28, color: palette.onAccent, marginLeft: 4 },
-  recycles: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: spacing.lg,
-    gap: spacing.sm,
-  },
-  recycle: {
-    flex: 1,
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: palette.border,
-    backgroundColor: palette.surface,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  recycleLabel: { fontFamily: fonts.body, fontSize: 13, fontWeight: '600', color: palette.text },
+  recycles: { marginTop: spacing.lg },
   mouthsKicker: {
     fontFamily: fonts.body,
     fontSize: 11,
@@ -236,12 +234,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
     textTransform: 'lowercase',
   },
-  mouths: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
+  mouths: { marginTop: spacing.sm, gap: spacing.sm },
   mouth: {
     width: 44,
     height: 44,
@@ -254,12 +247,4 @@ const styles = StyleSheet.create({
   },
   mouthOn: { borderColor: palette.gold, backgroundColor: palette.goldSoft },
   mouthGlyph: { fontFamily: fonts.display, fontSize: 18, color: palette.textDim },
-  stories: {
-    fontFamily: fonts.body,
-    fontSize: 14,
-    color: palette.textFaint,
-    textAlign: 'center',
-    marginTop: spacing.xl,
-    padding: spacing.sm,
-  },
 });

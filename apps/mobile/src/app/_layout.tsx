@@ -6,6 +6,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { palette } from '@/constants/theme';
 import { AppStateProvider } from '@/lib/store';
 
+import '@/styles/transitions-root.css';
+import '@/styles/transitions.css';
+
 export default function RootLayout() {
   return (
     <SafeAreaProvider>

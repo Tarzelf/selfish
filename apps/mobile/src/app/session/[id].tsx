@@ -11,6 +11,9 @@ import { recycleVariant } from '@/data/close-catalog';
 import { formatClock, usePlayback } from '@/lib/player';
 import { useAppState } from '@/lib/store';
 import type { RecycleKey, SessionVariant } from '@/lib/types';
+import { IconSwap } from '@/motion/icon-swap';
+import { SlidingTabs } from '@/motion/sliding-tabs';
+import { TextSwap } from '@/motion/text-swap';
 
 function PlayerCore({
   variant,
@@ -65,7 +68,13 @@ function PlayerCore({
           accessibilityRole="button"
           accessibilityLabel={finished ? 'Again' : playback.playing ? 'Pause' : 'Play'}
         >
-          <Text style={styles.playGlyph}>{finished ? '↺' : playback.playing ? '❚❚' : '▶'}</Text>
+          <IconSwap
+            state={playback.playing ? 'b' : 'a'}
+            a={finished ? '↺' : '▶'}
+            b="❚❚"
+            style={{ width: 28, height: 28 }}
+            glyphStyle={styles.playGlyph}
+          />
         </Pressable>
         <Pressable onPress={() => playback.seekBy(15)} style={styles.skipButton} accessibilityRole="button" accessibilityLabel="Forward 15 seconds">
           <Text style={styles.skipLabel}>+15</Text>
@@ -221,12 +230,11 @@ export default function SessionScreen() {
       <View style={styles.hero}>
         <CoverArt family={family} size={isClose ? 120 : 168} radius={24} />
         <Caption style={styles.gateKicker}>{(isClose ? 'Close loop' : family.dynamic).toUpperCase()}</Caption>
-        <Display style={styles.heroTitle}>{family.title}</Display>
-        <Body dim style={styles.heroMeta}>
-          {voice.name} · {variant.durationMin} min
-          {isClose ? ` · ${variant.label}` : ` · ${variant.pace === 'slow' ? 'slow pace' : 'measured pace'}`}
-          {variant.extendedBuildup ? ' · extended buildup' : ''}
-        </Body>
+        <TextSwap text={family.title} style={styles.heroTitleSwap} />
+        <TextSwap
+          text={`${voice.name} · ${variant.durationMin} min${isClose ? ` · ${variant.label}` : ` · ${variant.pace === 'slow' ? 'slow pace' : 'measured pace'}`}${variant.extendedBuildup ? ' · extended buildup' : ''}`}
+          style={styles.heroMetaSwap}
+        />
       </View>
 
       <PlayerCore
@@ -244,19 +252,24 @@ export default function SessionScreen() {
           <Heading>Recycle</Heading>
           <Caption>Same mouth. Four buttons. This is the product.</Caption>
           <View style={styles.chipWrap}>
-            {(['again', 'slower', 'closer', 'after'] as RecycleKey[]).map((key) => {
-              const target = key === 'again' ? variant : recycleVariant(family, key);
-              const selected = key !== 'again' && target?.id === variant.id;
-              const locked = target ? !heatAllowed(target.heat) : true;
-              return (
-                <Chip
-                  key={key}
-                  label={key === 'again' ? 'Again' : key === 'slower' ? 'Slower' : key === 'closer' ? 'Closer' : 'After'}
-                  selected={selected}
-                  onPress={() => !locked && pickRecycle(key)}
-                />
-              );
-            })}
+            <SlidingTabs
+              tabs={[
+                { id: 'again', label: 'Again' },
+                { id: 'slower', label: 'Slower' },
+                { id: 'closer', label: 'Closer' },
+                { id: 'after', label: 'After' },
+              ]}
+              selected={
+                variant.label === 'Slower'
+                  ? 'slower'
+                  : variant.label === 'Closer'
+                    ? 'closer'
+                    : variant.label === 'After'
+                      ? 'after'
+                      : 'again'
+              }
+              onSelect={(id) => pickRecycle(id as RecycleKey)}
+            />
           </View>
         </>
       ) : (
@@ -315,7 +328,16 @@ const styles = StyleSheet.create({
   leave: { fontFamily: fonts.body, color: palette.textFaint, textAlign: 'center', marginTop: spacing.md, fontSize: 15, padding: spacing.sm },
   hero: { alignItems: 'center', marginTop: spacing.md },
   heroTitle: { textAlign: 'center', marginTop: spacing.xs },
+  heroTitleSwap: {
+    fontFamily: fonts.display,
+    fontSize: 32,
+    lineHeight: 40,
+    color: palette.text,
+    textAlign: 'center',
+    marginTop: spacing.xs,
+  },
   heroMeta: { textAlign: 'center' },
+  heroMetaSwap: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: palette.textDim, textAlign: 'center' },
   player: {
     backgroundColor: palette.surface,
     borderRadius: radius.lg,

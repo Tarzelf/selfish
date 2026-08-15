@@ -96,3 +96,4 @@ Until (2) moves, we are still generic.
 - Finished loops stay on the rail. Aftercare is one tap, same mouth.
 - Onboarding heat is honest: Soft / Warm / Close, not Comfort / Slow burn / Spicy.
 - Real Close-register take: `Stay` (Grok/castor) plus `After` from the same mouth. Grok accepted the dirty-talk script.
+- Motion from [transitions.dev](https://transitions.dev/skill.html): texts reveal on enter, text swap when the mouth changes, shimmer on “headphones on,” sliding recycle tabs, avatar-group lift on other mouths, play/pause icon swap, age-gate shake. Tokens live in `apps/mobile/src/styles/transitions-root.css`.

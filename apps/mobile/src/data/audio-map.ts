@@ -9,9 +9,10 @@
 
 /** variantId → bundled audio module */
 export const VARIANT_AUDIO: Record<string, number> = {
-  // Close loop "Stay" — hand-authored dirty-talk register, Grok/castor, speed 0.92
+  // Close loop "Stay" — four recycles, same mouth (Grok/castor)
   'f-stay-1': require('../../assets/audio/stay-close-preview.mp3'),
-  // Close loop "Stay / After" — same mouth, aftercare, Grok/castor, speed 0.88
+  'f-stay-2': require('../../assets/audio/stay-slower-preview.mp3'),
+  'f-stay-3': require('../../assets/audio/stay-closer-preview.mp3'),
   'f-stay-4': require('../../assets/audio/stay-after-preview.mp3'),
   // "Back to Yours" Original — Warm story render (Grok script → safety → castor voice → QA-passed)
   'f-back-to-yours-1': require('../../assets/audio/back-to-yours-preview.mp3'),

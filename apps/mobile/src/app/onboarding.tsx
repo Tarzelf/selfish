@@ -10,6 +10,9 @@ import { fonts, palette, radius, spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { useAppState } from '@/lib/store';
 import { type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
+import { ErrorField } from '@/motion/error-field';
+import { IconSwap } from '@/motion/icon-swap';
+import { TextsReveal } from '@/motion/texts-reveal';
 
 type Step = 'welcome' | 'age' | 'honesty' | 'moods' | 'heat' | 'limits' | 'done';
 
@@ -32,11 +35,13 @@ function Landing({ onBegin }: { onBegin: () => void }) {
   return (
     <Screen>
       <Text style={styles.landingWordmark}>SELFISH</Text>
-      <Text style={styles.landingHero}>Time that&apos;s{'\n'}just for you.</Text>
-      <Body dim style={styles.landingLede}>
-        Intimate audio fiction and unhurried sleep stories — written with care, whispered up close,
-        and tuned to exactly the mood you&apos;re in tonight.
-      </Body>
+      <TextsReveal>
+        <Text style={styles.landingHero}>Time that&apos;s{'\n'}just for you.</Text>
+        <Body dim style={styles.landingLede}>
+          Intimate audio fiction and unhurried sleep stories — written with care, whispered up close,
+          and tuned to exactly the mood you&apos;re in tonight.
+        </Body>
+      </TextsReveal>
 
       <LinearGradient colors={['#2B1631', '#7E2F4E']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.listenCard}>
         <View style={styles.listenOrb} />
@@ -49,7 +54,13 @@ function Landing({ onBegin }: { onBegin: () => void }) {
             accessibilityLabel={status.playing ? 'Pause sample' : 'Play sample'}
             style={({ pressed }) => [styles.listenPlay, pressed && { opacity: 0.8 }]}
           >
-            <Text style={styles.listenPlayGlyph}>{status.playing ? '❚❚' : '▶'}</Text>
+            <IconSwap
+              state={status.playing ? 'b' : 'a'}
+              a="▶"
+              b="❚❚"
+              style={{ width: 18, height: 18 }}
+              glyphStyle={styles.listenPlayGlyph}
+            />
           </Pressable>
           <Text style={styles.listenMeta}>Jasper · a 30-second whisper{'\n'}Rendered by our engine — no human recorded this.</Text>
         </View>
@@ -101,6 +112,7 @@ export default function Onboarding() {
   const [heatCap, setHeatCap] = useState<HeatLevel>('comfort');
   const [limits, setLimits] = useState<string[]>([]);
   const [name, setName] = useState('');
+  const [ageError, setAgeError] = useState(false);
 
   const stepIndex = STEPS.indexOf(step);
   const next = () => setStep(STEPS[Math.min(stepIndex + 1, STEPS.length - 1)]);
@@ -145,31 +157,53 @@ export default function Onboarding() {
 
         {step === 'age' && (
           <View style={styles.stepBody}>
-            <Display>First things first</Display>
-            <Body dim style={styles.lede}>
-              Selfish is for adults. Enter your birth year to continue.
-            </Body>
-            <TextInput
-              style={styles.input}
-              value={birthYear}
-              onChangeText={setBirthYear}
-              placeholder="Year of birth (e.g. 1994)"
-              placeholderTextColor={palette.textFaint}
-              keyboardType="number-pad"
-              maxLength={4}
-              accessibilityLabel="Year of birth"
-            />
+            <TextsReveal key="age">
+              <Display>First things first</Display>
+              <Body dim style={styles.lede}>
+                Selfish is for adults. Enter your birth year to continue.
+              </Body>
+            </TextsReveal>
+            <ErrorField
+              error={ageError}
+              message="Enter a birth year that makes you 18 or older."
+              style={{ marginTop: spacing.md }}
+            >
+              <TextInput
+                style={[styles.input, styles.inputFlush]}
+                value={birthYear}
+                onChangeText={(v) => {
+                  setBirthYear(v);
+                  setAgeError(false);
+                }}
+                placeholder="Year of birth (e.g. 1994)"
+                placeholderTextColor={palette.textFaint}
+                keyboardType="number-pad"
+                maxLength={4}
+                accessibilityLabel="Year of birth"
+              />
+            </ErrorField>
             <Caption style={styles.finePrint}>
               Your birth year stays on this device in the preview build. On iOS we additionally
               honor the Declared Age Range provided by your Apple Account settings.
             </Caption>
             <View style={styles.spacer} />
-            <Button label="I'm 18 or older — continue" onPress={next} disabled={!isAdult} />
+            <Button
+              label="I'm 18 or older — continue"
+              onPress={() => {
+                if (!isAdult) {
+                  setAgeError(false);
+                  requestAnimationFrame(() => setAgeError(true));
+                  return;
+                }
+                next();
+              }}
+            />
           </View>
         )}
 
         {step === 'honesty' && (
           <View style={styles.stepBody}>
+            <TextsReveal key="honesty">
             <Display>The honest part</Display>
             <Body dim style={styles.lede}>
               Every voice in Selfish is a studio-crafted synthetic performance, built from
@@ -181,6 +215,7 @@ export default function Onboarding() {
               Producing sessions uses third-party AI services. Your listening choices never leave
               your account, and none of your personal data is used to train anything.
             </Body>
+            </TextsReveal>
             <View style={styles.spacer} />
             <Button label="Sounds fair — I agree" onPress={next} />
             <Caption style={styles.finePrint}>
@@ -191,10 +226,12 @@ export default function Onboarding() {
 
         {step === 'moods' && (
           <View style={styles.stepBody}>
+            <TextsReveal key="moods">
             <Display>How do you want to feel?</Display>
             <Body dim style={styles.lede}>
               Pick any that ring true. This tunes your Tonight page — change it whenever you like.
             </Body>
+            </TextsReveal>
             <View style={styles.chipWrap}>
               {MOODS.map((m) => (
                 <Chip key={m.id} label={m.label} hint={m.hint} selected={moods.includes(m.id)} onPress={() => toggleMood(m.id)} />
@@ -207,12 +244,14 @@ export default function Onboarding() {
 
         {step === 'heat' && (
           <View style={styles.stepBody}>
+            <TextsReveal key="heat">
             <Display>What do you want first?</Display>
             <Body dim style={styles.lede}>
               This is the door. Soft is the cover story — held, sleepy, supported. Close is why
               you will open this twice in one day. Nothing above your pick is ever shown. Change
               it anytime in You.
             </Body>
+            </TextsReveal>
             <HeatChoice value={heatCap} onChange={setHeatCap} />
             <View style={styles.spacer} />
             <Button label="Continue" onPress={next} />
@@ -221,11 +260,13 @@ export default function Onboarding() {
 
         {step === 'limits' && (
           <View style={styles.stepBody}>
+            <TextsReveal key="limits">
             <Display>Anything off the table?</Display>
             <Body dim style={styles.lede}>
               Select themes you never want to encounter. They will be filtered out everywhere,
               permanently, no questions asked.
             </Body>
+            </TextsReveal>
             <View style={styles.chipWrap}>
               {LIMIT_TAGS.map((t) => (
                 <Chip key={t} label={t} selected={limits.includes(t)} onPress={() => toggleLimit(t)} />
@@ -238,11 +279,13 @@ export default function Onboarding() {
 
         {step === 'done' && (
           <View style={styles.stepBody}>
+            <TextsReveal key="done">
             <Display>One last thing</Display>
             <Body dim style={styles.lede}>
               What should we call you? Optional — some sessions can greet you by name if you want
               them to (off by default).
             </Body>
+            </TextsReveal>
             <TextInput
               style={styles.input}
               value={name}
@@ -271,6 +314,7 @@ const styles = StyleSheet.create({
   stepBody: { flex: 1, justifyContent: 'center' },
   lede: { marginBottom: spacing.md, color: palette.textDim },
   chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.md },
+  inputFlush: { marginTop: 0, borderColor: 'transparent' },
   input: {
     backgroundColor: palette.surface,
     borderWidth: 1,
