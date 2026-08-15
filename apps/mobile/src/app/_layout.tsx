@@ -1,15 +1,29 @@
-import { Stack } from 'expo-router';
+import { Stack, useGlobalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { palette } from '@/constants/theme';
-import { AppStateProvider } from '@/lib/store';
+import { AppStateProvider, useAppState } from '@/lib/store';
+import { isWhopReturnSuccess } from '@/lib/whop';
+
+function WhopReturnUnlock() {
+  const params = useGlobalSearchParams();
+  const { ready, prefs, activateWhopMembership } = useAppState();
+
+  useEffect(() => {
+    if (!ready || prefs.whopEntitledAt) return;
+    if (isWhopReturnSuccess(params)) activateWhopMembership();
+  }, [ready, prefs.whopEntitledAt, params, activateWhopMembership]);
+
+  return null;
+}
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AppStateProvider>
+        <WhopReturnUnlock />
         <StatusBar style="light" />
         <Stack
           screenOptions={{
