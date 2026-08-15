@@ -3,11 +3,12 @@ import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { CoverArt } from '@/components/cover-art';
+import { MembershipCtas } from '@/components/membership-ctas';
 import { Body, Button, Caption, Card, Chip, Display, HeatBadge, Heading, Screen } from '@/components/ui';
 import { fonts, palette, radius, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getFamily, getSeries, getVoice } from '@/data/catalog';
-import { allowedVariants as variantsForCap, isFreeFamily, lockedVariants as lockedForCap } from '@/lib/catalog-access';
+import { allowedVariants as variantsForCap, lockedVariants as lockedForCap } from '@/lib/catalog-access';
 import { formatClock, usePlayback } from '@/lib/player';
 import { useAppState } from '@/lib/store';
 import type { SessionVariant } from '@/lib/types';
@@ -62,7 +63,7 @@ function PlayerCore({
 export default function SessionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { prefs, familyVisible, canPlayFamily, startPreview, recordProgress } = useAppState();
+  const { prefs, familyVisible, canPlayFamily, recordProgress } = useAppState();
 
   const family = getFamily(id);
   const voice = family ? getVoice(family.voiceId) : undefined;
@@ -145,20 +146,9 @@ export default function SessionScreen() {
             </Caption>
           </Card>
           {locked ? (
-            <>
-              <Caption style={{ marginTop: spacing.md }}>
-                {isFreeFamily(family)
-                  ? 'This session is in your free tier.'
-                  : 'This session is part of Selfish+. Start the 14-day preview to listen — no card in this build.'}
-              </Caption>
-              <Button
-                label="Start 14-day preview"
-                onPress={() => {
-                  startPreview();
-                  setAcknowledged(true);
-                }}
-              />
-            </>
+            <View style={{ marginTop: spacing.md }}>
+              <MembershipCtas />
+            </View>
           ) : (
             <Button label="I'm in" onPress={() => setAcknowledged(true)} />
           )}
