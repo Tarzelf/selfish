@@ -156,10 +156,10 @@
   /* Tabs sliding */
   --tabs-dur: 250ms;
   --tabs-ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --tabs-text-muted: rgba(15, 15, 15, 0.8);
-  --tabs-text-active: #0f0f0f;
-  --tabs-bar-bg: #f1f1f1;
-  --tabs-pill-bg: #ffffff;
+  --tabs-text-muted: rgba(245, 245, 247, 0.64);
+  --tabs-text-active: #1a1006;
+  --tabs-bar-bg: #14141a;
+  --tabs-pill-bg: #ffb457;
   /* Tooltip open/close */
   --tt-in-dur: 150ms;
   --tt-out-dur: 50ms;

@@ -19,7 +19,12 @@ export function AtmosphereSky() {
   const { part } = useAtmosphere();
 
   if (Platform.OS === 'web') {
-    return <View pointerEvents="none" className="t-sky" style={styles.root} {...{ 'data-part': part }} />;
+    const wash = skyWash(part);
+    return (
+      <View pointerEvents="none" className="t-sky" style={styles.root} {...{ 'data-part': part }}>
+        <LinearGradient colors={[...wash.colors]} locations={[...wash.locations]} style={StyleSheet.absoluteFill} />
+      </View>
+    );
   }
 
   const wash = skyWash(part);

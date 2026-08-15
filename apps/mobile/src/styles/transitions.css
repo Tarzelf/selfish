@@ -97,7 +97,8 @@
 /* ── 16 tabs sliding ─────────────────────────────────────────────── */
 .t-tabs {
   position: relative;
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
   gap: 3px;
   padding: 3px;

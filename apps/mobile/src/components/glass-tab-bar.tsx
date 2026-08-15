@@ -23,7 +23,7 @@ function Dock({
       <LiquidGlass island style={styles.island}>
         <View style={styles.row}>
           {items.map((item) => {
-            const color = item.focused ? palette.onAccent : palette.textDim;
+            const color = item.focused ? palette.onAccent : palette.text;
             return (
               <Pressable
                 key={item.name}

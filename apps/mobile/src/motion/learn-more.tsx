@@ -9,7 +9,7 @@ export function LearnMore({ label, onPress }: { label: string; onPress: () => vo
   if (Platform.OS === 'web') {
     return (
       <Pressable accessibilityRole="button" onPress={onPress} className="t-learn" style={styles.row}>
-        <Text style={[styles.label, { color: palette.textDim }]}>{label}</Text>
+        <Text style={[styles.label, { color: palette.text }]}>{label}</Text>
         <View className="t-learn-chevron">
           {React.createElement(
             'svg',
@@ -34,7 +34,7 @@ export function LearnMore({ label, onPress }: { label: string; onPress: () => vo
 
   return (
     <Pressable accessibilityRole="button" onPress={onPress} style={styles.row}>
-      <Text style={[styles.label, { color: palette.textDim }]}>{label} →</Text>
+      <Text style={[styles.label, { color: palette.text }]}>{label} →</Text>
     </Pressable>
   );
 }

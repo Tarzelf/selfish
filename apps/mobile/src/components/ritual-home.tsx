@@ -94,10 +94,12 @@ export function RitualHome() {
 
   return (
     <View style={styles.wrap}>
-      <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
+      <View style={styles.wordmarkChip}>
+        <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
+      </View>
       <TextsReveal>
         <Text style={[styles.line, { color: palette.text }]}>{alreadyHere(voice?.gender)}</Text>
-        {firstName ? <Text style={[styles.aside, { color: palette.textDim }]}>{firstName}.</Text> : <Text style={[styles.aside, { color: palette.textDim }]}> </Text>}
+        {firstName ? <Text style={[styles.aside, { color: palette.text }]}>{firstName}.</Text> : <Text style={[styles.aside, { color: palette.text }]}> </Text>}
       </TextsReveal>
 
       <LinearGradient colors={['#2B1631', '#1A121F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.stage}>
@@ -157,14 +159,20 @@ export function RitualHome() {
 const styles = StyleSheet.create({
   wrap: { paddingTop: spacing.lg },
   empty: { paddingTop: spacing.xxl },
+  wordmarkChip: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#121214',
+    borderColor: 'rgba(245,245,247,0.14)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
   wordmark: {
     fontFamily: fonts.body,
     fontSize: 15,
     letterSpacing: -0.2,
     fontWeight: '700',
-    textShadowColor: 'rgba(0,0,0,0.7)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 16,
   },
   line: {
     fontFamily: fonts.display,

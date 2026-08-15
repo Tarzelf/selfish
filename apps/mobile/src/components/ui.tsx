@@ -1,6 +1,7 @@
 import { useIsFocused } from 'expo-router';
 import React from 'react';
 import {
+  Platform,
   Pressable,
   type PressableStateCallbackType,
   ScrollView,
@@ -33,7 +34,9 @@ export function Screen({
 }) {
   const insets = useSafeAreaInsets();
   const focused = useIsFocused();
-  if (!focused) {
+  // Slot already unmounts inactive web rooms. useIsFocused can be false
+  // without a tab navigator and would blank the only painted screen.
+  if (Platform.OS !== 'web' && !focused) {
     return <View style={styles.screen} />;
   }
   const inner = (

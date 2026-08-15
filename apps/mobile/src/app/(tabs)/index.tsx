@@ -87,7 +87,9 @@ function EditorialTonight() {
 
   return (
     <Screen>
-      <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
+      <View style={styles.wordmarkChip}>
+        <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
+      </View>
       <Text style={[styles.greeting, { color: palette.text }]}>
         {copy.hello}
         {firstName ? `,\n${firstName}` : ''}.
@@ -155,12 +157,21 @@ function EditorialTonight() {
 }
 
 const styles = StyleSheet.create({
+  wordmarkChip: {
+    alignSelf: 'flex-start',
+    marginTop: spacing.lg,
+    backgroundColor: '#121214',
+    borderColor: 'rgba(245,245,247,0.14)',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
   wordmark: {
     fontFamily: fonts.body,
     fontSize: 13,
     letterSpacing: -0.2,
     fontWeight: '700',
-    marginTop: spacing.lg,
   },
   greeting: {
     fontFamily: fonts.display,

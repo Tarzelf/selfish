@@ -42,7 +42,7 @@ export function LiquidGlass({
         island && styles.island,
         {
           borderColor: palette.glassBorder,
-          backgroundColor: palette.glassTint,
+          backgroundColor: '#121214',
         },
         style,
       ]}
@@ -61,5 +61,6 @@ const styles = StyleSheet.create({
   web: {
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
+    backgroundColor: '#121214',
   },
 });

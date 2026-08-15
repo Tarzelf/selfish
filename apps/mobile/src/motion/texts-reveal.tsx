@@ -45,8 +45,9 @@ export function TextsReveal({
   style?: StyleProp<ViewStyle>;
 }) {
   const lines = React.Children.toArray(children);
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(Platform.OS === 'web');
   useEffect(() => {
+    if (Platform.OS === 'web') return;
     const t = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(t);
   }, []);

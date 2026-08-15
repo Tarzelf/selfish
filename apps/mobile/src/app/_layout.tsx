@@ -1,4 +1,5 @@
 import { Stack } from 'expo-router';
+import { DarkTheme, ThemeProvider } from 'expo-router/react-navigation';
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { View } from 'react-native';
@@ -7,6 +8,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AtmosphereSky } from '@/components/atmosphere-sky';
 import { AtmosphereProvider, useAtmosphere } from '@/lib/atmosphere';
+import { selfishNavigationTheme } from '@/lib/navigation-theme';
 import { AppStateProvider } from '@/lib/store';
 
 import '@/styles/transitions-root.css';
@@ -17,13 +19,15 @@ import '@/styles/atmosphere.css';
 // and stays painted — Today, Browse, and Rest ghost through each other.
 enableScreens(true);
 
+const navigationTheme = selfishNavigationTheme(DarkTheme);
+
 function ThemedStack() {
   const { palette } = useAtmosphere();
   return (
     <View style={{ flex: 1, backgroundColor: '#060608', overflow: 'hidden' }}>
       <AtmosphereSky />
       <StatusBar style={palette.status} />
-      <View style={{ flex: 1, zIndex: 1 }}>
+      <View style={{ flex: 1, zIndex: 1, backgroundColor: 'transparent' }}>
         <Stack
           screenOptions={{
             headerShown: false,
@@ -47,7 +51,9 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <AppStateProvider>
         <AtmosphereProvider>
-          <ThemedStack />
+          <ThemeProvider value={navigationTheme}>
+            <ThemedStack />
+          </ThemeProvider>
         </AtmosphereProvider>
       </AppStateProvider>
     </SafeAreaProvider>

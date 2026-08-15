@@ -67,9 +67,9 @@ export const EVENING: Palette = {
 
 export const MORNING: Palette = {
   bg: '#060608',
-  surface: 'rgba(16, 16, 20, 0.58)',
-  surfaceRaised: 'rgba(22, 22, 28, 0.7)',
-  surfacePressed: 'rgba(28, 28, 34, 0.82)',
+  surface: 'rgba(16, 16, 20, 0.88)',
+  surfaceRaised: 'rgba(22, 22, 28, 0.92)',
+  surfacePressed: 'rgba(28, 28, 34, 0.96)',
   border: 'rgba(245,245,247,0.16)',
   borderSoft: 'rgba(245,245,247,0.10)',
   ...INK,
