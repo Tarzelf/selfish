@@ -7,12 +7,14 @@ import { Card, HeatBadge } from '@/components/ui';
 import { fonts, palette, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getSeries, getVoice } from '@/data/catalog';
+import { isFreeFamily } from '@/lib/catalog-access';
 import { useAppState } from '@/lib/store';
 import type { SessionFamily } from '@/lib/types';
 
 export function SessionCard({ family, compact }: { family: SessionFamily; compact?: boolean }) {
   const router = useRouter();
-  const { heatAllowed } = useAppState();
+  const { heatAllowed, canPlayFamily } = useAppState();
+  const playable = canPlayFamily(family);
   const voice = getVoice(family.voiceId);
   const series = getSeries(family.seriesId);
   const [minHeat, maxHeat] = family.heatRange;
@@ -45,6 +47,7 @@ export function SessionCard({ family, compact }: { family: SessionFamily; compac
             {voice?.name} · {durationLabel} · {family.variants.length}{' '}
             {family.variants.length === 1 ? 'version' : 'versions'}
             {hasAudio ? '  ·  ▶ preview' : ''}
+            {isFreeFamily(family) ? '  ·  free' : playable ? '' : '  ·  Selfish+'}
           </Text>
         </View>
       </View>

@@ -70,7 +70,7 @@ export default function Tonight() {
 
       {continueFamilies.length > 0 && (
         <>
-          <Heading>Pick up where he left off</Heading>
+          <Heading>Pick up where you left off</Heading>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.rail}>
             {continueFamilies.map(({ entry, family }) => (
               <View key={entry.familyId}>

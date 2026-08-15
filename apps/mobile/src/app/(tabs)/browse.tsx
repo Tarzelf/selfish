@@ -4,7 +4,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SessionCard } from '@/components/session-card';
 import { Body, Chip, Display, Heading, Screen } from '@/components/ui';
 import { fonts, palette, spacing } from '@/constants/theme';
-import { ALL_DYNAMICS, ALL_TAGS, VOICES } from '@/data/catalog';
+import { VOICES } from '@/data/catalog';
+import { browseDynamics, browseTags } from '@/lib/catalog-access';
 import { useAppState } from '@/lib/store';
 
 export default function Browse() {
@@ -17,6 +18,8 @@ export default function Browse() {
     set(list.includes(value) ? list.filter((x) => x !== value) : [...list, value]);
 
   const desire = useMemo(() => visibleCatalog.filter((f) => f.shelf === 'desire'), [visibleCatalog]);
+  const tagOptions = useMemo(() => browseTags(desire), [desire]);
+  const dynamicOptions = useMemo(() => browseDynamics(desire), [desire]);
 
   // Multi-tag AND filtering — the thing the incumbents still don't do.
   const results = useMemo(
@@ -38,14 +41,14 @@ export default function Browse() {
 
       <Heading>Dynamic</Heading>
       <View style={styles.chipWrap}>
-        {ALL_DYNAMICS.map((d) => (
+        {dynamicOptions.map((d) => (
           <Chip key={d} label={d} selected={dynamics.includes(d)} onPress={() => toggle(dynamics, setDynamics, d)} />
         ))}
       </View>
 
       <Heading>Tags</Heading>
       <View style={styles.chipWrap}>
-        {ALL_TAGS.map((t) => (
+        {tagOptions.map((t) => (
           <Chip key={t} label={t} selected={tags.includes(t)} onPress={() => toggle(tags, setTags, t)} />
         ))}
       </View>

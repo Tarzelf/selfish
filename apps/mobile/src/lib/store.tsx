@@ -2,10 +2,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 import { CATALOG } from '@/data/catalog';
+import { canPlay, heatAllowed as heatAllowedFor, isFamilyVisible, visibleCatalog as filterCatalog } from '@/lib/catalog-access';
 import {
   type ContinueEntry,
   DEFAULT_PREFERENCES,
-  HEAT_ORDER,
   type HeatLevel,
   type Preferences,
   type SessionFamily,
@@ -24,6 +24,9 @@ interface AppState {
   /** Catalog filtered by the user's heat cap and hard limits. */
   visibleCatalog: SessionFamily[];
   heatAllowed: (heat: HeatLevel) => boolean;
+  familyVisible: (family: SessionFamily) => boolean;
+  canPlayFamily: (family: SessionFamily) => boolean;
+  startPreview: () => void;
 }
 
 const Ctx = createContext<AppState | null>(null);
@@ -76,24 +79,45 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const heatAllowed = useCallback(
-    (heat: HeatLevel) => HEAT_ORDER.indexOf(heat) <= HEAT_ORDER.indexOf(prefs.heatCap),
-    [prefs.heatCap],
-  );
+  const heatAllowed = useCallback((heat: HeatLevel) => heatAllowedFor(heat, prefs.heatCap), [prefs.heatCap]);
 
-  const visibleCatalog = useMemo(
-    () =>
-      CATALOG.filter(
-        (f) =>
-          !f.tags.some((t) => prefs.hardLimits.includes(t)) &&
-          f.variants.some((v) => heatAllowed(v.heat)),
-      ),
-    [prefs.hardLimits, heatAllowed],
-  );
+  const familyVisible = useCallback((family: SessionFamily) => isFamilyVisible(family, prefs), [prefs]);
+
+  const canPlayFamily = useCallback((family: SessionFamily) => canPlay(family, prefs), [prefs]);
+
+  const startPreview = useCallback(() => {
+    setPrefs({ membershipStartedAt: Date.now() });
+  }, [setPrefs]);
+
+  const visibleCatalog = useMemo(() => filterCatalog(CATALOG, prefs), [prefs]);
 
   const value = useMemo(
-    () => ({ ready, prefs, setPrefs, resetAll, continueList, recordProgress, visibleCatalog, heatAllowed }),
-    [ready, prefs, setPrefs, resetAll, continueList, recordProgress, visibleCatalog, heatAllowed],
+    () => ({
+      ready,
+      prefs,
+      setPrefs,
+      resetAll,
+      continueList,
+      recordProgress,
+      visibleCatalog,
+      heatAllowed,
+      familyVisible,
+      canPlayFamily,
+      startPreview,
+    }),
+    [
+      ready,
+      prefs,
+      setPrefs,
+      resetAll,
+      continueList,
+      recordProgress,
+      visibleCatalog,
+      heatAllowed,
+      familyVisible,
+      canPlayFamily,
+      startPreview,
+    ],
   );
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;

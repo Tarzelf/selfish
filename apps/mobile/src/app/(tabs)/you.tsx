@@ -4,12 +4,15 @@ import { StyleSheet, Switch, Text, View } from 'react-native';
 
 import { Body, Button, Caption, Card, Chip, Display, Divider, Heading, Screen } from '@/components/ui';
 import { fonts, palette, spacing } from '@/constants/theme';
+import { isPreviewActive, previewDaysLeft } from '@/lib/catalog-access';
 import { useAppState } from '@/lib/store';
 import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS } from '@/lib/types';
 
 export default function You() {
   const router = useRouter();
-  const { prefs, setPrefs, resetAll } = useAppState();
+  const { prefs, setPrefs, resetAll, startPreview } = useAppState();
+  const previewOn = isPreviewActive(prefs);
+  const daysLeft = previewDaysLeft(prefs);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const toggleLimit = (t: string) =>
@@ -70,11 +73,17 @@ export default function You() {
 
       <Heading>Membership</Heading>
       <Card>
-        <Body>Selfish+ (preview build)</Body>
+        <Body>{previewOn ? `Selfish+ preview · ${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left` : 'Selfish+'}</Body>
         <Caption>
-          $6.99/month or $49.99/year after a 14-day free trial. Full catalog, every version of
-          every session, downloads. Payments are not wired up in this preview.
+          {previewOn
+            ? 'Full catalog is unlocked on this device. Stripe checkout ships with the public smoke test — this preview does not take a card.'
+            : 'Three Desire and three Rest sessions stay free. Start a 14-day preview for the rest of the catalog. $6.99/month or $49.99/year after; no card in this build.'}
         </Caption>
+        {!previewOn && (
+          <View style={{ marginTop: spacing.md }}>
+            <Button label="Start 14-day preview" onPress={startPreview} />
+          </View>
+        )}
       </Card>
 
       <Divider />

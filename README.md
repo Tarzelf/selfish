@@ -30,7 +30,9 @@ npm install
 npm run web        # or: npx expo start (iOS simulator / Expo Go)
 ```
 
-The preview build runs entirely on-device: seed catalog in `src/data/catalog.ts`, preferences in AsyncStorage. **Sessions with a ▶ badge play real audio** rendered by the live pipeline (Grok script → safety classifier → Grok TTS → automated audio-QA); the voice transparency page has playable engine previews for every voice persona. Sessions without bundled audio use a simulated clock. Payments and Supabase sync are stubbed by design.
+The preview build runs entirely on-device: seed catalog in `src/data/catalog.ts`, preferences in AsyncStorage. **Sessions with a ▶ badge play real audio** rendered by the live pipeline (Grok script → safety classifier → Grok TTS → automated audio-QA); the voice transparency page has playable engine previews for every voice persona. Sessions without bundled audio use a simulated clock.
+
+**Shipped in the preview:** age gate, onboarding, Tonight / Browse / Rest / You, heat-cap variant gating, hard-limit filtering (including deep links), Continue rail, a permanent free tier (3 Desire + 3 Rest), and a 14-day Selfish+ preview that unlocks the rest of the catalog on-device. Stripe checkout and live Supabase sync are the next production step — they are not mocked as working payments.
 
 ### Web deploy (for user testing)
 

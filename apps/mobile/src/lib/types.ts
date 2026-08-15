@@ -103,6 +103,8 @@ export interface Preferences {
   hardLimits: string[];
   /** Neutral lock-screen/Now Playing metadata + blurred artwork. */
   discreetMode: boolean;
+  /** When the 14-day Selfish+ preview started. Null = free tier only. */
+  membershipStartedAt: number | null;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
@@ -115,6 +117,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   favoriteVoiceIds: [],
   hardLimits: [],
   discreetMode: true,
+  membershipStartedAt: null,
 };
 
 /** Tags a user may exclude globally during onboarding. */

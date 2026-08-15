@@ -7,6 +7,7 @@ import { Body, Button, Caption, Card, Chip, Display, HeatBadge, Heading, Screen 
 import { fonts, palette, radius, spacing } from '@/constants/theme';
 import { VARIANT_AUDIO } from '@/data/audio-map';
 import { getFamily, getSeries, getVoice } from '@/data/catalog';
+import { allowedVariants as variantsForCap, isFreeFamily, lockedVariants as lockedForCap } from '@/lib/catalog-access';
 import { formatClock, usePlayback } from '@/lib/player';
 import { useAppState } from '@/lib/store';
 import type { SessionVariant } from '@/lib/types';
@@ -61,15 +62,17 @@ function PlayerCore({
 export default function SessionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { prefs, heatAllowed, recordProgress } = useAppState();
+  const { prefs, familyVisible, canPlayFamily, startPreview, recordProgress } = useAppState();
 
   const family = getFamily(id);
   const voice = family ? getVoice(family.voiceId) : undefined;
   const series = family ? getSeries(family.seriesId) : undefined;
+  const blocked = family ? !familyVisible(family) : false;
+  const locked = family ? !canPlayFamily(family) : false;
 
   const allowedVariants = useMemo(
-    () => family?.variants.filter((v) => heatAllowed(v.heat)) ?? [],
-    [family, heatAllowed],
+    () => (family ? variantsForCap(family, prefs.heatCap) : []),
+    [family, prefs.heatCap],
   );
   const [variantId, setVariantId] = useState<string | null>(null);
   const variant = allowedVariants.find((v) => v.id === variantId) ?? allowedVariants[0];
@@ -85,16 +88,30 @@ export default function SessionScreen() {
     [family, variant, recordProgress],
   );
 
-  if (!family || !variant || !voice) {
+  if (!family || blocked || !voice) {
     return (
       <Screen scroll={false}>
-        <Display>Not found</Display>
+        <Display>{blocked ? 'Outside your limits' : 'Not found'}</Display>
+        <Body dim style={{ marginTop: spacing.sm }}>
+          {blocked
+            ? 'This session is filtered by a hard limit or heat cap you set. Nothing here will play.'
+            : 'That session is not in the catalog.'}
+        </Body>
         <Button label="Back" onPress={() => router.back()} />
       </Screen>
     );
   }
 
-  const lockedVariants = family.variants.filter((v) => !heatAllowed(v.heat));
+  if (!variant) {
+    return (
+      <Screen scroll={false}>
+        <Display>Outside your heat cap</Display>
+        <Button label="Back" onPress={() => router.back()} />
+      </Screen>
+    );
+  }
+
+  const lockedVariants = lockedForCap(family, prefs.heatCap);
 
   // Content notes gate: never surprise a listener. One acknowledgment per open.
   if (!acknowledged) {
@@ -127,7 +144,24 @@ export default function SessionScreen() {
               speakers.
             </Caption>
           </Card>
-          <Button label="I'm in" onPress={() => setAcknowledged(true)} />
+          {locked ? (
+            <>
+              <Caption style={{ marginTop: spacing.md }}>
+                {isFreeFamily(family)
+                  ? 'This session is in your free tier.'
+                  : 'This session is part of Selfish+. Start the 14-day preview to listen — no card in this build.'}
+              </Caption>
+              <Button
+                label="Start 14-day preview"
+                onPress={() => {
+                  startPreview();
+                  setAcknowledged(true);
+                }}
+              />
+            </>
+          ) : (
+            <Button label="I'm in" onPress={() => setAcknowledged(true)} />
+          )}
           <Text style={styles.leave} onPress={() => router.back()}>
             Not tonight
           </Text>
