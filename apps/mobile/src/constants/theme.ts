@@ -66,6 +66,7 @@ export const fonts = {
 export const type = {
   wordmark: { fontFamily: fonts.display, fontSize: 22, lineHeight: 26, color: palette.bone },
   display: { fontFamily: fonts.display, fontSize: 36, lineHeight: 42, color: palette.bone },
+  numeral: { fontFamily: fonts.display, fontSize: 52, lineHeight: 60, color: palette.bone },
   title: { fontFamily: fonts.display, fontSize: 28, lineHeight: 34, color: palette.bone },
   cardTitle: { fontFamily: fonts.display, fontSize: 20, lineHeight: 24, color: palette.bone },
   heading: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, fontWeight: '500' as const, color: palette.boneDim },

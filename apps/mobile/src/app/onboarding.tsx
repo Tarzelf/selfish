@@ -1,24 +1,25 @@
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import {
   Body,
   Button,
   Caption,
-  Card,
-  Chip,
-  ChipRow,
+  Choice,
+  ChoiceStack,
   Display,
   Field,
+  HitLabel,
+  NumeralField,
   PlayControl,
-  Screen,
+  Progress,
+  StepScreen,
   TextLink,
-  Title,
   Wordmark,
 } from '@/components/ui';
-import { palette, spacing } from '@/constants/theme';
+import { spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { useAppState } from '@/lib/store';
 import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
@@ -26,6 +27,18 @@ import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/
 type Step = 'welcome' | 'age' | 'honesty' | 'moods' | 'heat' | 'limits' | 'done';
 
 const STEPS: Step[] = ['welcome', 'age', 'honesty', 'moods', 'heat', 'limits', 'done'];
+
+const HEAT_HINT: Record<HeatLevel, string> = {
+  comfort: 'Soft, warm, nothing sharp.',
+  'slow-burn': 'Patience. The long way around.',
+  spicy: 'Further. Only if you ask.',
+};
+
+function greeting(hour: number): string {
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+}
 
 function Landing({ onBegin }: { onBegin: () => void }) {
   const player = useAudioPlayer(VOICE_PREVIEW_AUDIO['v-jasper'] ?? null);
@@ -41,57 +54,31 @@ function Landing({ onBegin }: { onBegin: () => void }) {
   };
 
   return (
-    <Screen>
-      <Wordmark />
+    <StepScreen
+      chrome={<Wordmark style={styles.masthead} />}
+      dock={
+        <>
+          <Button label="Begin — it takes a minute" onPress={onBegin} />
+          <Caption style={styles.foot}>For adults. Free to explore.</Caption>
+        </>
+      }
+    >
       <Display>Time that&apos;s just for you.</Display>
-      <Body dim style={styles.landingLede}>
-        Intimate audio fiction and unhurried sleep stories — written with care, whispered up close,
-        tuned to the mood you&apos;re in tonight.
+      <Body dim style={styles.lede}>
+        Stories to fall asleep to, and stories that are very much not.
       </Body>
-
-      <Card>
-        <Caption>Headphones on.</Caption>
-        <Title style={styles.listenTitle}>Hear how close close can get.</Title>
-        <View style={styles.listenRow}>
-          <PlayControl
-            playing={status.playing}
-            onPress={toggle}
-            size="md"
-            label={status.playing ? 'Pause sample' : 'Play sample'}
-          />
-          <Caption style={styles.listenMeta}>
-            Jasper · a 30-second whisper. Rendered by our engine — no human recorded this.
-          </Caption>
-        </View>
-      </Card>
-
-      <View style={styles.props}>
-        {(
-          [
-            {
-              title: 'Made to your mood',
-              body: 'Comforted, adored, teased, in charge. Every story comes in softer, slower, and further versions.',
-            },
-            {
-              title: 'Private by design',
-              body: 'Nothing revealing on your lock screen. No feed. Hard limits you set once. Deletion that deletes.',
-            },
-            {
-              title: 'Honest about the voices',
-              body: 'Every voice is synthetic, licensed from a paid narrator, and we say so.',
-            },
-          ]
-        ).map((p) => (
-          <View key={p.title} style={styles.prop}>
-            <Body>{p.title}</Body>
-            <Caption style={styles.propBody}>{p.body}</Caption>
-          </View>
-        ))}
+      <View style={styles.listen}>
+        <PlayControl
+          playing={status.playing}
+          onPress={toggle}
+          size="lg"
+          label={status.playing ? 'Pause sample' : 'Play sample'}
+        />
+        <Caption style={styles.listenMeta}>
+          Headphones. Jasper, thirty seconds. Our engine — no human recorded this.
+        </Caption>
       </View>
-
-      <Button label="Begin — it takes a minute" onPress={onBegin} style={styles.landingCta} />
-      <Caption style={styles.landingFoot}>For adults. Free to explore.</Caption>
-    </Screen>
+    </StepScreen>
   );
 }
 
@@ -108,6 +95,7 @@ export default function Onboarding() {
 
   const stepIndex = STEPS.indexOf(step);
   const next = () => setStep(STEPS[Math.min(stepIndex + 1, STEPS.length - 1)]);
+  const back = () => setStep(STEPS[Math.max(stepIndex - 1, 0)]);
 
   const currentYear = new Date().getFullYear();
   const yearNum = Number(birthYear);
@@ -138,149 +126,176 @@ export default function Onboarding() {
     return <Landing onBegin={next} />;
   }
 
-  return (
-    <Screen scroll={false}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
-        <View style={styles.progressRow}>
-          {STEPS.slice(0, -1).map((s, i) => (
-            <View key={s} style={[styles.progressDot, i <= stepIndex && styles.progressDotOn]} />
-          ))}
-        </View>
+  const chrome = (
+    <View style={styles.chrome}>
+      <HitLabel label="Back" onPress={back} />
+      <Progress value={stepIndex / (STEPS.length - 1)} style={styles.chromeBar} />
+    </View>
+  );
 
-        {step === 'age' && (
-          <View style={styles.stepBody}>
-            <Display>First things first</Display>
-            <Body dim style={styles.lede}>
-              Selfish is for adults. Enter your birth year to continue.
-            </Body>
-            <Field
-              value={birthYear}
-              onChangeText={setBirthYear}
-              placeholder="Year of birth (e.g. 1994)"
-              keyboardType="number-pad"
-              maxLength={4}
-              accessibilityLabel="Year of birth"
-            />
-            <Caption style={styles.finePrint}>
-              Your birth year stays on this device in the preview build. On iOS we additionally
-              honor the Declared Age Range provided by your Apple Account settings.
-            </Caption>
-            <View style={styles.spacer} />
+  if (step === 'age') {
+    return (
+      <StepScreen
+        keyboard
+        chrome={chrome}
+        dock={
+          <>
             <Button label="I'm 18 or older — continue" onPress={next} disabled={!isAdult} />
-          </View>
-        )}
+            <Caption>Your birth year stays on this device.</Caption>
+          </>
+        }
+      >
+        <Display>First things first</Display>
+        <Body dim style={styles.lede}>
+          Selfish is for adults.
+        </Body>
+        <NumeralField
+          value={birthYear}
+          onChangeText={setBirthYear}
+          placeholder="1994"
+          maxLength={4}
+          accessibilityLabel="Year of birth"
+        />
+      </StepScreen>
+    );
+  }
 
-        {step === 'honesty' && (
-          <View style={styles.stepBody}>
-            <Display>The honest part</Display>
-            <Body dim style={styles.lede}>
-              Every voice in Selfish is a studio-crafted synthetic performance, built from
-              recordings licensed from real, paid narrators. Nothing is cloned without consent, and
-              nothing is generated live — every session is written, reviewed, and produced by our
-              studio before it reaches you.
-            </Body>
-            <Body dim style={styles.lede}>
-              Producing sessions uses third-party AI services. Your listening choices never leave
-              your account, and none of your personal data is used to train anything.
-            </Body>
-            <View style={styles.spacer} />
+  if (step === 'honesty') {
+    return (
+      <StepScreen
+        chrome={chrome}
+        dock={
+          <>
             <Button label="Sounds fair — I agree" onPress={next} />
-            <Caption style={styles.finePrint}>
-              The full voice transparency page is always one tap away in Settings.
-            </Caption>
-          </View>
-        )}
+            <Caption>The full story is always in You → Voice transparency.</Caption>
+          </>
+        }
+      >
+        <Display>The honest part</Display>
+        <Body dim style={styles.lede}>
+          Every voice is a studio-crafted synthetic performance, built from recordings a paid
+          narrator licensed for this.
+        </Body>
+        <Body dim style={styles.lede}>
+          Nothing is cloned without consent. Nothing is generated while you listen.
+        </Body>
+        <Body dim>
+          Your listening choices stay with your account. None of your data trains anything.
+        </Body>
+      </StepScreen>
+    );
+  }
 
-        {step === 'moods' && (
-          <View style={styles.stepBody}>
-            <Display>How do you want to feel?</Display>
-            <Body dim style={styles.lede}>
-              Pick any that ring true. This tunes your Tonight page — change it whenever you like.
-            </Body>
-            <ChipRow>
-              {MOODS.map((m) => (
-                <Chip key={m.id} label={m.label} hint={m.hint} selected={moods.includes(m.id)} onPress={() => toggleMood(m.id)} />
-              ))}
-            </ChipRow>
-            <View style={styles.spacer} />
-            <Button label="Continue" onPress={next} disabled={moods.length === 0} />
-          </View>
-        )}
-
-        {step === 'heat' && (
-          <View style={styles.stepBody}>
-            <Display>Set your heat</Display>
-            <Body dim style={styles.lede}>
-              This caps what appears anywhere in the app. It starts gentle; turn it up (or down) in
-              Settings whenever you like. Nothing above your setting is ever shown.
-            </Body>
-            <ChipRow>
-              {(['comfort', 'slow-burn', 'spicy'] as HeatLevel[]).map((h) => (
-                <Chip key={h} label={HEAT_LABEL[h]} selected={heatCap === h} onPress={() => setHeatCap(h)} />
-              ))}
-            </ChipRow>
-            <View style={styles.spacer} />
-            <Button label="Continue" onPress={next} />
-          </View>
-        )}
-
-        {step === 'limits' && (
-          <View style={styles.stepBody}>
-            <Display>Anything off the table?</Display>
-            <Body dim style={styles.lede}>
-              Select themes you never want to encounter. They will be filtered out everywhere,
-              permanently, no questions asked.
-            </Body>
-            <ChipRow>
-              {LIMIT_TAGS.map((t) => (
-                <Chip key={t} label={t} selected={limits.includes(t)} onPress={() => toggleLimit(t)} />
-              ))}
-            </ChipRow>
-            <View style={styles.spacer} />
-            <Button label={limits.length > 0 ? 'Continue' : 'Nothing — continue'} onPress={next} />
-          </View>
-        )}
-
-        {step === 'done' && (
-          <View style={styles.stepBody}>
-            <Display>One last thing</Display>
-            <Body dim style={styles.lede}>
-              What should we call you? Optional — some sessions can greet you by name if you want
-              them to (off by default).
-            </Body>
-            <Field
-              value={name}
-              onChangeText={setName}
-              placeholder="Your name (optional)"
-              autoCapitalize="words"
-              accessibilityLabel="Your name"
+  if (step === 'moods') {
+    return (
+      <StepScreen
+        chrome={chrome}
+        dock={<Button label="Continue" onPress={next} disabled={moods.length === 0} />}
+      >
+        <Display>How do you want to feel?</Display>
+        <Body dim style={styles.lede}>
+          Pick any that ring true. Change it whenever you like.
+        </Body>
+        <ChoiceStack>
+          {MOODS.map((m) => (
+            <Choice
+              key={m.id}
+              label={m.label}
+              hint={m.hint}
+              selected={moods.includes(m.id)}
+              onPress={() => toggleMood(m.id)}
             />
-            <View style={styles.spacer} />
-            <Button label="Take me in" onPress={finish} />
+          ))}
+        </ChoiceStack>
+      </StepScreen>
+    );
+  }
+
+  if (step === 'heat') {
+    return (
+      <StepScreen chrome={chrome} dock={<Button label="Continue" onPress={next} />}>
+        <Display>Set your heat</Display>
+        <Body dim style={styles.lede}>
+          This caps what appears anywhere. Nothing above it is ever shown.
+        </Body>
+        <ChoiceStack>
+          {(['comfort', 'slow-burn', 'spicy'] as HeatLevel[]).map((h) => (
+            <Choice
+              key={h}
+              label={HEAT_LABEL[h]}
+              hint={HEAT_HINT[h]}
+              selected={heatCap === h}
+              onPress={() => setHeatCap(h)}
+            />
+          ))}
+        </ChoiceStack>
+      </StepScreen>
+    );
+  }
+
+  if (step === 'limits') {
+    return (
+      <StepScreen
+        chrome={chrome}
+        dock={
+          <Button label={limits.length > 0 ? 'Continue' : 'Nothing — continue'} onPress={next} />
+        }
+      >
+        <Display>Anything off the table?</Display>
+        <Body dim style={styles.lede}>
+          Filtered out everywhere, permanently. No questions asked.
+        </Body>
+        <ChoiceStack>
+          {LIMIT_TAGS.map((t) => (
+            <Choice key={t} label={t} selected={limits.includes(t)} onPress={() => toggleLimit(t)} />
+          ))}
+        </ChoiceStack>
+      </StepScreen>
+    );
+  }
+
+  const first = name.trim();
+  return (
+    <StepScreen
+      keyboard
+      chrome={chrome}
+      dock={
+        <>
+          <Button label="Take me in" onPress={finish} />
+          <View style={styles.skip}>
             <TextLink label="Skip" onPress={finish} />
           </View>
-        )}
-      </KeyboardAvoidingView>
-    </Screen>
+        </>
+      }
+    >
+      <Display>{first ? `${greeting(new Date().getHours())}, ${first}.` : 'What should we call you?'}</Display>
+      <Body dim style={styles.lede}>
+        Optional. Some sessions can greet you by name — off by default.
+      </Body>
+      <Field
+        kind="quiet"
+        value={name}
+        onChangeText={setName}
+        placeholder="Your name"
+        autoCapitalize="words"
+        accessibilityLabel="Your name"
+      />
+    </StepScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  progressRow: { flexDirection: 'row', gap: spacing.xs, marginTop: spacing.lg },
-  progressDot: { flex: 1, height: 1, backgroundColor: palette.inkHigh },
-  progressDotOn: { backgroundColor: palette.bone },
-  stepBody: { flex: 1, justifyContent: 'center' },
+  masthead: { marginTop: spacing.md, marginBottom: spacing.sm },
+  chrome: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingTop: spacing.md,
+  },
+  chromeBar: { flex: 1 },
   lede: { marginBottom: spacing.md },
-  finePrint: { marginTop: spacing.md },
-  spacer: { height: spacing.xl },
-  landingLede: { marginTop: spacing.md, maxWidth: 560 },
-  listenTitle: { marginTop: spacing.sm },
-  listenRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.md },
-  listenMeta: { flex: 1 },
-  props: { marginTop: spacing.xxl, gap: spacing.xl },
-  prop: { maxWidth: 540 },
-  propBody: { marginTop: spacing.xs },
-  landingCta: { marginTop: spacing.xl },
-  landingFoot: { textAlign: 'center', marginTop: spacing.md },
+  listen: { marginTop: spacing.xl, gap: spacing.md, alignItems: 'flex-start' },
+  listenMeta: { maxWidth: 280 },
+  foot: { textAlign: 'center' },
+  skip: { alignItems: 'center' },
 });

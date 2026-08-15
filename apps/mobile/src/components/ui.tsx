@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   type PressableStateCallbackType,
   ScrollView,
@@ -289,8 +291,102 @@ export function HitLabel({
   );
 }
 
-export function Field({ style, ...rest }: TextInputProps) {
-  return <TextInput placeholderTextColor={palette.boneMute} style={[styles.field, style]} {...rest} />;
+export function Field({
+  kind = 'box',
+  style,
+  ...rest
+}: TextInputProps & { kind?: 'box' | 'quiet' }) {
+  return (
+    <TextInput
+      placeholderTextColor={palette.boneMute}
+      style={[kind === 'quiet' ? styles.fieldQuiet : styles.field, style]}
+      {...rest}
+    />
+  );
+}
+
+export function NumeralField({ style, ...rest }: TextInputProps) {
+  return (
+    <TextInput
+      placeholderTextColor={palette.boneMute}
+      keyboardType="number-pad"
+      style={[styles.numeral, style]}
+      {...rest}
+    />
+  );
+}
+
+export function Choice({
+  label,
+  hint,
+  selected,
+  onPress,
+}: {
+  label: string;
+  hint?: string;
+  selected?: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: !!selected }}
+      onPress={onPress}
+      style={(state: PressState) => [
+        styles.choice,
+        selected && styles.choiceSelected,
+        state.pressed && { opacity: 0.88 },
+      ]}
+    >
+      <Text style={[styles.choiceLabel, selected && styles.choiceLabelOn]}>{label}</Text>
+      {hint ? <Text style={styles.choiceHint}>{hint}</Text> : null}
+    </Pressable>
+  );
+}
+
+export function ChoiceStack({ children }: { children: React.ReactNode }) {
+  return <View style={styles.choiceStack}>{children}</View>;
+}
+
+export function StepScreen({
+  chrome,
+  children,
+  dock,
+  keyboard,
+}: {
+  chrome?: React.ReactNode;
+  children: React.ReactNode;
+  dock?: React.ReactNode;
+  keyboard?: boolean;
+}) {
+  const insets = useSafeAreaInsets();
+  const frame = (
+    <View style={[styles.screen, { backgroundColor: palette.ink, paddingTop: insets.top }]}>
+      <View style={[styles.shell, { paddingHorizontal: spacing.md }]}>
+        {chrome}
+        <ScrollView
+          style={styles.stepScroll}
+          contentContainerStyle={styles.stepBody}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {children}
+        </ScrollView>
+        {dock ? (
+          <View style={[styles.dock, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>{dock}</View>
+        ) : null}
+      </View>
+    </View>
+  );
+  if (!keyboard) return frame;
+  return (
+    <KeyboardAvoidingView
+      style={[styles.screen, { backgroundColor: palette.ink }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      {frame}
+    </KeyboardAvoidingView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -356,4 +452,31 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     backgroundColor: palette.inkLift,
   },
+  fieldQuiet: {
+    ...type.title,
+    paddingVertical: spacing.md,
+    marginTop: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: palette.line,
+  },
+  numeral: {
+    ...type.numeral,
+    textAlign: 'center',
+    paddingVertical: spacing.lg,
+    marginTop: spacing.md,
+  },
+  choice: {
+    backgroundColor: palette.inkLift,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  choiceSelected: { backgroundColor: palette.inkHigh },
+  choiceLabel: { ...type.label, color: palette.boneMute, fontWeight: '400' },
+  choiceLabelOn: { color: palette.bone },
+  choiceHint: { ...type.caption, marginTop: 4 },
+  choiceStack: { marginTop: spacing.lg },
+  stepScroll: { flex: 1 },
+  stepBody: { flexGrow: 1, justifyContent: 'center', paddingVertical: spacing.lg },
+  dock: { paddingTop: spacing.md, gap: spacing.sm },
 });
