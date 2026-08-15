@@ -12,6 +12,12 @@ export const HEAT_LABEL: Record<HeatLevel, string> = {
   spicy: 'Spicy',
 };
 
+export const HEAT_HINT: Record<HeatLevel, string> = {
+  comfort: 'Soft, warm, nothing sharp.',
+  'slow-burn': 'Patience. The long way around.',
+  spicy: 'Further. Only if you ask.',
+};
+
 export type Mood = 'comforted' | 'adored' | 'teased' | 'wanted' | 'missed' | 'in-charge';
 
 export const MOODS: { id: Mood; label: string; hint: string }[] = [
@@ -103,8 +109,10 @@ export interface Preferences {
   hardLimits: string[];
   /** Neutral lock-screen/Now Playing metadata + blurred artwork. */
   discreetMode: boolean;
-  /** When the 14-day Selfish+ preview started. Null = free tier only. */
+  /** When the 14-day Selfish+ preview started. Null = no local preview. */
   membershipStartedAt: number | null;
+  /** Set after a successful Whop web checkout return. Does not expire on-device. */
+  whopEntitledAt: number | null;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
@@ -118,6 +126,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   hardLimits: [],
   discreetMode: true,
   membershipStartedAt: null,
+  whopEntitledAt: null,
 };
 
 /** Tags a user may exclude globally during onboarding. */

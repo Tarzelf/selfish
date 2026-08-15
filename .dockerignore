@@ -1,0 +1,11 @@
+**/node_modules
+**/.expo
+**/dist
+**/.git
+**/*.log
+docs
+packages
+samples
+supabase
+apps/mobile/.claude
+apps/mobile/.vscode

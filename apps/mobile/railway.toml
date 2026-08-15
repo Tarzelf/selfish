@@ -1,10 +1,14 @@
 # Railway deployment of the Selfish web preview.
-# Deploy from apps/mobile: RAILWAY_TOKEN=<project-token> railway up --detach
+# Prefer the repo-root Dockerfile. This file is for a service
+# whose root directory is apps/mobile.
 
 [build]
-buildCommand = "npm ci --include=dev && npx expo export --platform web"
+builder = "NIXPACKS"
+buildCommand = "npm ci --include=dev && npm run build"
+nixpacksConfigPath = "nixpacks.toml"
 
 [deploy]
-startCommand = "npx serve dist -l ${PORT}"
+startCommand = "npm run serve:web"
 healthcheckPath = "/"
+healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"

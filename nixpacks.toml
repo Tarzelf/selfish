@@ -1,0 +1,15 @@
+# Fallback if a Railway service is still on Nixpacks instead of the Dockerfile.
+[variables]
+NIXPACKS_NODE_VERSION = "20"
+CI = "1"
+EXPO_NO_TELEMETRY = "1"
+NODE_OPTIONS = "--max-old-space-size=4096"
+
+[phases.install]
+cmds = ["npm ci --include=dev --prefix apps/mobile"]
+
+[phases.build]
+cmds = ["npm run build --prefix apps/mobile"]
+
+[start]
+cmd = "npm run serve:web --prefix apps/mobile"

@@ -1,11 +1,11 @@
 import React, { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { HeroCard } from '@/components/hero-card';
 import { SessionCard } from '@/components/session-card';
 import { VoiceRail } from '@/components/voice-rail';
-import { Caption, Chip, Heading, Screen } from '@/components/ui';
-import { fonts, palette, spacing } from '@/constants/theme';
+import { Caption, Chip, ChipRow, Display, Heading, Progress, Screen, Wordmark } from '@/components/ui';
+import { spacing } from '@/constants/theme';
 import { getFamily } from '@/data/catalog';
 import { useAppState } from '@/lib/store';
 import { HEAT_LABEL, type HeatLevel, MOODS, type Mood } from '@/lib/types';
@@ -14,7 +14,7 @@ type LengthPick = 'any' | 'short' | 'long';
 
 function eveningLine(hour: number): string {
   if (hour < 5) return 'The house is quiet.';
-  if (hour < 12) return 'Take a slow morning.';
+  if (hour < 12) return 'A slow morning.';
   if (hour < 18) return 'Steal a moment.';
   return 'The evening is yours.';
 }
@@ -42,7 +42,6 @@ export default function Tonight() {
       .sort((a, b) => b.rating - a.rating);
   }, [desire, mood, voiceId, heat, length, heatAllowed]);
 
-  // Hero: best match for the current mood — prefer sessions with real audio.
   const hero = useMemo(() => {
     const pool = matches.length > 0 ? matches : desire;
     return [...pool].sort((a, b) => Number(b.id === 'f-back-to-yours') - Number(a.id === 'f-back-to-yours'))[0];
@@ -56,28 +55,32 @@ export default function Tonight() {
 
   const firstName = prefs.displayName.split(' ')[0];
   const hour = new Date().getHours();
+  const hello = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   return (
     <Screen>
-      <Text style={styles.wordmark}>SELFISH</Text>
-      <Text style={styles.greeting}>
-        {hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'}
+      <Wordmark />
+      <Display>
+        {hello}
         {firstName ? `, ${firstName}` : ''}.
-      </Text>
-      <Text style={styles.subline}>{eveningLine(hour)} Tell us the feeling — we&apos;ll find the session.</Text>
+      </Display>
+      <Caption>{eveningLine(hour)}</Caption>
 
-      {hero && <HeroCard family={hero} kicker={mood ? `For feeling ${MOODS.find((m) => m.id === mood)?.label.toLowerCase()}` : "Tonight's pick"} />}
+      {hero && (
+        <HeroCard
+          family={hero}
+          kicker={mood ? `for feeling ${MOODS.find((m) => m.id === mood)?.label.toLowerCase()}` : 'tonight'}
+        />
+      )}
 
       {continueFamilies.length > 0 && (
         <>
           <Heading>Pick up where you left off</Heading>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.rail}>
             {continueFamilies.map(({ entry, family }) => (
-              <View key={entry.familyId}>
+              <View key={entry.familyId} style={styles.continueItem}>
                 <SessionCard family={family!} compact />
-                <View style={styles.progressTrack}>
-                  <View style={[styles.progressFill, { width: `${Math.round(entry.progress * 100)}%` }]} />
-                </View>
+                <Progress value={entry.progress} />
               </View>
             ))}
           </ScrollView>
@@ -85,18 +88,12 @@ export default function Tonight() {
       )}
 
       <Heading>How do you want to feel?</Heading>
-      <View style={styles.chipWrap}>
+      <ChipRow>
         {MOODS.map((m) => (
-          <Chip key={m.id} label={m.label} hint={m.hint} selected={mood === m.id} onPress={() => setMood(mood === m.id ? null : m.id)} />
+          <Chip key={m.id} label={m.label} selected={mood === m.id} onPress={() => setMood(mood === m.id ? null : m.id)} />
         ))}
-      </View>
-
-      <Heading>Who&apos;s talking tonight?</Heading>
-      <Caption>Tap ▶ to hear them up close. Every voice is synthetic, honestly made — and sounds anything but.</Caption>
-      <VoiceRail selectedVoiceId={voiceId} onSelect={setVoiceId} />
-
-      <Heading>Fine-tune</Heading>
-      <View style={styles.chipWrap}>
+      </ChipRow>
+      <ChipRow>
         {(['comfort', 'slow-burn', 'spicy'] as HeatLevel[]).map((h) => (
           <Chip
             key={h}
@@ -107,51 +104,24 @@ export default function Tonight() {
         ))}
         <Chip label="Under 15 min" selected={length === 'short'} onPress={() => setLength(length === 'short' ? 'any' : 'short')} />
         <Chip label="Take your time" selected={length === 'long'} onPress={() => setLength(length === 'long' ? 'any' : 'long')} />
-      </View>
+      </ChipRow>
 
-      <Heading>{matches.length === 0 ? 'Nothing matches that exact feeling' : 'More for tonight'}</Heading>
-      {matches.length === 0 && (
-        <Caption style={{ marginBottom: spacing.md }}>Loosen a filter — or let the pick above surprise you.</Caption>
-      )}
+      <Heading>Who’s talking</Heading>
+      <VoiceRail selectedVoiceId={voiceId} onSelect={setVoiceId} />
+
+      <Heading>{matches.length === 0 ? 'Nothing in that feeling' : 'More for tonight'}</Heading>
+      {matches.length === 0 && <Caption>Stay with the pick above, or loosen a filter.</Caption>}
       {rest.map((f) => (
         <SessionCard key={f.id} family={f} />
       ))}
 
-      <Caption style={styles.foot}>
-        Every session is written, safety-reviewed, and produced before it reaches you. Nothing is
-        generated while you listen. 🎧 Best with headphones.
-      </Caption>
+      <Caption style={styles.foot}>Written and reviewed before it reaches you.</Caption>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  wordmark: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    letterSpacing: 3,
-    fontWeight: '700',
-    color: palette.gold,
-    marginTop: spacing.lg,
-  },
-  greeting: {
-    fontFamily: fonts.display,
-    fontSize: 36,
-    lineHeight: 44,
-    color: palette.text,
-    marginTop: spacing.sm,
-  },
-  subline: { fontFamily: fonts.body, fontSize: 15, lineHeight: 22, color: palette.textDim, marginTop: spacing.xs },
-  rail: { marginTop: spacing.sm, marginHorizontal: -spacing.md, paddingHorizontal: spacing.md },
-  chipWrap: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.sm },
-  progressTrack: {
-    height: 3,
-    backgroundColor: palette.border,
-    borderRadius: 2,
-    marginRight: spacing.md,
-    marginTop: -spacing.sm,
-    marginBottom: spacing.sm,
-  },
-  progressFill: { height: 3, backgroundColor: palette.gold, borderRadius: 2 },
+  rail: { marginTop: spacing.sm, marginHorizontal: -spacing.lg, paddingHorizontal: spacing.lg },
+  continueItem: { width: 168, marginRight: spacing.md },
   foot: { marginTop: spacing.xl, textAlign: 'center' },
 });

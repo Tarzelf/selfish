@@ -32,15 +32,48 @@ npm run web        # or: npx expo start (iOS simulator / Expo Go)
 
 The preview build runs entirely on-device: seed catalog in `src/data/catalog.ts`, preferences in AsyncStorage. **Sessions with a ▶ badge play real audio** rendered by the live pipeline (Grok script → safety classifier → Grok TTS → automated audio-QA); the voice transparency page has playable engine previews for every voice persona. Sessions without bundled audio use a simulated clock.
 
-**Shipped in the preview:** age gate, onboarding, Tonight / Browse / Rest / You, heat-cap variant gating, hard-limit filtering (including deep links), Continue rail, a permanent free tier (3 Desire + 3 Rest), and a 14-day Selfish+ preview that unlocks the rest of the catalog on-device. Stripe checkout and live Supabase sync are the next production step — they are not mocked as working payments.
+**Shipped in the preview:** age gate, onboarding, Tonight / Browse / Rest / You, heat-cap variant gating, hard-limit filtering (including deep links), Continue rail, a permanent free tier (3 Desire + 3 Rest), and **Whop checkout for web Selfish+** ($6.99/month with a 14-day trial, or $49.99/year). Live Supabase sync is the next production step.
+
+### How to test Whop (web)
+
+1. `cd apps/mobile && npm install && npm run web`
+2. Complete onboarding, then open **You → Membership** or a paid session (anything that is not one of the six free families).
+3. Tap **Start monthly · 14-day trial**. Checkout opens at Whop.
+4. **$0 test:** at checkout, apply promo `SELFISHTEST` (100% off for 12 months). Or start the monthly plan — it has a 14-day trial (card required, $0 today).
+5. Come back to the app. On `http://localhost` Whop cannot redirect (HTTPS only), so tap **I completed checkout** on the membership card. On an HTTPS deploy, a `?whop=success` return unlocks automatically.
+6. A paid session (e.g. House Rules / Arrivals) should now play.
+
+Direct checkout links (no app required):
+
+- Monthly: https://whop.com/checkout/plan_zORafaxaGY4u0
+- Annual: https://whop.com/checkout/plan_VFf0oi9xcP5Nx
+
+Selfish+ is **not** published to the Whop marketplace (adult catalog). Dashboard: company `biz_fsQF44lZBKbFMC`. iOS still needs Apple IAP later — Whop is web-only.
+
+### Brand
+
+The name is the mark. Sentence-case italic *Selfish* on ink (`#0F0D10`), paper bone (`#F0E8DF`), one metal (ember) used rarely. No tracked `SELFISH`, no hotel monogram, no gold jewel play button. Tokens live in `apps/mobile/src/constants/theme.ts`; primitives in `src/components/ui.tsx` are the only place screens should get color, type, space, or radius.
+
+Rendered assets (regenerate with `python3 apps/mobile/scripts/render-brand.py`):
+
+| Asset | Path |
+|---|---|
+| Logo / app icon | `apps/mobile/assets/brand/logo-1024.png` |
+| Banner | `apps/mobile/assets/brand/banner-1920x720.png` |
+| Store banner | `apps/mobile/assets/brand/store-banner-1500x500.png` |
+| Open Graph | `apps/mobile/assets/brand/og-1200x630.png` |
 
 ### Web deploy (for user testing)
 
 ```bash
 cd apps/mobile
-npx expo export --platform web     # static site in dist/
+npm run build                      # static site in dist/
 npx netlify deploy --prod --dir dist   # or any static host; netlify.toml included
 ```
+
+**Railway:** connect the GitHub repo at the **repository root** (not `packages/pipeline`). The root `Dockerfile` exports the Expo web app and serves `dist` on `$PORT`. Node 20. Do not use `expo start` as the production start command.
+
+If the Railway service root directory is already `apps/mobile`, `apps/mobile/railway.toml` + `npm run build` / `npm run serve:web` is the path.
 
 ## Running the pipeline demo
 
