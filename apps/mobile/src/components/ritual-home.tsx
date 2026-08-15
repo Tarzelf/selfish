@@ -1,27 +1,17 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { Chip } from '@/components/ui';
 import { fonts, radius, spacing } from '@/constants/theme';
-import { VARIANT_AUDIO } from '@/data/audio-map';
-import { closeForVoice, getFamily, getVoice, VOICES } from '@/data/catalog';
+import { closeForVoice, getVoice, VOICES } from '@/data/catalog';
 import { recycleVariant } from '@/data/close-catalog';
 import { useAtmosphere } from '@/lib/atmosphere';
+import { cueCloseLoop, feelingsOnHome, HOME_RECYCLES } from '@/lib/home-cue';
 import { useAppState } from '@/lib/store';
-import type { RecycleKey, SessionFamily } from '@/lib/types';
-import { AvatarGroup } from '@/motion/avatar-group';
+import { MOODS, type Mood, type RecycleKey, type SessionFamily } from '@/lib/types';
 import { LearnMore } from '@/motion/learn-more';
-import { ShimmerText } from '@/motion/shimmer-text';
-import { SlidingTabs } from '@/motion/sliding-tabs';
 import { TextsReveal } from '@/motion/texts-reveal';
-import { TextSwap } from '@/motion/text-swap';
-
-function alreadyHere(gender: string | undefined): string {
-  if (gender === 'F') return "She's already here.";
-  if (gender === 'NB') return "They're already here.";
-  return "He's already here.";
-}
 
 function openLoop(family: SessionFamily, variantId: string, play: boolean) {
   return {
@@ -30,38 +20,38 @@ function openLoop(family: SessionFamily, variantId: string, play: boolean) {
   };
 }
 
-const RECYCLES: { id: RecycleKey; label: string }[] = [
-  { id: 'again', label: 'Again' },
-  { id: 'slower', label: 'Slower' },
-  { id: 'closer', label: 'Closer' },
-  { id: 'after', label: 'After' },
-];
+function hello(part: 'morning' | 'evening', name: string) {
+  const hour = part === 'morning' ? 'Good morning' : 'Good evening';
+  return name ? `${hour}, ${name}.` : `${hour}.`;
+}
 
 export function RitualHome() {
   const router = useRouter();
-  const { palette } = useAtmosphere();
+  const { part, palette } = useAtmosphere();
   const { visibleCatalog, ritual, prefs } = useAppState();
   const closeLoops = useMemo(() => visibleCatalog.filter((f) => f.format === 'close'), [visibleCatalog]);
+  const feelings = useMemo(() => feelingsOnHome(closeLoops), [closeLoops]);
 
+  const [mood, setMood] = useState<Mood | null>(null);
   const [voiceId, setVoiceId] = useState<string | null>(null);
 
-  const cued = useMemo(() => {
-    if (voiceId) return closeForVoice(voiceId, closeLoops) ?? closeLoops[0];
-    const remembered = ritual.lastFinishedFamilyId ?? ritual.lastFamilyId;
-    if (remembered) {
-      const found = closeLoops.find((f) => f.id === remembered) ?? getFamily(remembered);
-      if (found && found.format === 'close' && closeLoops.some((f) => f.id === found.id)) return found;
-    }
-    return closeLoops.find((f) => f.id === 'f-stay') ?? closeLoops[0];
-  }, [voiceId, closeLoops, ritual.lastFinishedFamilyId, ritual.lastFamilyId]);
+  const cued = useMemo(
+    () =>
+      cueCloseLoop({
+        loops: closeLoops,
+        mood,
+        voiceId,
+        lastFamilyId: ritual.lastFinishedFamilyId ?? ritual.lastFamilyId,
+      }),
+    [closeLoops, mood, voiceId, ritual.lastFinishedFamilyId, ritual.lastFamilyId],
+  );
 
   if (!cued) {
     return (
-      <View style={styles.empty}>
+      <View style={styles.wrap}>
         <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
-        <TextsReveal>
-          <Text style={[styles.line, { color: palette.text }]}>Raise heat to Close in You — then this room opens.</Text>
-        </TextsReveal>
+        <Text style={[styles.headline, { color: palette.text }]}>What do you want to feel.</Text>
+        <Text style={[styles.lede, { color: palette.text }]}>Raise heat to Close in You — then this room opens.</Text>
       </View>
     );
   }
@@ -82,6 +72,7 @@ export function RitualHome() {
     defaultVariant.label.toLowerCase() === 'after'
       ? (defaultVariant.label.toLowerCase() as RecycleKey)
       : 'again';
+  const feelingLabel = mood ? (MOODS.find((m) => m.id === mood)?.label ?? 'Wanted') : null;
 
   const go = (key: RecycleKey) => {
     if (key === 'again') {
@@ -94,39 +85,82 @@ export function RitualHome() {
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.wordmarkChip}>
-        <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
-      </View>
+      <Text style={[styles.wordmark, { color: palette.text }]}>Selfish</Text>
       <TextsReveal>
-        <Text style={[styles.line, { color: palette.text }]}>{alreadyHere(voice?.gender)}</Text>
-        {firstName ? <Text style={[styles.aside, { color: palette.text }]}>{firstName}.</Text> : <Text style={[styles.aside, { color: palette.text }]}> </Text>}
+        <Text style={[styles.hello, { color: palette.text }]}>{hello(part, firstName)}</Text>
+        <Text style={[styles.headline, { color: palette.text }]}>What do you want{'\n'}to feel.</Text>
       </TextsReveal>
 
-      <LinearGradient colors={['#2B1631', '#1A121F']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.stage}>
-        <View style={styles.orb} />
-        <ShimmerText text="HEADPHONES ON" style={styles.kicker} />
-        <TextSwap text={cued.title} style={styles.title} />
-        <TextSwap
-          text={`${voice?.name ?? ''} · ${minutes} min${VARIANT_AUDIO[defaultVariant.id] ? '  ·  ▶' : ''}`}
-          style={styles.meta}
-        />
+      <View style={styles.feelings}>
+        {feelings.map((id) => {
+          const meta = MOODS.find((m) => m.id === id);
+          if (!meta) return null;
+          return (
+            <Chip
+              key={id}
+              label={meta.label}
+              selected={mood === id}
+              onPress={() => {
+                setMood(mood === id ? null : id);
+              }}
+            />
+          );
+        })}
+      </View>
+
+      <View style={[styles.stage, { borderColor: palette.border }]}>
+        {feelingLabel ? (
+          <Text style={[styles.kicker, { color: palette.gold }]}>{feelingLabel.toLowerCase()}</Text>
+        ) : (
+          <Text style={[styles.kicker, { color: palette.gold }]}>for you</Text>
+        )}
+        <Text style={[styles.title, { color: palette.text }]}>{cued.title}</Text>
+        <Text style={[styles.blurb, { color: palette.text }]}>{cued.blurb}</Text>
+        <Text style={[styles.meta, { color: palette.text }]}>
+          {voice?.name}
+          {voice?.descriptor ? ` · ${voice.descriptor}` : ''}
+        </Text>
+        {cued.lovedFor.length > 0 ? (
+          <Text style={[styles.loved, { color: palette.textDim }]}>loved for {cued.lovedFor.join(', ')}</Text>
+        ) : null}
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={`Play ${cued.title}`}
+          accessibilityLabel={`Play ${cued.title}, ${minutes} minutes, ${voice?.name ?? ''}`}
           onPress={() => router.push(openLoop(cued, defaultVariant.id, true))}
-          style={({ pressed }) => [styles.play, { backgroundColor: palette.gold }, pressed && { opacity: 0.85, transform: [{ scale: 0.98 }] }]}
+          style={({ pressed }) => [styles.play, { backgroundColor: palette.gold }, pressed && { opacity: 0.88 }]}
         >
-          <Text style={[styles.playGlyph, { color: palette.onAccent }]}>▶</Text>
+          <Text style={[styles.playLabel, { color: palette.onAccent }]}>
+            Play {cued.title} · {minutes} min
+          </Text>
         </Pressable>
-      </LinearGradient>
-
-      <View style={styles.recycles}>
-        <SlidingTabs tabs={RECYCLES} selected={cuedRecycle} onSelect={(id) => go(id as RecycleKey)} />
       </View>
 
-      <Text style={[styles.mouthsKicker, { color: palette.textFaint }]}>other mouths</Text>
-      <AvatarGroup style={styles.mouths}>
+      <Text style={[styles.sameVoice, { color: palette.text }]}>Same voice</Text>
+      <View style={styles.recycles}>
+        {HOME_RECYCLES.map((item) => {
+          const selected = cuedRecycle === item.id;
+          return (
+            <Pressable
+              key={item.id}
+              accessibilityRole="button"
+              accessibilityLabel={`${item.label}, ${item.hint}`}
+              onPress={() => go(item.id)}
+              style={({ pressed }) => [
+                styles.recycle,
+                { borderColor: selected ? palette.gold : palette.border, backgroundColor: selected ? palette.gold : '#121214' },
+                pressed && { opacity: 0.85 },
+              ]}
+            >
+              <Text style={[styles.recycleLabel, { color: selected ? palette.onAccent : palette.text }]}>{item.label}</Text>
+              <Text style={[styles.recycleHint, { color: selected ? palette.onAccent : palette.textDim }]}>{item.hint}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <Text style={[styles.voicesKicker, { color: palette.text }]}>A voice you know</Text>
+      <View style={styles.voices}>
         {VOICES.map((v) => {
           const hasLoop = closeForVoice(v.id, closeLoops);
           if (!hasLoop) return null;
@@ -137,20 +171,20 @@ export function RitualHome() {
               accessibilityRole="button"
               accessibilityLabel={v.name}
               accessibilityState={{ selected }}
-              onPress={() => setVoiceId(v.id)}
+              onPress={() => setVoiceId(voiceId === v.id ? null : v.id)}
               style={({ pressed }) => [
-                styles.mouth,
-                { borderColor: palette.border, backgroundColor: palette.surface },
-                selected && { borderColor: palette.gold, backgroundColor: palette.goldSoft },
-                pressed && { opacity: 0.8 },
+                styles.voice,
+                { borderColor: selected ? palette.gold : palette.border, backgroundColor: selected ? palette.goldSoft : '#121214' },
+                pressed && { opacity: 0.85 },
               ]}
             >
-              <Text style={[styles.mouthGlyph, { color: palette.textDim }, selected && { color: palette.gold }]}>{v.name.charAt(0)}</Text>
+              <Text style={[styles.voiceName, { color: selected ? palette.gold : palette.text }]}>{v.name}</Text>
             </Pressable>
           );
         })}
-      </AvatarGroup>
+      </View>
 
+      <Text style={[styles.privacy, { color: palette.textDim }]}>Private on this device. Headphones if you have them.</Text>
       <LearnMore label="Stories, if you have time" onPress={() => router.push('/browse')} />
     </View>
   );
@@ -158,112 +192,140 @@ export function RitualHome() {
 
 const styles = StyleSheet.create({
   wrap: { paddingTop: spacing.lg },
-  empty: { paddingTop: spacing.xxl },
-  wordmarkChip: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#121214',
-    borderColor: 'rgba(245,245,247,0.14)',
-    borderWidth: StyleSheet.hairlineWidth,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
   wordmark: {
     fontFamily: fonts.body,
-    fontSize: 15,
-    letterSpacing: -0.2,
+    fontSize: 13,
+    letterSpacing: 1.4,
     fontWeight: '700',
+    textTransform: 'uppercase',
   },
-  line: {
+  hello: {
+    fontFamily: fonts.body,
+    fontSize: 16,
+    marginTop: spacing.xl,
+    letterSpacing: -0.2,
+  },
+  headline: {
     fontFamily: fonts.display,
-    fontSize: 48,
-    lineHeight: 50,
-    marginTop: spacing.md,
+    fontSize: 44,
+    lineHeight: 46,
+    marginTop: spacing.sm,
     letterSpacing: -1.2,
     fontWeight: '700',
-    textShadowColor: 'rgba(0,0,0,0.75)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 28,
   },
-  aside: {
-    fontFamily: fonts.display,
-    fontStyle: 'italic',
-    fontSize: 22,
-    marginTop: spacing.xs,
-    textShadowColor: 'rgba(0,0,0,0.7)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 16,
+  lede: {
+    fontFamily: fonts.body,
+    fontSize: 17,
+    lineHeight: 24,
+    marginTop: spacing.md,
+  },
+  feelings: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: spacing.lg,
   },
   stage: {
     marginTop: spacing.xl,
-    borderRadius: radius.lg + 8,
-    paddingVertical: spacing.xl,
+    borderRadius: radius.lg + 4,
+    paddingVertical: spacing.lg,
     paddingHorizontal: spacing.lg,
-    alignItems: 'center',
-    overflow: 'hidden',
+    backgroundColor: '#121214',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    minHeight: 280,
-    justifyContent: 'center',
-  },
-  orb: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 280,
-    top: -120,
-    right: -80,
-    backgroundColor: 'rgba(224,138,120,0.22)',
   },
   kicker: {
     fontFamily: fonts.body,
-    fontSize: 11,
-    letterSpacing: 2.2,
+    fontSize: 12,
+    letterSpacing: 1.6,
     fontWeight: '700',
-    color: '#E8B98A',
+    textTransform: 'lowercase',
   },
   title: {
     fontFamily: fonts.display,
-    fontSize: 44,
-    lineHeight: 50,
-    color: '#F7F1E8',
+    fontSize: 40,
+    lineHeight: 44,
     marginTop: spacing.sm,
-    textAlign: 'center',
     letterSpacing: -0.6,
+    fontWeight: '700',
+  },
+  blurb: {
+    fontFamily: fonts.body,
+    fontSize: 17,
+    lineHeight: 24,
+    marginTop: spacing.sm,
+    maxWidth: 420,
   },
   meta: {
     fontFamily: fonts.body,
     fontSize: 14,
-    color: 'rgba(243,237,247,0.72)',
+    lineHeight: 20,
+    marginTop: spacing.md,
+  },
+  loved: {
+    fontFamily: fonts.body,
+    fontSize: 13,
     marginTop: spacing.xs,
-    textAlign: 'center',
   },
   play: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: spacing.lg,
+    borderRadius: radius.pill,
+    paddingVertical: 16,
+    paddingHorizontal: 22,
+    alignItems: 'center',
   },
-  playGlyph: { fontSize: 28, marginLeft: 4 },
-  recycles: { marginTop: spacing.lg },
-  mouthsKicker: {
+  playLabel: {
     fontFamily: fonts.body,
-    fontSize: 11,
-    letterSpacing: 1.8,
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  sameVoice: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    fontWeight: '600',
+    marginTop: spacing.xl,
+    letterSpacing: -0.1,
+  },
+  recycles: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: spacing.sm,
+  },
+  recycle: {
+    flexGrow: 1,
+    flexBasis: '22%',
+    minWidth: 72,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  recycleLabel: { fontFamily: fonts.body, fontSize: 13, fontWeight: '700' },
+  recycleHint: { fontFamily: fonts.body, fontSize: 11, marginTop: 2 },
+  voicesKicker: {
+    fontFamily: fonts.body,
+    fontSize: 13,
+    fontWeight: '600',
+    marginTop: spacing.xl,
+  },
+  voices: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: spacing.sm,
+  },
+  voice: {
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+  },
+  voiceName: { fontFamily: fonts.body, fontSize: 14, fontWeight: '600' },
+  privacy: {
+    fontFamily: fonts.body,
+    fontSize: 13,
     textAlign: 'center',
     marginTop: spacing.xl,
-    textTransform: 'lowercase',
   },
-  mouths: { marginTop: spacing.sm, gap: spacing.sm },
-  mouth: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  mouthGlyph: { fontFamily: fonts.display, fontSize: 18 },
 });

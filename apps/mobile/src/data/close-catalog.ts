@@ -29,7 +29,7 @@ export const CLOSE_CATALOG: SessionFamily[] = [
   closeFamily({
     id: 'f-stay',
     title: 'Stay',
-    blurb: 'The door is closed. He is already in the room.',
+    blurb: 'You closed the door. He stayed.',
     dynamic: 'In your ear',
     voiceId: 'v-jasper',
     moods: ['wanted', 'adored'],
@@ -48,7 +48,7 @@ export const CLOSE_CATALOG: SessionFamily[] = [
   closeFamily({
     id: 'f-right-here',
     title: 'Right Here',
-    blurb: 'Close to the microphone. Closer than that.',
+    blurb: 'Closer than the microphone. Only for you.',
     dynamic: 'In your ear',
     voiceId: 'v-rowan',
     moods: ['wanted', 'comforted'],
@@ -67,10 +67,10 @@ export const CLOSE_CATALOG: SessionFamily[] = [
   closeFamily({
     id: 'f-the-list',
     title: 'The List',
-    blurb: 'He has been keeping track. He is going to tell you.',
+    blurb: 'Everything he noticed. Said out loud, to you.',
     dynamic: 'Praise',
     voiceId: 'v-elias',
-    moods: ['adored', 'wanted'],
+    moods: ['adored', 'wanted', 'missed'],
     tags: ['praise', 'close', 'boyfriend'],
     contentNotes: ['explicit praise', 'dirty talk'],
     heatRange: ['comfort', 'spicy'],
@@ -86,7 +86,7 @@ export const CLOSE_CATALOG: SessionFamily[] = [
   closeFamily({
     id: 'f-quiet',
     title: 'Quiet',
-    blurb: 'She says your name like it settles an argument.',
+    blurb: 'She says your name like it settles something.',
     dynamic: 'In your ear',
     voiceId: 'v-noor',
     moods: ['wanted', 'adored'],
@@ -108,7 +108,7 @@ export const CLOSE_CATALOG: SessionFamily[] = [
     blurb: 'A laugh held just behind the teeth. Then she stops laughing.',
     dynamic: 'Tease',
     voiceId: 'v-camille',
-    moods: ['teased', 'wanted'],
+    moods: ['teased', 'wanted', 'in-charge'],
     tags: ['F4F', 'close', 'banter'],
     contentNotes: ['explicit dirty talk', 'teasing', 'F4F'],
     heatRange: ['comfort', 'spicy'],

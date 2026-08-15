@@ -48,27 +48,33 @@ This is what "varieties they can literally recycle" means. Not a content firehos
 
 ## The ritual (home, after Close is on)
 
+Women do not open Quinn for "a man is already in the room." They open it for a **feeling they choose**: aftercare, praise, boyfriend, wanted, in charge (Quinn's own top tags; Maya's mood set; Nagoski's accelerator after the brakes are off).
+
 ```
           SELFISH
 
-     He's already here.
+     Good evening, Ada.
+     What do you want to feel.
 
-           [ ▶ ]
-      Jasper · Stay right there
-           4 min
+     [Wanted] [Adored] [Held] [In charge]
 
-     Again    Slower    Closer    After
+     Stay
+     You closed the door. He stayed.
+     Jasper · Play Stay · 4 min
 
-     — other mouths —
-     [J] [E] [R] [N] …
+     Same voice
+     Again (the take) · Slower (more breath) · Closer · After (aftercare)
+
+     A voice you know
+     Jasper  Elias  Rowan  Noor  Camille  Ash
 ```
 
-One thumb. Headphones on. No decisions.
+She is the subject. The voice has a name. Recycles stay — they are the habit — but they are not the first sentence.
 
-- First session of the day: the loop she finished last, or the house pick for her favorite voice
-- Mid-loop: she can switch recycle without leaving
-- After it ends: it does **not** disappear. It offers Again. That's the multiple-times-a-day hook.
-- Stories and Rest live one tab over, for when she wants them. They are not the front door.
+- First open: the loop she finished last, unless she taps a feeling or a voice
+- Recycles stay one tap away from the same mouth
+- After it ends: it does **not** disappear. Again is the multiple-times-a-day hook.
+- Stories and Rest live one tab over. They are not the front door.
 
 ## What we will not do
 

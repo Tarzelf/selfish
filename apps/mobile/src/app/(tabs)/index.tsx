@@ -92,9 +92,16 @@ function EditorialTonight() {
       </View>
       <Text style={[styles.greeting, { color: palette.text }]}>
         {copy.hello}
-        {firstName ? `,\n${firstName}` : ''}.
+        {firstName ? `, ${firstName}` : ''}.
       </Text>
-      <Text style={[styles.subline, { color: palette.textDim }]}>{copy.line} Tell us the feeling — we&apos;ll find the session.</Text>
+      <Text style={[styles.headline, { color: palette.text }]}>What do you want{'\n'}to feel.</Text>
+      <Text style={[styles.subline, { color: palette.text }]}>{copy.line}</Text>
+
+      <View style={styles.chipWrap}>
+        {MOODS.map((m) => (
+          <Chip key={m.id} label={m.label} selected={mood === m.id} onPress={() => setMood(mood === m.id ? null : m.id)} />
+        ))}
+      </View>
 
       {hero && <HeroCard family={hero} kicker={mood ? `For feeling ${MOODS.find((m) => m.id === mood)?.label.toLowerCase()}` : copy.kicker} />}
 
@@ -113,13 +120,6 @@ function EditorialTonight() {
           </ScrollView>
         </>
       )}
-
-      <Heading>How do you want to feel?</Heading>
-      <View style={styles.chipWrap}>
-        {MOODS.map((m) => (
-          <Chip key={m.id} label={m.label} hint={m.hint} selected={mood === m.id} onPress={() => setMood(mood === m.id ? null : m.id)} />
-        ))}
-      </View>
 
       <Heading>{copy.who}</Heading>
       <Caption>Tap ▶ to hear them up close. Every voice is synthetic, honestly made — and sounds anything but.</Caption>
@@ -174,15 +174,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   greeting: {
+    fontFamily: fonts.body,
+    fontSize: 16,
+    marginTop: spacing.xl,
+    letterSpacing: -0.2,
+  },
+  headline: {
     fontFamily: fonts.display,
-    fontSize: 52,
-    lineHeight: 52,
-    letterSpacing: -1.4,
+    fontSize: 44,
+    lineHeight: 46,
+    letterSpacing: -1.2,
     fontWeight: '700',
-    marginTop: spacing.md,
-    textShadowColor: 'rgba(0,0,0,0.45)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 28,
+    marginTop: spacing.sm,
   },
   subline: {
     fontFamily: fonts.body,
