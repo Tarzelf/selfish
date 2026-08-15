@@ -50,6 +50,21 @@ Direct checkout links (no app required):
 
 Selfish+ is **not** published to the Whop marketplace (adult catalog). Dashboard: company `biz_fsQF44lZBKbFMC`. iOS still needs Apple IAP later — Whop is web-only.
 
+### Brand
+
+The preview used Expo’s default blue chevron as the app icon. The real system is already in `apps/mobile/src/constants/theme.ts` and the cover-art language: wine-and-candlelight (`#141019`), champagne gold (`#DFAE72`), italic display serif, letter-spaced `SELFISH` mark.
+
+Rendered assets (regenerate with `python3 apps/mobile/scripts/render-brand.py`):
+
+| Asset | Path |
+|---|---|
+| Logo / app icon | `apps/mobile/assets/brand/logo-1024.png` |
+| Selfish+ banner | `apps/mobile/assets/brand/banner-1920x720.png` |
+| Store banner | `apps/mobile/assets/brand/store-banner-1500x500.png` |
+| Open Graph | `apps/mobile/assets/brand/og-1200x630.png` |
+
+Those are live on the Whop company (logo, banner, OG). Store accent is gold.
+
 ### Web deploy (for user testing)
 
 ```bash
