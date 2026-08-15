@@ -9,8 +9,10 @@ import {
   heatAllowed,
   isBlockedByLimits,
   isFamilyVisible,
+  hasCatalogAccess,
   isFreeFamily,
   isPreviewActive,
+  isWhopMember,
   lockedVariants,
   previewDaysLeft,
   visibleCatalog,
@@ -126,4 +128,18 @@ test('preview entitlement unlocks the paid catalog for 14 days', () => {
   assert.equal(isPreviewActive(expired, now), false);
   assert.equal(canPlay(houseRules, expired, now), false);
   assert.equal(canPlay(backToYours, expired, now), true);
+});
+
+test('Whop checkout unlocks the paid catalog and outlasts an expired preview', () => {
+  const now = Date.UTC(2026, 7, 15);
+  const paid = {
+    ...DEFAULT_PREFERENCES,
+    heatCap: 'spicy' as const,
+    membershipStartedAt: now - 15 * 24 * 60 * 60 * 1000,
+    whopEntitledAt: now,
+  };
+  assert.equal(isWhopMember(paid), true);
+  assert.equal(isPreviewActive(paid, now), false);
+  assert.equal(hasCatalogAccess(paid, now), true);
+  assert.equal(canPlay(houseRules, paid, now), true);
 });

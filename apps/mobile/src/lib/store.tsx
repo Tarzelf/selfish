@@ -27,6 +27,7 @@ interface AppState {
   familyVisible: (family: SessionFamily) => boolean;
   canPlayFamily: (family: SessionFamily) => boolean;
   startPreview: () => void;
+  activateWhopMembership: () => void;
 }
 
 const Ctx = createContext<AppState | null>(null);
@@ -89,6 +90,10 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setPrefs({ membershipStartedAt: Date.now() });
   }, [setPrefs]);
 
+  const activateWhopMembership = useCallback(() => {
+    setPrefs({ whopEntitledAt: Date.now() });
+  }, [setPrefs]);
+
   const visibleCatalog = useMemo(() => filterCatalog(CATALOG, prefs), [prefs]);
 
   const value = useMemo(
@@ -104,6 +109,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       familyVisible,
       canPlayFamily,
       startPreview,
+      activateWhopMembership,
     }),
     [
       ready,
@@ -117,6 +123,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       familyVisible,
       canPlayFamily,
       startPreview,
+      activateWhopMembership,
     ],
   );
 

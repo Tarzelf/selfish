@@ -38,8 +38,19 @@ export function isFreeFamily(family: SessionFamily): boolean {
   return FREE_FAMILY_IDS.has(family.id);
 }
 
+export function isWhopMember(prefs: Pick<Preferences, 'whopEntitledAt'>): boolean {
+  return prefs.whopEntitledAt != null;
+}
+
 export function isPreviewActive(prefs: Pick<Preferences, 'membershipStartedAt'>, now = Date.now()): boolean {
   return prefs.membershipStartedAt != null && now - prefs.membershipStartedAt < PREVIEW_MS;
+}
+
+export function hasCatalogAccess(
+  prefs: Pick<Preferences, 'membershipStartedAt' | 'whopEntitledAt'>,
+  now = Date.now(),
+): boolean {
+  return isWhopMember(prefs) || isPreviewActive(prefs, now);
 }
 
 export function previewDaysLeft(prefs: Pick<Preferences, 'membershipStartedAt'>, now = Date.now()): number {
@@ -49,11 +60,11 @@ export function previewDaysLeft(prefs: Pick<Preferences, 'membershipStartedAt'>,
 
 export function canPlay(
   family: SessionFamily,
-  prefs: Pick<Preferences, 'heatCap' | 'hardLimits' | 'membershipStartedAt'>,
+  prefs: Pick<Preferences, 'heatCap' | 'hardLimits' | 'membershipStartedAt' | 'whopEntitledAt'>,
   now = Date.now(),
 ): boolean {
   if (!isFamilyVisible(family, prefs)) return false;
-  return isFreeFamily(family) || isPreviewActive(prefs, now);
+  return isFreeFamily(family) || hasCatalogAccess(prefs, now);
 }
 
 export function visibleCatalog<T extends SessionFamily>(

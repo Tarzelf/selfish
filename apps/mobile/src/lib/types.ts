@@ -103,8 +103,10 @@ export interface Preferences {
   hardLimits: string[];
   /** Neutral lock-screen/Now Playing metadata + blurred artwork. */
   discreetMode: boolean;
-  /** When the 14-day Selfish+ preview started. Null = free tier only. */
+  /** When the 14-day Selfish+ preview started. Null = no local preview. */
   membershipStartedAt: number | null;
+  /** Set after a successful Whop web checkout return. Does not expire on-device. */
+  whopEntitledAt: number | null;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
@@ -118,6 +120,7 @@ export const DEFAULT_PREFERENCES: Preferences = {
   hardLimits: [],
   discreetMode: true,
   membershipStartedAt: null,
+  whopEntitledAt: null,
 };
 
 /** Tags a user may exclude globally during onboarding. */

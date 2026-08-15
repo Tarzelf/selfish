@@ -32,7 +32,23 @@ npm run web        # or: npx expo start (iOS simulator / Expo Go)
 
 The preview build runs entirely on-device: seed catalog in `src/data/catalog.ts`, preferences in AsyncStorage. **Sessions with a ▶ badge play real audio** rendered by the live pipeline (Grok script → safety classifier → Grok TTS → automated audio-QA); the voice transparency page has playable engine previews for every voice persona. Sessions without bundled audio use a simulated clock.
 
-**Shipped in the preview:** age gate, onboarding, Tonight / Browse / Rest / You, heat-cap variant gating, hard-limit filtering (including deep links), Continue rail, a permanent free tier (3 Desire + 3 Rest), and a 14-day Selfish+ preview that unlocks the rest of the catalog on-device. Stripe checkout and live Supabase sync are the next production step — they are not mocked as working payments.
+**Shipped in the preview:** age gate, onboarding, Tonight / Browse / Rest / You, heat-cap variant gating, hard-limit filtering (including deep links), Continue rail, a permanent free tier (3 Desire + 3 Rest), and **Whop checkout for web Selfish+** ($6.99/month with a 14-day trial, or $49.99/year). Live Supabase sync is the next production step.
+
+### How to test Whop (web)
+
+1. `cd apps/mobile && npm install && npm run web`
+2. Complete onboarding, then open **You → Membership** or a paid session (anything that is not one of the six free families).
+3. Tap **Start monthly · 14-day trial**. Checkout opens at Whop.
+4. **$0 test:** at checkout, apply promo `SELFISHTEST` (100% off for 12 months). Or start the monthly plan — it has a 14-day trial (card required, $0 today).
+5. Come back to the app. On `http://localhost` Whop cannot redirect (HTTPS only), so tap **I completed checkout** on the membership card. On an HTTPS deploy, a `?whop=success` return unlocks automatically.
+6. A paid session (e.g. House Rules / Arrivals) should now play.
+
+Direct checkout links (no app required):
+
+- Monthly: https://whop.com/checkout/plan_zORafaxaGY4u0
+- Annual: https://whop.com/checkout/plan_VFf0oi9xcP5Nx
+
+Selfish+ is **not** published to the Whop marketplace (adult catalog). Dashboard: company `biz_fsQF44lZBKbFMC`. iOS still needs Apple IAP later — Whop is web-only.
 
 ### Web deploy (for user testing)
 
