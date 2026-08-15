@@ -213,6 +213,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     backgroundColor: '#060608',
   },
+  shell: { flex: 1, width: '100%', maxWidth: SHELL_MAX_WIDTH, alignSelf: 'center' },
   display: {
     fontFamily: fonts.display,
     fontSize: 42,
