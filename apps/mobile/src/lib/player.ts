@@ -25,6 +25,8 @@ export interface Playback {
   seekBy: (deltaSec: number) => void;
   /** Jump to a fraction (0..1), preserving play state. Used by variant switching. */
   seekTo: (fraction: number) => void;
+  /** The Again button: start over and play. */
+  restart: () => void;
 }
 
 export function usePlayback(
@@ -101,6 +103,16 @@ export function usePlayback(
     [isReal, mockDurationSec, player, realDuration],
   );
 
+  const restart = useCallback(() => {
+    if (!isReal) {
+      setMockElapsed(0);
+      setMockPlaying(true);
+      return;
+    }
+    player.seekTo(0);
+    player.play();
+  }, [isReal, player]);
+
   if (isReal) {
     const durationSec = realDuration || 1;
     return {
@@ -112,6 +124,7 @@ export function usePlayback(
       toggle,
       seekBy,
       seekTo,
+      restart,
     };
   }
 
@@ -124,6 +137,7 @@ export function usePlayback(
     toggle,
     seekBy,
     seekTo,
+    restart,
   };
 }
 

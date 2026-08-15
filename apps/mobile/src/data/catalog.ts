@@ -1,5 +1,9 @@
 import type { SessionFamily, Series, Voice } from '@/lib/types';
 
+import { CLOSE_CATALOG } from '@/data/close-catalog';
+
+export { CLOSE_CATALOG, closeForVoice, recycleVariant } from '@/data/close-catalog';
+
 /**
  * Seed catalog for the preview build.
  * In production this is served from Supabase (see /supabase/migrations) and
@@ -81,10 +85,13 @@ export const SERIES: Series[] = [
 ];
 
 export const CATALOG: SessionFamily[] = [
-  // ——— Desire: Boyfriend experience ———
+  ...CLOSE_CATALOG,
+
+  // ——— Desire: Boyfriend experience (Warm stories) ———
   {
     id: 'f-back-to-yours',
     shelf: 'desire',
+    format: 'story',
     title: 'Back to Yours',
     blurb: 'The dinner party ran long. He kept catching your eye across the table, and now the walk home is taking a very deliberate detour.',
     dynamic: 'Boyfriend experience',
@@ -107,6 +114,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-sunday-morning',
     shelf: 'desire',
+    format: 'story',
     title: 'Sunday, Stay',
     blurb: 'No alarms. His arm over your waist, his voice still rough with sleep, and a very persuasive argument against getting up.',
     dynamic: 'Boyfriend experience',
@@ -125,6 +133,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-airport-run',
     shelf: 'desire',
+    format: 'story',
     title: 'Arrivals',
     blurb: 'Three weeks apart, and he is waiting at the barrier pretending he has been fine. He has not been fine.',
     dynamic: 'Reunion',
@@ -148,6 +157,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-after-the-win',
     shelf: 'desire',
+    format: 'story',
     title: 'After the Win',
     blurb: 'You closed the deal. He heard everything through the door, and he has opinions about how brilliant you are. Detailed opinions.',
     dynamic: 'Praise',
@@ -167,6 +177,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-long-week',
     shelf: 'desire',
+    format: 'story',
     title: 'The Long Week',
     blurb: 'You have been holding everyone else together for five days. Tonight somebody notices, sits you down, and takes over.',
     dynamic: 'Praise',
@@ -189,6 +200,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-borrowed-jacket',
     shelf: 'desire',
+    format: 'story',
     title: 'The Borrowed Jacket',
     blurb: "Your best friend of six years just watched you put on his jacket, and something in his face finally gave him away.",
     dynamic: 'Friends to lovers',
@@ -208,6 +220,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-two-truths',
     shelf: 'desire',
+    format: 'story',
     title: 'Two Truths',
     blurb: 'A road trip, a shared playlist, and a game that was supposed to be innocent. Camille never plays anything innocently.',
     dynamic: 'Friends to lovers',
@@ -228,6 +241,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-house-rules',
     shelf: 'desire',
+    format: 'story',
     title: 'House Rules',
     blurb: 'The concierge at the Tide House has exactly one rule for guests who cannot switch off: let someone else decide for a while. You checked the box at booking. He read it.',
     dynamic: 'Soft dom',
@@ -248,6 +262,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-say-when',
     shelf: 'desire',
+    format: 'story',
     title: 'Say When',
     blurb: 'You are in charge tonight — he just needs you to say so out loud. He is very good at waiting. Annoyingly good.',
     dynamic: 'You lead',
@@ -269,6 +284,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-heavy-day',
     shelf: 'desire',
+    format: 'story',
     title: 'Heavy Day',
     blurb: 'No plot. No demands. Ash makes tea, puts your phone face-down, and stays until your shoulders drop.',
     dynamic: 'Comfort',
@@ -287,6 +303,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-apology',
     shelf: 'desire',
+    format: 'story',
     title: 'The Apology',
     blurb: 'He was wrong, he knows it, and he is not going to be casual about it. A masterclass in taking responsibility, delivered quietly, from very close.',
     dynamic: 'Apology',
@@ -305,6 +322,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-emberlight-2',
     shelf: 'desire',
+    format: 'story',
     title: 'Shelf Life',
     blurb: 'The bookshop is closed. Noor is re-shelving poetry, reading the good lines out loud, and standing closer each time you pretend to browse.',
     dynamic: 'Slow burn',
@@ -328,6 +346,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-rain-on-glass',
     shelf: 'rest',
+    format: 'rest',
     title: 'Rain on the Glass',
     blurb: 'A storm outside, a fire inside, and Rowan reading you toward sleep with no intention of finishing the chapter.',
     dynamic: 'Read to sleep',
@@ -346,6 +365,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-night-train',
     shelf: 'rest',
+    format: 'rest',
     title: 'Night Train South',
     blurb: 'A sleeper cabin, a slow country going past in the dark, and a voice keeping gentle track of it all so you do not have to.',
     dynamic: 'Sleep story',
@@ -363,6 +383,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-unwind-count',
     shelf: 'rest',
+    format: 'rest',
     title: 'Ten Slow Things',
     blurb: 'A breath-paced body scan from Noor: ten unhurried instructions, each one heavier than the last.',
     dynamic: 'Wind-down',
@@ -380,6 +401,7 @@ export const CATALOG: SessionFamily[] = [
   {
     id: 'f-harbor-morning',
     shelf: 'rest',
+    format: 'rest',
     title: 'The Harbor Before Anyone',
     blurb: 'Elias narrates an empty harbor at dawn — ropes, gulls, slow water — until the world feels manageable again.',
     dynamic: 'Sleep story',

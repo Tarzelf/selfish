@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { HeroCard } from '@/components/hero-card';
+import { RitualHome } from '@/components/ritual-home';
 import { SessionCard } from '@/components/session-card';
 import { VoiceRail } from '@/components/voice-rail';
 import { Caption, Chip, Heading, Screen } from '@/components/ui';
@@ -20,14 +21,28 @@ function eveningLine(hour: number): string {
 }
 
 export default function Tonight() {
-  const { prefs, visibleCatalog, continueList, heatAllowed } = useAppState();
+  const { prefs } = useAppState();
+  if (prefs.heatCap === 'spicy') {
+    return (
+      <Screen>
+        <RitualHome />
+      </Screen>
+    );
+  }
+  return <EditorialTonight />;
+}
 
+function EditorialTonight() {
+  const { prefs, visibleCatalog, continueList, heatAllowed } = useAppState();
   const [mood, setMood] = useState<Mood | null>(null);
   const [voiceId, setVoiceId] = useState<string | null>(null);
   const [heat, setHeat] = useState<HeatLevel | null>(null);
   const [length, setLength] = useState<LengthPick>('any');
 
-  const desire = useMemo(() => visibleCatalog.filter((f) => f.shelf === 'desire'), [visibleCatalog]);
+  const desire = useMemo(
+    () => visibleCatalog.filter((f) => f.shelf === 'desire' && f.format !== 'close'),
+    [visibleCatalog],
+  );
 
   const matches = useMemo(() => {
     return desire
@@ -42,7 +57,6 @@ export default function Tonight() {
       .sort((a, b) => b.rating - a.rating);
   }, [desire, mood, voiceId, heat, length, heatAllowed]);
 
-  // Hero: best match for the current mood — prefer sessions with real audio.
   const hero = useMemo(() => {
     const pool = matches.length > 0 ? matches : desire;
     return [...pool].sort((a, b) => Number(b.id === 'f-back-to-yours') - Number(a.id === 'f-back-to-yours'))[0];
@@ -70,7 +84,7 @@ export default function Tonight() {
 
       {continueFamilies.length > 0 && (
         <>
-          <Heading>Pick up where he left off</Heading>
+          <Heading>Pick up where they left off</Heading>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.rail}>
             {continueFamilies.map(({ entry, family }) => (
               <View key={entry.familyId}>
@@ -120,6 +134,7 @@ export default function Tonight() {
       <Caption style={styles.foot}>
         Every session is written, safety-reviewed, and produced before it reaches you. Nothing is
         generated while you listen. 🎧 Best with headphones.
+        {prefs.heatCap !== 'spicy' ? ' The other room opens when you set heat to Close in You.' : ''}
       </Caption>
     </Screen>
   );

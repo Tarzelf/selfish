@@ -7,9 +7,27 @@ export type HeatLevel = 'comfort' | 'slow-burn' | 'spicy';
 export const HEAT_ORDER: HeatLevel[] = ['comfort', 'slow-burn', 'spicy'];
 
 export const HEAT_LABEL: Record<HeatLevel, string> = {
-  comfort: 'Comfort',
-  'slow-burn': 'Slow burn',
-  spicy: 'Spicy',
+  comfort: 'Soft',
+  'slow-burn': 'Warm',
+  spicy: 'Close',
+};
+
+/** Honest, roommate-safe. The heat is in the audio — the label tells her what feeling she opted into. */
+export const HEAT_HINT: Record<HeatLevel, string> = {
+  comfort: 'Held. Sleepy. Aftercare. The supported feeling — and the cover story.',
+  'slow-burn': 'Tension. Being wanted. The movie in your head. Evenings, not afternoons.',
+  spicy: 'In your ear. Breath. Want. Loops you will open more than once today.',
+};
+
+export type SessionFormat = 'close' | 'story' | 'rest';
+
+export type RecycleKey = 'again' | 'slower' | 'closer' | 'after';
+
+export const RECYCLE_LABEL: Record<RecycleKey, string> = {
+  again: 'Again',
+  slower: 'Slower',
+  closer: 'Closer',
+  after: 'After',
 };
 
 export type Mood = 'comforted' | 'adored' | 'teased' | 'wanted' | 'missed' | 'in-charge';
@@ -59,6 +77,8 @@ export interface SessionVariant {
 export interface SessionFamily {
   id: string;
   shelf: Shelf;
+  /** Close = 3–7 min dirty-talk loops. Story = 8–20 min Warm narrative. Rest = sleep. */
+  format: SessionFormat;
   title: string;
   blurb: string;
   /** Relationship dynamic, e.g. "Boyfriend experience", "Praise", "Friends to lovers". */
@@ -78,6 +98,8 @@ export interface SessionFamily {
   rating: number;
   /** Play-derived chips, e.g. "loved for: buildup". */
   lovedFor: string[];
+  /** Close loops only: variant ids for the four recycle buttons. Again replays the current take. */
+  recycles?: Partial<Record<Exclude<RecycleKey, 'again'>, string>>;
 }
 
 export interface ContinueEntry {
@@ -103,6 +125,8 @@ export interface Preferences {
   hardLimits: string[];
   /** Neutral lock-screen/Now Playing metadata + blurred artwork. */
   discreetMode: boolean;
+  /** First Close session showed content notes. Later loops skip the literary gate. */
+  closeNotesAcked: boolean;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = {
@@ -115,6 +139,22 @@ export const DEFAULT_PREFERENCES: Preferences = {
   favoriteVoiceIds: [],
   hardLimits: [],
   discreetMode: true,
+  closeNotesAcked: false,
+};
+
+/** Last Close loop — the ritual home cues this, and finished loops never vanish. */
+export interface RitualMemory {
+  lastFamilyId: string | null;
+  lastVariantId: string | null;
+  lastFinishedFamilyId: string | null;
+  lastFinishedVariantId: string | null;
+}
+
+export const EMPTY_RITUAL: RitualMemory = {
+  lastFamilyId: null,
+  lastVariantId: null,
+  lastFinishedFamilyId: null,
+  lastFinishedVariantId: null,
 };
 
 /** Tags a user may exclude globally during onboarding. */

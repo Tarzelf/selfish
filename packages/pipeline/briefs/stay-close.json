@@ -1,0 +1,23 @@
+{
+  "familyId": "f-stay",
+  "shelf": "desire",
+  "format": "close",
+  "title": "Stay",
+  "dynamic": "In your ear",
+  "voiceId": "v-jasper",
+  "moods": ["wanted", "adored"],
+  "tags": ["boyfriend", "close", "praise"],
+  "premise": "No plot. Two established adults, already in a private room, door closed. Second-person ASMR dirty talk: proximity, breath, praise, want. Written to be replayed, not finished. Consent-forward. All characters are established adults.",
+  "beats": [
+    "He is already close. Tells her not to move. Breath.",
+    "What he wants, said plainly, in her ear.",
+    "Praise for how she sounds, how she stays.",
+    "Does not leave. Stay. Aftercare beat at the end of Closer; After variant is aftercare-only."
+  ],
+  "variants": [
+    { "label": "Again", "heat": "spicy", "pace": "measured", "extendedBuildup": false, "targetMinutes": 4 },
+    { "label": "Slower", "heat": "spicy", "pace": "slow", "extendedBuildup": false, "targetMinutes": 6 },
+    { "label": "Closer", "heat": "spicy", "pace": "measured", "extendedBuildup": false, "targetMinutes": 5 },
+    { "label": "After", "heat": "comfort", "pace": "slow", "extendedBuildup": false, "targetMinutes": 2 }
+  ]
+}

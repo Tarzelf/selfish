@@ -2,10 +2,11 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { StyleSheet, Switch, Text, View } from 'react-native';
 
+import { HeatChoice } from '@/components/heat-choice';
 import { Body, Button, Caption, Card, Chip, Display, Divider, Heading, Screen } from '@/components/ui';
 import { fonts, palette, spacing } from '@/constants/theme';
 import { useAppState } from '@/lib/store';
-import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS } from '@/lib/types';
+import { LIMIT_TAGS } from '@/lib/types';
 
 export default function You() {
   const router = useRouter();
@@ -25,12 +26,8 @@ export default function You() {
       <Body dim>Your settings, your limits, your business.</Body>
 
       <Heading>Heat cap</Heading>
-      <Caption>Nothing above this ever appears, anywhere in the app.</Caption>
-      <View style={styles.chipWrap}>
-        {(['comfort', 'slow-burn', 'spicy'] as HeatLevel[]).map((h) => (
-          <Chip key={h} label={HEAT_LABEL[h]} selected={prefs.heatCap === h} onPress={() => setPrefs({ heatCap: h })} />
-        ))}
-      </View>
+      <Caption>Nothing above this ever appears, anywhere in the app. Close opens the other room.</Caption>
+      <HeatChoice value={prefs.heatCap} onChange={(heatCap) => setPrefs({ heatCap })} />
 
       <Heading>Hard limits</Heading>
       <Caption>Themes selected here are filtered out everywhere, permanently.</Caption>

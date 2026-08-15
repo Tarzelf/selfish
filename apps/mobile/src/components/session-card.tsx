@@ -33,8 +33,8 @@ export function SessionCard({ family, compact }: { family: SessionFamily; compac
         <View style={styles.content}>
           <View style={styles.topRow}>
             <Text style={styles.dynamic} numberOfLines={1}>
-              {family.dynamic.toUpperCase()}
-              {series ? `  ·  ${series.title.toUpperCase()} E${family.episode}` : ''}
+              {family.format === 'close' ? 'LOOP' : family.dynamic.toUpperCase()}
+              {family.format !== 'close' && series ? `  ·  ${series.title.toUpperCase()} E${family.episode}` : ''}
             </Text>
             <HeatBadge heat={maxHeat} locked={!heatAllowed(maxHeat)} />
           </View>
@@ -42,8 +42,10 @@ export function SessionCard({ family, compact }: { family: SessionFamily; compac
             {family.title}
           </Text>
           <Text style={styles.meta} numberOfLines={1}>
-            {voice?.name} · {durationLabel} · {family.variants.length}{' '}
-            {family.variants.length === 1 ? 'version' : 'versions'}
+            {voice?.name} · {durationLabel} ·{' '}
+            {family.format === 'close'
+              ? `${family.variants.length} recycles`
+              : `${family.variants.length} ${family.variants.length === 1 ? 'version' : 'versions'}`}
             {hasAudio ? '  ·  ▶ preview' : ''}
           </Text>
         </View>

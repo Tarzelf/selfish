@@ -4,11 +4,12 @@ import { useRouter } from 'expo-router';
 import React, { useMemo, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { HeatChoice } from '@/components/heat-choice';
 import { Body, Button, Caption, Chip, Display, Screen } from '@/components/ui';
 import { fonts, palette, radius, spacing } from '@/constants/theme';
 import { VOICE_PREVIEW_AUDIO } from '@/data/audio-map';
 import { useAppState } from '@/lib/store';
-import { HEAT_LABEL, type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
+import { type HeatLevel, LIMIT_TAGS, MOODS, type Mood } from '@/lib/types';
 
 type Step = 'welcome' | 'age' | 'honesty' | 'moods' | 'heat' | 'limits' | 'done';
 
@@ -206,16 +207,13 @@ export default function Onboarding() {
 
         {step === 'heat' && (
           <View style={styles.stepBody}>
-            <Display>Set your heat</Display>
+            <Display>What do you want first?</Display>
             <Body dim style={styles.lede}>
-              This caps what appears anywhere in the app. It starts gentle; turn it up (or down) in
-              Settings whenever you like. Nothing above your setting is ever shown.
+              This is the door. Soft is the cover story — held, sleepy, supported. Close is why
+              you will open this twice in one day. Nothing above your pick is ever shown. Change
+              it anytime in You.
             </Body>
-            <View style={styles.chipWrap}>
-              {(['comfort', 'slow-burn', 'spicy'] as HeatLevel[]).map((h) => (
-                <Chip key={h} label={HEAT_LABEL[h]} selected={heatCap === h} onPress={() => setHeatCap(h)} />
-              ))}
-            </View>
+            <HeatChoice value={heatCap} onChange={setHeatCap} />
             <View style={styles.spacer} />
             <Button label="Continue" onPress={next} />
           </View>

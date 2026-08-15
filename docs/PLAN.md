@@ -39,9 +39,11 @@ Two shelves. One engine. Radical honesty about how it's made.
 - **Explicit tier: deferred post-launch entirely** (web-only when it comes; zero in-app references ever — the web link in iOS is checkout-only with neutral copy).
 - Focus/adaptive-soundscape shelf: cut from v1 (debate D1); ambient production assets live on in Rest.
 
-### 4.2 The hero: the variation engine
+### 4.2 The hero: Close loops (spicy) and the variation engine (warm)
 
-Every session ships as a **family**: the same story rendered in ~4 deliberate variants along heat, pace, and buildup. The player exposes it as **"More like this, but…"** — softer · slower · more buildup · less explicit — an instant switch that keeps place in the story where possible.
+**Close is the unit of value when she opts spicy.** 3–7 min, no plot, ASMR dirty talk, four recycles (Again · Slower · Closer · After). Home becomes a ritual: one voice, one play, last loop cued. See `docs/EXPERIENCE.md`.
+
+Warm stories still ship as a **family**: the same story rendered in ~4 deliberate variants along heat, pace, and buildup. The player exposes it as **"More like this, but…"** — softer · slower · more buildup · less explicit — an instant switch that keeps place in the story where possible.
 
 - Launch catalog: **100 Desire session-families (≈400 renders) + 30 Rest sessions**, deep in three dynamics (BFE, praise, friends-to-lovers), plus F4F and NB-voiced sessions at launch (≥15 sessions; roster of ~6 voices: 3 M, 2 F, 1 NB).
 - Marketed as "hundreds of ways to hear it," never as "150 tracks."
